@@ -1,0 +1,19 @@
+#
+# An unexpected error has occurred (6)
+#
+Stack:
+/lib/x86_64-linux-gnu/libc.so.6(+0x3ef20) [0x7fe69c623f20]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0xc7) [0x7fe69c623e97]
+/lib/x86_64-linux-gnu/libc.so.6(abort+0x141) [0x7fe69c625801]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/libstdc++.so.6(_ZN9__gnu_cxx27__verbose_terminate_handlerEv+0x155) [0x7fe69cc4ba95]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/libstdc++.so.6(+0x5dc06) [0x7fe69cc49c06]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/libstdc++.so.6(+0x5dc33) [0x7fe69cc49c33]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/libstdc++.so.6(+0x5de5e) [0x7fe69cc49e5e]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/librdi_labtoolsRT.so(+0x388ae) [0x7fe64ca7c8ae]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/librdi_labtoolsRT.so(+0x3b10f) [0x7fe64ca7f10f]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/librdi_labtoolsRT.so(+0x3b1a8) [0x7fe64ca7f1a8]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/librdi_labtoolsRT.so(+0x487f0) [0x7fe64ca8c7f0]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/librdi_labtoolsRT.so(LRT::Engine::run()+0x353) [0x7fe64ca77c93]
+/opt/Xilinx/Vivado/2016.4/lib/lnx64.o/libboost_thread.so(+0xeff5) [0x7fe69a782ff5]
+/lib/x86_64-linux-gnu/libpthread.so.0(+0x76db) [0x7fe69c02f6db]
+/lib/x86_64-linux-gnu/libc.so.6(clone+0x3f) [0x7fe69c70688f]
