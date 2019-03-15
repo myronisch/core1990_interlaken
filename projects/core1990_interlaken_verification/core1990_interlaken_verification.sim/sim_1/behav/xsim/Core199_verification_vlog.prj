@@ -1,0 +1,25 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "../../../../core1990_interlaken_verification.srcs/sources_1/ip/clk_40MHz" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/sim/gtwizard_ultrascale_v1_7_gtye4_channel.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/sim/interlaken_0_gt_gtye4_channel_wrapper.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/sim/gtwizard_ultrascale_v1_7_gtye4_common.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/sim/interlaken_0_gt_gtye4_common_wrapper.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/sim/interlaken_0_gt_gtwizard_gtye4.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/sim/interlaken_0_gt_gtwizard_top.v" \
+
+verilog work  --include "../../../../core1990_interlaken_verification.srcs/sources_1/ip/clk_40MHz" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/sim/interlaken_0_gt.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/interlaken_v2_4_0/interlaken_0_wrapper.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/interlaken_v2_4_0/interlaken_0_ultrascale_tx_userclk.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/interlaken_v2_4_0/interlaken_0_ultrascale_rx_userclk.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/interlaken_0.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/RX_FIFO/sim/RX_FIFO.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/TX_FIFO/sim/TX_FIFO.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/clk_40MHz/clk_40MHz_clk_wiz.v" \
+"../../../../core1990_interlaken_verification.srcs/sources_1/ip/clk_40MHz/clk_40MHz.v" \
+
+# compile glbl module
+verilog work "glbl.v"
+
+# Do not sort compile order
+nosort

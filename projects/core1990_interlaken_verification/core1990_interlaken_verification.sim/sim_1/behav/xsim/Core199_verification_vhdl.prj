@@ -1,0 +1,21 @@
+# compile vhdl design source files
+vhdl work  \
+"../../../../../../sources/transmitter/framing_burst.vhd" \
+"../../../../../../sources/transmitter/framing_meta.vhd" \
+"../../../../../../sources/transmitter/scrambler.vhd" \
+"../../../../../../sources/transmitter/encoder.vhd" \
+"../../../../../../sources/transmitter/interlaken_transmitter.vhd" \
+"../../../../../../sources/receiver/deframing_burst.vhd" \
+"../../../../../../sources/receiver/deframing_meta.vhd" \
+"../../../../../../sources/receiver/descrambler.vhd" \
+"../../../../../../sources/receiver/decoder.vhd" \
+"../../../../../../sources/receiver/interlaken_receiver.vhd" \
+"../../../../../../sources/interlaken_interface.vhd" \
+"../../../../../../sources/test/data_generator.vhd" \
+"../../../../../../sources/ip_cores/Transceiver_10g_64b67b_sim_netlist.vhdl" \
+"../../../../../../sources/crc/crc-24.vhd" \
+"../../../../../../sources/crc/crc-32.vhd" \
+"../../../../../../sources/test/Core1990_verification.vhd" \
+
+# Do not sort compile order
+nosort

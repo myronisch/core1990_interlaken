@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Webtalk v2018.1 (64-bit)
+# SW Build 2188600 on Wed Apr  4 18:39:19 MDT 2018
+# IP Build 2185939 on Wed Apr  4 20:55:05 MDT 2018
+# Start of session at: Wed Mar 13 15:20:06 2019
+# Process ID: 16652
+# Current directory: /home/leover/Desktop/Core1990_Verification/projects/core1990_interlaken_verification/core1990_interlaken_verification.sim/sim_1/behav/xsim
+# Command line: wbtcv -mode batch -source /home/leover/Desktop/Core1990_Verification/projects/core1990_interlaken_verification/core1990_interlaken_verification.sim/sim_1/behav/xsim/xsim.dir/Core199_verification_behav/webtalk/xsim_webtalk.tcl -notrace
+# Log file: /home/leover/Desktop/Core1990_Verification/projects/core1990_interlaken_verification/core1990_interlaken_verification.sim/sim_1/behav/xsim/webtalk.log
+# Journal file: /home/leover/Desktop/Core1990_Verification/projects/core1990_interlaken_verification/core1990_interlaken_verification.sim/sim_1/behav/xsim/webtalk.jou
+#-----------------------------------------------------------
+source /home/leover/Desktop/Core1990_Verification/projects/core1990_interlaken_verification/core1990_interlaken_verification.sim/sim_1/behav/xsim/xsim.dir/Core199_verification_behav/webtalk/xsim_webtalk.tcl -notrace
+INFO: [Common 17-206] Exiting Webtalk at Wed Mar 13 15:20:07 2019...

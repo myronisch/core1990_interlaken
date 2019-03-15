@@ -1,0 +1,8 @@
+set_property SRC_FILE_INFO {cfile:/home/leover/Desktop/Core1990_Verification/projects/core1990_interlaken_verification/core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/synth/interlaken_0_gt.xdc rfile:../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/ip_0/synth/interlaken_0_gt.xdc id:1 order:EARLY scoped_inst:inst/interlaken_0_gt_i/inst} [current_design]
+set_property SRC_FILE_INFO {cfile:/home/leover/Desktop/Core1990_Verification/projects/core1990_interlaken_verification/core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/synth/interlaken_0.xdc rfile:../../../core1990_interlaken_verification.srcs/sources_1/ip/interlaken_0/synth/interlaken_0.xdc id:2 order:EARLY scoped_inst:inst} [current_design]
+set_property src_info {type:SCOPED_XDC file:1 line:57 export:INPUT save:INPUT read:READ} [current_design]
+set_property LOC GTYE4_CHANNEL_X1Y48 [get_cells -hierarchical -filter {NAME =~ *gen_channel_container[36].*gen_gtye4_channel_inst[0].GTYE4_CHANNEL_PRIM_INST}]
+set_property src_info {type:SCOPED_XDC file:1 line:66 export:INPUT save:INPUT read:READ} [current_design]
+set_case_analysis 1 [get_pins {inst/interlaken_0_gt_i/inst/gen_gtwizard_gtye4_top.interlaken_0_gt_gtwizard_gtye4_inst/gen_gtwizard_gtye4.gen_pwrgood_delay_inst[0].delay_powergood_inst/gen_powergood_delay.pwr_on_fsm_reg/Q}]
+set_property src_info {type:SCOPED_XDC file:2 line:55 export:INPUT save:INPUT read:READ} [current_design]
+set_property LOC ILKNE4_X1Y8 [get_cells -hierarchical -filter {NAME =~ *inst/i_ilkn_top_inst/* && REF_NAME==ILKNE4}]

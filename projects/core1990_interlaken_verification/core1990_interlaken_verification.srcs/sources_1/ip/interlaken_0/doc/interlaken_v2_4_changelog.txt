@@ -1,0 +1,185 @@
+2018.1:
+ * Version 2.4
+ * Bug Fix: Updated OOBFC RTL for RX CRC issue on board
+ * Feature Enhancement: Added .h file for AXI4-register map details for
+ * Revision change in one or more subcores
+
+2017.4:
+ * Version 2.3
+ * No changes
+
+2017.3:
+ * Version 2.3
+ * Feature Enhancement: CR
+ * Feature Enhancement: Updated for IPI board assistance support for vcu118 board
+
+2017.2:
+ * Version 2.2
+ * Feature Enhancement: GTWIZ LOCATE USERE DATA WIDTH changed to Example design when GT in example design
+ * Feature Enhancement: CR
+ * Feature Enhancement: Updated GTWIZ version from 1.6 to 1.7
+
+2017.1:
+ * Version 2.1
+ * Port Change: gt_refclk_out port added when shared logic is inside the core configurations
+ * Feature Enhancement: CR fixes
+ * Feature Enhancement: ZynqultraScale plus RFSoc support added
+
+2016.4:
+ * Version 2.0 (Rev. 1)
+ * Port Change: gtwiz_reset_tx_datapath and gtwiz_reset_rx_datapath ports made visble for all configurations
+ * Feature Enhancement: CR fixes
+
+2016.3:
+ * Version 2.0
+ * Port Change: Ports added for GT out of IP
+ * Feature Enhancement: GT outside the IP
+ * Feature Enhancement: IPI and designer assistance support
+ * Feature Enhancement: Added 25 Line rate support for Ultra Scale Plus -2lV speed grade devices
+
+2016.2:
+ * Version 1.10
+ * Retransmission enabled in GUI for ultrascale plus devices
+
+2016.1:
+ * Version 1.9
+ * Retransmission enabled in GUI
+ * Both QPLL0 and QPLL1 support for GT DRP
+ * Added ability to change initial clock frequency
+ * Improved shared logic option
+ * Support for the clocking and reset logic wrappers outside the core when shared logic is in example design
+ * Changes to HDL library management to support Vivado IP simulation library
+
+2015.4.2:
+ * Version 1.8
+ * No changes
+
+2015.4.1:
+ * Version 1.8
+ * No changes
+
+2015.4:
+ * Version 1.8
+ * OOBFC constraints updated and included OOBFC generator and monitor
+ * Added kintex095 ffva1156 package support
+ * Added Zynq Ultrascale plus devices support
+
+2015.3:
+ * Version 1.7
+ * AXI4-Lite support added for control and status
+ * GTWIZ version is updated to 1_6
+ * IP revision number added to HDL module, library, and include file names, to support designs with both locked and upgraded IP instances
+ * Updated the port names for the reset ports
+ * CLKWIZ version is updated to 5_2
+ * Added support for UltrascalePlus devices
+ * Kintex095 device new parts support added
+ * OOBFC feature enabled back
+
+2015.2.1:
+ * Version 1.6
+ * No changes
+
+2015.2:
+ * Version 1.6
+ * Example design Code optimization
+ * 3.125G lane rate support for all the lanes from 1 to 12
+ * DISABLE SKIP WORD and BYPASS MODE options added in GUI Tab-I
+ * Rate Limiter GUI option enabled in GUI Tab-2
+
+2015.1:
+ * Version 1.5
+ * LANE 1 support for all the lane rates
+ * OOBFC 32,64 and 20148 calendar length support with 12 Lanes
+ * Burstshort all the possible values support for all the BURSTMAX values
+
+2014.4.1:
+ * Version 1.4 (Rev. 1)
+ * Updated latest ultrascale devices/packages support
+ * Multiple IBFUDS instantiated and added differential clocl pin pairs when Lane_rate > 16.375 Gb/s as per UG578
+
+2014.4:
+ * Version 1.4
+ * Different Lane rates with all number of lane combiantions from 2 to 12
+ * Error Injection test case addition
+ * Support for XCVU160 and XCVU190 devices
+ * Added core_drp_reset port
+
+2014.3:
+ * Version 1.3
+ * GT group selection in GUI tab-3
+ * Auto filling of best and possible GT locations for the selected ILKN core in GUI tab-3
+ * Packet Gen/Mon updated with burst mode
+ * Licensing the ILKN core
+ * BURSTSHORT values supports 64,96 and 128 only due SW limitation
+ * Supporting different reference clock options for GT
+
+2014.2:
+ * Version 1.2
+ * ILKN core selection from GUI tab-3
+ * Auto filling of best possible GT locations for the selected ILKN core in GUI tab-3
+ * GTH Implementation Support
+ * GTY Implementation Support
+
+2014.1:
+ * Version 1.1
+ * GTH Implementation on XCVU095-FFVD1924 device without bitstream support. This is due to the timing information not being accurate; designs may fail timing
+ * GTY simulation only
+ * Lane rates supported 12x12.5G, 6x25G
+ * Synchronous / Asynchronous Clocking mode
+ * MetaFrame 256 upto 8192
+ * OOBFC for different calendar lengths
+ * IBFC for different calendar lengths
+ * Shared Logic in core / example design
+ * XSIM / Questa (10.2a) / VCS (H-2013.06-sp1) / IES (12-20.016)
+
+2013.4:
+ * Version 1.0
+ * Initial release
+ * 12 x 12.5Gbps supported
+ * Note - This core is released for simulation only. Hardware implementation is not supported with this release
+
+(c) Copyright 2013 - 2018 Xilinx, Inc. All rights reserved.
+
+This file contains confidential and proprietary information
+of Xilinx, Inc. and is protected under U.S. and
+international copyright and other intellectual property
+laws.
+
+DISCLAIMER
+This disclaimer is not a license and does not grant any
+rights to the materials distributed herewith. Except as
+otherwise provided in a valid license issued to you by
+Xilinx, and to the maximum extent permitted by applicable
+law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
+WITH ALL FAULTS, AND XILINX HEREBY DISCLAIMS ALL WARRANTIES
+AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
+BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
+INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
+(2) Xilinx shall not be liable (whether in contract or tort,
+including negligence, or under any other theory of
+liability) for any loss or damage of any kind or nature
+related to, arising under or in connection with these
+materials, including for any direct, or any indirect,
+special, incidental, or consequential loss or damage
+(including loss of data, profits, goodwill, or any type of
+loss or damage suffered as a result of any action brought
+by a third party) even if such damage or loss was
+reasonably foreseeable or Xilinx had been advised of the
+possibility of the same.
+
+CRITICAL APPLICATIONS
+Xilinx products are not designed or intended to be fail-
+safe, or for use in any application requiring fail-safe
+performance, such as life-support or safety devices or
+systems, Class III medical devices, nuclear facilities,
+applications related to the deployment of airbags, or any
+other applications that could lead to death, personal
+injury, or severe property or environmental damage
+(individually and collectively, "Critical
+Applications"). Customer assumes the sole risk and
+liability of any use of Xilinx products in Critical
+Applications, subject only to applicable laws and
+regulations governing limitations on product liability.
+
+THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
+PART OF THIS FILE AT ALL TIMES.

@@ -1,0 +1,1 @@
+vopt -64 +acc -l elaborate.log -L xil_defaultlib -L xpm -L gtwizard_ultrascale_v1_7_3 -L work -L interlaken_v2_4_0 -L unisims_ver -L unimacro_ver -L secureip -work work work.interlaken_0 work.glbl -o interlaken_0_opt

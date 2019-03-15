@@ -1,0 +1,4 @@
+Running: xsim.dir/Core199_verification_behav/xsimk -simmode gui -wdb Core199_verification_behav.wdb -simrunnum 0 -socket 53749
+Design successfully loaded
+Design Loading Memory Usage: 361124 KB (Peak: 361124 KB)
+Design Loading CPU Usage: 1000 ms

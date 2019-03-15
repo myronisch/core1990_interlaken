@@ -1,0 +1,236 @@
+Vivado Simulator 2018.1
+Copyright 1986-1999, 2001-2017 Xilinx, Inc. All Rights Reserved.
+Running: /home/leover/Vivado/2018.1/bin/unwrapped/lnx64.o/xelab -wto 0c60939e885346d3a17bd940637aeb3f --incr --debug typical --relax --mt 8 -L gtwizard_ultrascale_v1_7_3 -L xil_defaultlib -L work -L interlaken_v2_4_0 -L fifo_generator_v13_2_2 -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot Core199_verification_behav work.Core199_verification work.glbl -log elaborate.log 
+Using 8 slave threads.
+Starting static elaboration
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1fs
+Compiling package std.standard
+Compiling package std.textio
+Compiling package ieee.std_logic_1164
+Compiling package ieee.numeric_std
+Compiling package unisim.vcomponents
+Compiling package ieee.std_logic_arith
+Compiling package ieee.vital_timing
+Compiling package ieee.vital_primitives
+Compiling package unisim.vpkg
+Compiling package ieee.std_logic_unsigned
+Compiling package ieee.std_logic_signed
+Compiling package vl.vl_types
+Compiling module work.glbl
+Compiling module unisims_ver.IBUFDS
+Compiling module unisims_ver.MMCME4_ADV(CLKFBOUT_MULT_F=6.0,C...
+Compiling module unisims_ver.BUFG
+Compiling module work.clk_40MHz_clk_wiz
+Compiling module work.clk_40MHz
+Compiling secureip modules ...
+Compiling architecture gtxe2_channel_v of entity unisim.GTXE2_CHANNEL [\GTXE2_CHANNEL(align_comma_enabl...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_multi_gt [transceiver_10g_64b67b_transceiv...]
+Compiling architecture lut1_v of entity unisim.LUT1 [\LUT1(init="0001")(0,3)\]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0110")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01111000")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0111111110000000")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01111111111111111000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01111111111111111111...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1001")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11010010")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111111110")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1101111100100000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01111111111111111111...]
+Compiling architecture fdre_v of entity unisim.FDRE [fdre_default]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000100000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00100010001000101010...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1011")(0,3)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000001000011000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000010000")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000000000000100")(0...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0010")(0,3)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10001010000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111110110000...]
+Compiling architecture fdse_v of entity unisim.FDSE [\FDSE(init='0')\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11111110")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11011111111111111111...]
+Compiling architecture carry4_v of entity unisim.CARRY4 [carry4_default]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001110...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111110110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111011110000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11011111111111111111...]
+Compiling architecture fdce_v of entity unisim.FDCE [fdce_default]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10111111")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111101110000...]
+Compiling architecture fdre_v of entity unisim.FDRE [\FDRE(init='1')\]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0001")(0,3)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00110100001101000111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111110110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000001000...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_6 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_7 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111011111110...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111110111111101111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111101111")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="01010101101011110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11101110111111101111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00001111000011100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000100000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001100...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111100010000")(0...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_8 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101010111010100000...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_9 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_10 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_11 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_12 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111100000010")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000100000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1110")(0,3)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="0111")(0,3)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111011111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1010101100000000")(0...]
+Compiling architecture lut2_v of entity unisim.LUT2 [\LUT2(init="1000")(0,3)\]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11111000")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10111111111111111111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1110111111111111")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="10101001")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1010101010101001")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="10101010101010101010...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10101010101010101010...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00000010")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture fdse_v of entity unisim.FDSE [fdse_default]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM [transceiver_10g_64b67b_transceiv...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111011...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0010111100100000")(0...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000000011110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000010000000000000...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="11111101")(0,7)\]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="10001000000010001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000010000000100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111000000001111...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="00001000")(0,7)\]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="00000000100000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111110110100...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111110111111110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111000000001111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="01000100000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111110110000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1110111111100000")(0...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000010000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000001111...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_1 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_2 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_3 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_4 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_5 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000100000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000001...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="11111111111111111111...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut6_v of entity unisim.LUT6 [\LUT6(init="00000000000000000000...]
+Compiling architecture lut5_v of entity unisim.LUT5 [\LUT5(init="11111111111111110001...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0111111111111111")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111011111")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111111111101")(0...]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="0000011100000000")(0...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_init [transceiver_10g_64b67b_transceiv...]
+Compiling architecture gtxe2_common_v of entity unisim.GTXE2_COMMON [\GTXE2_COMMON(qpll_fbdiv="010100...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_common [transceiver_10g_64b67b_transceiv...]
+Compiling architecture lut3_v of entity unisim.LUT3 [\LUT3(init="01110100")(0,7)\]
+Compiling architecture lut4_v of entity unisim.LUT4 [\LUT4(init="1111111101000000")(0...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_common_reset [transceiver_10g_64b67b_transceiv...]
+Compiling architecture ibufds_gte2_v of entity unisim.IBUFDS_GTE2 [\IBUFDS_GTE2(0,1)\]
+Compiling architecture bufg_v of entity unisim.BUFG [bufg_default]
+Compiling architecture mmcme2_adv_v of entity unisim.MMCME2_ADV [\MMCME2_ADV(clkfbout_mult_f=2.0,...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE_0 [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_USRCLK_SOURCE [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b_Transceiver_10g_64b67b_support [transceiver_10g_64b67b_transceiv...]
+Compiling architecture structure of entity work.Transceiver_10g_64b67b [transceiver_10g_64b67b_default]
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2_sync_stag...
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2_bhv_ver_a...
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2_CONV_VER(...
+Compiling module fifo_generator_v13_2_2.fifo_generator_vlog_beh(C_DATA_C...
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2(C_DATA_CO...
+Compiling module work.TX_FIFO
+Compiling architecture rtl of entity work.CRC_24 [\CRC_24(crc_width=32,g_poly="000...]
+Compiling architecture framing of entity work.Burst_Framer [\Burst_Framer(burstmax=256,burst...]
+Compiling architecture rtl of entity work.CRC_32 [\CRC_32(0,31)(0,31)\]
+Compiling architecture framing of entity work.Meta_Framer [\Meta_Framer(packetlength=2028)\]
+Compiling architecture scrambling of entity work.Scrambler [scrambler_default]
+Compiling architecture encoding of entity work.Encoder [encoder_default]
+Compiling architecture transmitter of entity work.Interlaken_Transmitter [\Interlaken_Transmitter(burstmax...]
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2_sync_stag...
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2_bhv_ver_a...
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2_CONV_VER(...
+Compiling module fifo_generator_v13_2_2.fifo_generator_vlog_beh(C_DATA_C...
+Compiling module fifo_generator_v13_2_2.fifo_generator_v13_2_2(C_DATA_CO...
+Compiling module work.RX_FIFO
+Compiling architecture deframing of entity work.Burst_Deframer [burst_deframer_default]
+Compiling architecture deframing of entity work.Meta_Deframer [meta_deframer_default]
+Compiling architecture behavior of entity work.Descrambler [\Descrambler(packetlength=2028)\]
+Compiling architecture decoding of entity work.Decoder [decoder_default]
+Compiling architecture receiver of entity work.Interlaken_Receiver [\Interlaken_Receiver(packetlengt...]
+Compiling architecture interface of entity work.interlaken_interface [\interlaken_interface(burstmax=2...]
+Compiling architecture rtl of entity work.data_generator [data_generator_default]
+Compiling module unisims_ver.IBUFDS_GTE4
+Compiling module unisims_ver.BUFG_GT
+Compiling module work.interlaken_0_cdc_sync
+Compiling module work.interlaken_0_ultrascale_tx_userc...
+Compiling module work.interlaken_0_ultrascale_rx_userc...
+Compiling secureip modules ...
+Compiling module unisims_ver.GTYE4_COMMON(BIAS_CFG2=16'b01001...
+Compiling module xil_defaultlib.gtwizard_ultrascale_v1_7_3_gtye4...
+Compiling module xil_defaultlib.interlaken_0_gt_gtye4_common_wra...
+Compiling secureip modules ...
+Compiling module unisims_ver.GTYE4_CHANNEL(ADAPT_CFG0=16'b0,A...
+Compiling module xil_defaultlib.gtwizard_ultrascale_v1_7_3_gtye4...
+Compiling module xil_defaultlib.interlaken_0_gt_gtye4_channel_wr...
+Compiling module gtwizard_ultrascale_v1_7_3.gtwizard_ultrascale_v1_7_3_gtye4...
+Compiling module gtwizard_ultrascale_v1_7_3.gtwizard_ultrascale_v1_7_3_bit_s...
+Compiling module gtwizard_ultrascale_v1_7_3.gtwizard_ultrascale_v1_7_3_reset...
+Compiling module gtwizard_ultrascale_v1_7_3.gtwizard_ultrascale_v1_7_3_reset...
+Compiling module gtwizard_ultrascale_v1_7_3.gtwizard_ultrascale_v1_7_3_gtwiz...
+Compiling module gtwizard_ultrascale_v1_7_3.gtwizard_ultrascale_v1_7_3_gtwiz...
+Compiling module gtwizard_ultrascale_v1_7_3.gtwizard_ultrascale_v1_7_3_gtwiz...
+Compiling module xil_defaultlib.interlaken_0_gt_gtwizard_gtye4(C...
+Compiling module xil_defaultlib.interlaken_0_gt_gtwizard_top(C_C...
+Compiling module work.interlaken_0_gt
+Compiling module work.interlaken_0_endianness_swapper
+Compiling secureip modules ...
+Compiling module unisims_ver.ILKNE4(CTL_RX_LAST_LANE=4'b0,CTL...
+Compiling module interlaken_v2_4_0.interlaken_v2_4_0_top4(CTL_RX_MF...
+Compiling module work.interlaken_0_wrapper(C_NUM_LANES...
+Compiling module work.interlaken_0
+Compiling architecture test of entity work.core199_verification
+Built simulation snapshot Core199_verification_behav

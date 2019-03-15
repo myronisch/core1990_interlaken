@@ -1,0 +1,2 @@
+RX_FIFO.v,verilog,work,../../../../core1990_interlaken_verification.srcs/sources_1/ip/RX_FIFO/sim/RX_FIFO.v,
+glbl.v,Verilog,work,glbl.v
