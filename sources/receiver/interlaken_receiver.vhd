@@ -31,10 +31,11 @@ entity Interlaken_Receiver is
 		Decoder_lock      : out std_logic;
 		Descrambler_lock  : out std_logic;
 		
-		Data_Descrambler : out std_logic_vector(63 downto 0);
-		Data_Decoder     : out std_logic_vector(63 downto 0);
+		Data_Descrambler : out std_logic_vector(66 downto 0);
+		Data_Decoder     : out std_logic_vector(66 downto 0);
 		
 		RX_FIFO_Full         : out std_logic;
+		RX_FIFO_Empty        : out std_logic;
 		RX_FIFO_Read         : in std_logic;
 		
 		RX_Link_Up      : out std_logic;
@@ -76,15 +77,15 @@ architecture Receiver of Interlaken_Receiver is
     signal RX_FIFO_Write : std_logic;
     signal Data_valid_Burst_Out : std_logic;
     signal Flowcontrol : std_logic_vector (15 downto 0);
-    signal FIFO_empty : std_logic;
+    --signal FIFO_empty : std_logic;
     
-    signal Data_Meta_Out : std_logic_vector(63 downto 0);
-    signal Data_Descrambler_Out : std_logic_vector(63 downto 0);
+    signal Data_Meta_Out : std_logic_vector(66 downto 0);
+    signal Data_Descrambler_Out : std_logic_vector(66 downto 0);
     signal Data_Control_Descrambler_Out : std_logic;
     signal Data_control_Meta_out : std_logic;
     signal Data_valid_Meta_out : std_logic;
     
-    signal Data_Decoder_Out : std_logic_vector(63 downto 0);
+    signal Data_Decoder_Out : std_logic_vector(66 downto 0);
     signal Data_Control_Decoder_Out, Data_valid_decoder_out : std_logic;
     signal Data_valid_Descrambler_out : std_logic;
     signal Lane_Number : std_logic_vector(3 downto 0);
@@ -111,7 +112,7 @@ begin
         rd_en           => RX_FIFO_Read,
         dout            => FIFO_Data_Out,
         full            => RX_FIFO_Full,
-        empty           => FIFO_Empty,
+        empty           => RX_FIFO_Empty,
         rd_data_count   => FIFO_Read_Count,
         wr_data_count   => FIFO_Write_Count,
         prog_full       => FIFO_prog_full,
@@ -125,8 +126,13 @@ begin
         reset       => reset,
         
         Data_in          => Data_Meta_Out,
-        Data_out         => Data_Burst_Out,
-        Data_control_in  => Data_Control_Meta_Out,
+        Data_out         => Data_Burst_Out(63 downto 0),
+        
+        SOP              => Data_Burst_Out(68),--: out std_logic;
+        EOP              => Data_Burst_Out(67),--: out std_logic;
+        EOP_valid        => Data_Burst_Out(66 downto 64),--: out std_logic_vector(2 downto 0);
+        
+       -- Data_control_in  => Data_Control_Meta_Out,
         
         Flowcontrol => RX_Flowcontrol,
         CRC24_Error => CRC24_Error,
@@ -146,8 +152,8 @@ begin
         
         Data_in          => Data_Descrambler_Out,
         Data_out         => Data_Meta_Out,
-        Data_control_in  => Data_Control_Descrambler_Out,
-        Data_control_out => Data_control_Meta_out,
+       -- Data_control_in  => Data_Control_Descrambler_Out,
+        --Data_control_out => Data_control_Meta_out,
         Data_valid_in    => Data_valid_Descrambler_out,
         Data_valid_out   => Data_valid_Meta_out
     );
@@ -165,8 +171,8 @@ begin
         
         Data_in          => Data_Decoder_Out,
         Data_out         => Data_Descrambler_Out,
-        Data_control_In  => Data_Control_Decoder_Out,
-        Data_control_Out => Data_control_Descrambler_Out,
+        --Data_control_In  => Data_Control_Decoder_Out,
+        --Data_control_Out => Data_control_Descrambler_Out,
         Data_valid_in    => Data_valid_decoder_out,
         Data_valid_out   => Data_valid_Descrambler_out,
         Lock             => Descrambler_In_lock,

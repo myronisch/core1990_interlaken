@@ -5,10 +5,10 @@ use ieee.numeric_std.all;
 entity Encoder is
     port(
         Clk          : in std_logic;                     -- Clock input
-        Data_In      : in std_logic_vector(63 downto 0); -- Data input
+        Data_In      : in std_logic_vector(66 downto 0); -- Data input
         Data_Out     : out std_logic_vector(66 downto 0);-- Encoded 67-bit output
         
-        Data_Control : in std_logic;                     -- Determines whether the word is data or control
+        --Data_Control : in std_logic;                     -- Determines whether the word is data or control
         Data_valid_in: in std_logic;
         Data_valid_out: out std_logic;
         
@@ -35,7 +35,7 @@ begin
             --Offset      <= (others => '0');
         elsif (rising_edge(clk)) then 
             if (encoder_en = '1' and Gearboxready = '1') then
-                Data_Temp(63 downto 0) := Data_In;
+                Data_Temp(63 downto 0) := Data_In(63 downto 0);
                 
                 Disparity_Data := 0;  -- Calculating disparity of incoming data
                 for i in 63 downto 0 loop
@@ -57,11 +57,7 @@ begin
                     end if;
                 end if;
                 
-                if(Data_Control = '1') then   -- Select word type
-                    Data_Temp(65 downto 64) := "10"; -- Control word
-                else
-                    Data_Temp(65 downto 64) := "01"; -- Data word
-                end if;
+                Data_Temp(65 downto 64) := Data_in(65 downto 64); -- Control ("10") / data word ("01")
                 
                 --------------------------------------------
 --                Offset_V := 32;       -- Debug to see average transmitted disparity

@@ -7,10 +7,13 @@ entity Burst_Deframer is
         Clk              : in std_logic;                     -- Clock input
         Reset		     : in std_logic;					 -- Reset decoder
         
-        Data_In          : in std_logic_vector(63 downto 0); -- Data input
-        Data_Out         : out std_logic_vector(68 downto 0); --Data output including SOP, EOP and EOP_valid
+        Data_In          : in std_logic_vector(66 downto 0); -- Data input
+        Data_Out         : out std_logic_vector(63 downto 0); --Data output
         
-        Data_Control_In  : in std_logic;                     --	Indicates whether the word is data or control
+        SOP              : out std_logic;
+        EOP              : out std_logic;
+        EOP_valid        : out std_logic_vector(2 downto 0);
+        
         Data_Valid_In    : in std_logic;
         Data_Valid_Out   : out std_logic;                    -- Indicated valid data and enables the fifo write pin
         
@@ -24,51 +27,36 @@ architecture Deframing of Burst_Deframer is
     signal pres_state, next_state : state_type;
     
     signal Packet_Counter : integer range 0 to 60;
-    signal Data_P1, Data_P2, Data_P3 : std_logic_vector(65 downto 0);
+    signal Data_P1, Data_P2, Data_P3 : std_logic_vector(66 downto 0); 
+    signal Data_valid_P1, Data_valid_P2, Data_valid_P3: std_logic;
     signal Data_Temp : std_logic_vector(65 downto 0);
-    signal data_word_reg, data_word_reg_p1 : std_logic_vector(63 downto 0);
+    --signal data_word_reg, data_word_reg_p1 : std_logic_vector(65 downto 0);
     signal control_word_reg : std_logic_vector(1 downto 0);
     signal packet_ready, packet_busy : std_logic;
     
-    signal CRC24_Value, CRC24_Value_P1 : std_logic_vector(31 downto 0) := (others => '0'); -- CRC-24 value received
-    signal SOP, SOP_p1 : std_logic;
-    signal EOP : std_logic;
-    signal EOP_Valid : std_logic_vector(2 downto 0);
+    signal CRC24_Value, CRC24_Value_P1 : std_logic_vector(23 downto 0) := (others => '0'); -- CRC-24 value received
+    signal SOP_signal, SOP_p1 : std_logic;
+    signal EOP_signal : std_logic;
+    signal EOP_Valid_signal : std_logic_vector(2 downto 0);
     --signal FlowControl : std_logic_vector(15 downto 0);
     signal Channel : std_logic_vector(7 downto 0);
     
     -- CRC-24 related
     signal CRC24_In  : std_logic_vector(63 downto 0);   -- Data transmitted to CRC-24
-    signal CRC24_Out : std_logic_vector(31 downto 0);   -- Calculated CRC-24 which returns
+    signal CRC24_Out : std_logic_vector(23 downto 0);   -- Calculated CRC-24 which returns
     signal CRC24_En  : std_logic;                       -- Indicate the CRC-24 the data is valid
     signal CRC24_Rst : std_logic;                       -- CRC-24 reset
     
-    component CRC_24 -- Add the CRC-24 component
-        generic
-        (
-            Nbits     : positive := 64;
-            CRC_Width : positive := 24;
-            G_Poly    : Std_Logic_Vector := X"32_8B63";
-            G_InitVal : std_logic_vector := X"FF_FFFF"
-        );
-        port
-        (
-            CRC   : out std_logic_vector(CRC_Width-1 downto 0);
-            Calc  : in  std_logic;
-            Clk   : in  std_logic;
-            DIn   : in  std_logic_vector(Nbits-1 downto 0);
-            Reset : in  std_logic
-        );
-    end component CRC_24;
+
 begin
         
-    CRC_24_Encoding : CRC_24 -- Define the connections of the CRC-24 component to the Burst component and generics
+    CRC_24_Encoding : entity work.CRC_24 -- Define the connections of the CRC-24 component to the Burst component and generics
     generic map
     (
         Nbits       => 64,
-        CRC_Width   => 32,
-        G_Poly      => X"04C1_1DB7", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41")
-        G_InitVal   => X"FFFF_FFFF"
+        CRC_Width   => 24,
+        G_Poly      => X"32_8B63", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41") -- leo: changed 04C1_1DB7 to 328B63
+        G_InitVal   => X"FF_FFFF"
     )
     port map
     (
@@ -79,23 +67,6 @@ begin
         Reset   => CRC24_Rst
     );
 
-    input : process (Clk, Reset) is --Input registers
-    begin 
-        if (Reset = '1') then
-            Data_P1 <= (others => '0');
-            Data_P2 <= (others => '0');
-            Data_P3 <= (others => '0');
-            
-        elsif (rising_edge(clk)) then
-            Data_P3 <= Data_P2;
-            Data_P2 <= Data_P1;
-            Data_P1 <= Data_valid_in & Data_Control_In & Data_In;
-            --control_word_reg <= "00";
-            
---            Data_Valid_Out <= Data_Valid_P2;
---            Data_Valid_P2 <= Data_Valid_P1;
-        end if;
-    end process input;
     
     CRC_Check : process (clk, reset) is
     begin
@@ -109,7 +80,7 @@ begin
             
             CRC24_Value <= CRC24_Value_P1; -- CRC24 pipeline to prevent mistimings in reading the value
             
-            if (Data_P1(64 downto 63) = "11") then --Control word and idle/burst word
+            if (Data_P1(65 downto 63) = "10"&"1") then --Control word and idle/burst word 
                 CRC24_Rst <= '1';
             end if;
             
@@ -117,17 +88,19 @@ begin
                 CRC24_En <= '0';
             end if;
             
-            --if(Diagnostic_Error = '0' and Data_P3(63 downto 58) = "011001") then
-            if (Data_P3(64 downto 63) = "11" and Data_P3(61) = '0' and (Data_P3(62) xor Data_P3(60)) = '1') then --Check for max burst length word or end of burst (contains CRC-24)
-                if(CRC24_Out = CRC24_Value) then
-                    CRC24_Error <= '0';
-                else
+            CRC24_Error <= '0';
+            -- TODO: Split this into CRC24 error and burst error 
+            if (Data_P3(65 downto 63) = "10"&"1" ) then --and Data_P3(61) = '0' and (Data_P3(62) xor Data_P3(60)) = '1') then --Check for max burst length word or end of burst (contains CRC-24) -- 
+                if(CRC24_Out /= CRC24_Value) then
                     CRC24_Error <= '1';
                 end if;
-            else
-                CRC24_Error <= '0';
-            end if;
+            
+            
+        else
+            CRC24_Error <= '0';
+            
         end if;
+end if;
     end process CRC_Check;
     
     Burst_Deframing : process (clk, reset) is
@@ -135,58 +108,46 @@ begin
         if reset = '1' then
             Data_Out <= (others => '0');
             Data_Temp <= (others => '0');
-            SOP <= '0';
-            EOP <= '0';
-            EOP_Valid <= (others => '0');
+            SOP_signal <= '0';
+            EOP_signal <= '0';
+            EOP_Valid_signal <= (others => '0');
             FlowControl <= (others => '0');
             Channel <= (others => '0');
-            data_word_reg <= (others => '0');
+            Data_P1 <= (others => '0');
+            Data_P2 <= (others => '0');
+            Data_P3 <= (others => '0');
+            Data_valid_P3 <= '0';
+            Data_valid_P2 <= '0';
+            Data_valid_P1 <= '0';
         elsif rising_edge(clk) then
+        
+            Data_P1 <= Data_In;
+            Data_valid_P1 <= Data_valid_in;
+        
             Data_Valid_Out <= '0';
-            
-            if(data_valid_in = '1' and data_control_in = '0') then
-                data_word_reg <= data_in;
-                data_word_reg_p1 <= data_word_reg;
+            if(data_valid_in = '1' and data_in(65 downto 64) = "10") then
+                Data_valid_P1 <= '0';
+                --data_word_reg <= data_in;
+                --data_word_reg_p1 <= data_word_reg;
                 --SOP_p1 <= SOP;
             end if;
             
-            control_word_reg <= data_valid_in & data_control_in;
             
-            if (Data_control_in = '1' and Data_valid_in = '1') then
-                SOP <= Data_In(61);
+            if (Data_in(65 downto 64) = "10" and Data_valid_in = '1') then
+                SOP_signal <= Data_In(61);
                 if(Data_in(60) = '1') then
-                    EOP <= '1';
-                    EOP_Valid <= Data_In(59 downto 57);
+                    EOP_signal <= '1';
+                    EOP_Valid_signal <= Data_In(59 downto 57);
                 end if;
                 FlowControl <= Data_In(55 downto 40);
                 Channel <= Data_In(39 downto 32);
             end if;
-             
-            if(EOP = '1') then
-                if (control_word_reg(1) = '1' and control_word_reg(0) = '0') then
-                    --data_out <= EOP_valid & '0' & EOP & data_word_reg;
-                    Data_Valid_Out <= '1';
-                    packet_busy <= '0';
-                    EOP <= '0';
-                    EOP_Valid <= (others => '0');
-                end if;
-            elsif(SOP = '1') then
-                if (control_word_reg(1) = '1' and control_word_reg(0) = '0') then --valid
-                    --data_out <= EOP_valid & SOP & EOP & data_word_reg; --SOP_P1
-                    Data_Valid_Out <= '1';
-                    SOP <= '0';
-                end if;
-                packet_busy <= '1';
-            end if;
             
-            data_out <= EOP_valid & (SOP and not EOP) & EOP & data_word_reg_p1; --SOP_P1
-                    
-            if(packet_busy = '1') then
-                if(control_word_reg(1) = '1' and control_word_reg(0) = '0') then
-                    --data_out <= EOP_valid & SOP_p1 & EOP & data_word_reg_p1;
-                    Data_Valid_Out <= '1';
-                end if;
-            end if;
+            data_out <= data_P1(63 downto 0);
+            EOP_valid <= EOP_valid_signal;
+            SOP <= SOP_signal;
+            EOP <= EOP_signal;
+            data_valid_out <= data_valid_P1;
             
         end if;
     end process Burst_Deframing;
@@ -198,23 +159,19 @@ begin
         end if;
     end process state_register;
     
-    state_decoder : process (pres_state, Packet_Counter, Data_Control_In, Data_In) is
+    state_decoder : process (pres_state, Packet_Counter, Data_In) is
     begin
         case pres_state is
         when IDLE =>
-            if (Data_Control_In = '1' and Data_In(63 downto 60) = "1110") then --SOP set and EOP not set
+            if ( Data_In(65 downto 60) = "101110") then --SOP set and EOP not set
                 next_state <= CRC;
---            elsif (Data_Control_In = '1' and Data_In(63 downto 61) = "1111") then --SOP and EOP set
---                next_state <= CRC;
             else
                 next_state <= IDLE;
             end if;
         when CRC =>
-            --if(Data_Control_In = '1' and Data_In(61) = '0' and Data_In(60) = '0') then -- Middle of packet
-            --    next_state <= CRC;
-            if(Data_Control_In = '1' and Data_In(61) = '0' and Data_In(60) = '1') then -- End of packet
+            if(Data_In(65 downto 64) = "10" and Data_In(61) = '0' and Data_In(60) = '1') then -- End of packet (EOP)
                 next_state <= IDLE;
-            elsif(Data_Control_In = '1' and Data_In(61) = '1') then -- Repeating start condition -> Error
+            elsif(Data_In(65 downto 64) = "10" and Data_In(61) = '1') then -- Repeating start condition (SOP) -> Error
                 next_state <= IDLE;
             else
                 next_state <= CRC;
@@ -229,27 +186,16 @@ begin
         if rising_edge(clk) then
             case pres_state is
             when IDLE =>
-                --CRC24_Rst <= '0'; 
                 CRC24_In <= (others => '0');
---                Data_Valid_P1 <= '0';
-                if (Data_Control_In = '1' and Data_In(63 downto 60) = "1110") then --SOP set and EOP not set
-                    --CRC24_Rst <= '1';
-                    CRC24_In <= Data_In; 
+                if (Data_In(65 downto 60) = "101110") then --SOP set and EOP not set
+                    CRC24_In <= Data_In(63 downto 0); 
                 end if;
             when CRC =>
---                Data_Valid_P1 <= '1';
-                CRC24_In <= Data_In;
-                --CRC24_RST <= '0';   
-                if(Data_Control_In = '1' and Data_In(63) = '1' and Data_In(61) = '0') then -- Either the middle or end of packet; Control word/Burst word/No SOP
-                    if(Data_In(60) = '0') then
-                        --CRC24_Rst<= '1';
-                    end if;
-                    CRC24_Value_P1 <= Data_In(31 downto 0); -- Copy received CRC-24 value
+                CRC24_In <= Data_In(63 downto 0);
+                if(Data_In(65 downto 63) = "101"  and Data_In(61) = '0') then -- Either the middle or end of packet; Control word/Burst word/No SOP
+                    CRC24_Value_P1 <= Data_In(23 downto 0); -- Copy received CRC-24 value
                     CRC24_In(63 downto 32) <= Data_In(63 downto 32); --Change to CRC-length
                     CRC24_In(31 downto 0)  <= (others => '0');
---                    Data_Valid_P1 <= '0';
-                elsif(Data_Control_In = '1' and Data_In(61) = '1') then -- Repeating start condition -> Error
---                    Data_valid_P1 <= '0';
                 end if;                
            
             end case;

@@ -10,7 +10,7 @@ entity Decoder is
         Decoder_En      : in std_logic;                     -- Enables the decoder
         Data_Valid_In   : in std_logic;
         Data_Valid_Out  : out std_logic;
-        Data_Out        : out std_logic_vector(63 downto 0);-- Decoded 64-bit output
+        Data_Out        : out std_logic_vector(66 downto 0);-- Decoded 64-bit output
         Data_Control    : out std_logic;                    --	Indicates whether the word is data or control
         
         Sync_Locked  : out std_logic;
@@ -210,10 +210,11 @@ begin
                 Data_Valid_Out <= Data_Valid_P3;
                 
                 if (Data_Header(2) = '1') then -- Read inversion bit
-                    Data_Out <= not(Data_Temp);
+                    Data_Out(63 downto 0) <= not(Data_Temp(63 downto 0));
                 else
-                    Data_Out <= Data_Temp;
+                    Data_Out(63 downto 0) <= Data_Temp(63 downto 0);
                 end if;
+                Data_Out(66 downto 64) <= Data_Header;
                 
                 if(Data_Header(1) = '1') then -- Read control word bit
                     Data_Control <= '1';

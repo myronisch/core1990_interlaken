@@ -55,6 +55,7 @@ read_vhdl -library work $proj_dir/sources/receiver/interlaken_receiver.vhd
 # Test bench
 # ----------------------------------------------------------
 read_vhdl -library work $proj_dir/sources/test/Core1990_verification.vhd
+read_vhdl -library work $proj_dir/sources/test/data_generator.vhd
 
 # ----------------------------------------------------------
 # IP cores
@@ -86,7 +87,7 @@ read_xdc -verbose $proj_dir/constraints/Core1990_Constraints.xdc
 #set_property target_constrs_file $proj_dir/constraints/probes.xdc [current_fileset -constrset]
 #set_property STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE MoreGlobalIterations [get_runs impl_1]
 
-set_property top interlaken_interface [current_fileset]
+set_property top Core199_verification [current_fileset]
 
 puts "INFO: Done!"
 

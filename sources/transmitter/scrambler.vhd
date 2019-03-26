@@ -6,13 +6,13 @@ entity Scrambler is
 		Clk				: in std_logic;			              -- System clock
 		Scram_Rst		: in std_logic;			              -- Scrambler reset, use for initialization
 		
-		Data_In 		: in std_logic_vector (63 downto 0);  -- Data input
-		Data_Out 		: out std_logic_vector (63 downto 0); -- Data output
+		Data_In 		: in std_logic_vector (66 downto 0);  -- Data input
+		Data_Out 		: out std_logic_vector (66 downto 0); -- Data output
 		
 		Lane_Number		: in std_logic_vector (3 downto 0);   -- Each lane number starts with different scrambler word  
 		Scrambler_En	: in std_logic; 					  -- Input valid
-		Data_Control_In : in std_logic;                       -- Indicates a control word
-		Data_Control_Out: out std_logic;                      -- Output control word indication
+		--Data_Control_In : in std_logic;                       -- Indicates a control word
+		--Data_Control_Out: out std_logic;                      -- Output control word indication
 		
 		Data_Valid_In   : in std_logic;                       -- Input valid
         Data_Valid_Out	: out std_logic;    				  -- Output valid
@@ -89,31 +89,35 @@ begin
     shiftreg(1) <= Poly(53) xor Poly(15);
     shiftreg(0) <= Poly(52) xor Poly(14);
 
-	Scramble : process (Clk, Scram_Rst, Data_control_in, lane_number)
+	Scramble : process (Clk, Scram_Rst, lane_number)
 	begin
         if(Scram_Rst = '1') then
             Poly                <= (others => '1');
             Poly(57 downto 54)  <= Lane_Number(3 downto 0);
             Data_Out            <= (others => '0');
-            Data_Control_Out    <= '0';
+            --Data_Control_Out    <= '0';
             Data_Valid_Out      <= '0';
 		elsif (rising_edge(clk)) then
             --if (Data_Valid_In = '1' and Gearboxready = '1') then
             if (Gearboxready = '1') then
-                if (Data_Control_In = '1') then                     --Checks if incoming data is control word
-                    if(Data_In(63 downto 58) = "011110") then       -- Sync words are not scrambled
+                if (Data_In(65 downto 64) = "10") then                     --Checks if incoming data is control word
+                    if(Data_In(63 downto 58)= "011110") then       -- Sync words are not scrambled  
                         Data_Out <= Data_In;
+                    --elsif(Data_In(63 downto 58)= "100001") then        -- leo added negative dispairity
+                     --   Data_Out <= Data_In;
                     elsif (Data_In(63 downto 58) = "001010") then   -- Scrambler state words are not scrambled
-                        Data_Out <= Data_In(63 downto 58) & Poly;
+                        Data_Out(63 downto 0) <= Data_In(63 downto 58) & Poly;
+                    --elsif(Data_In(63 downto 58)= "110101") then        -- leo added negative dispairity
+                      --  Data_Out <= Data_In(63 downto 58) & Poly;
                     else
                         Poly <= shiftreg(57 downto 0);              -- All other control words are scrambled
-                        Data_Out <= Data_In xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
+                        Data_Out(63 downto 0) <= Data_In(63 downto 0) xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
                     end if;
-                    Data_Control_Out <= '1';
+                    Data_Out(65 downto 64) <= "10";
                 else
                     Poly <= shiftreg(57 downto 0);                  -- All data words are scrambled
-                    Data_Out <= Data_In xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
-                    Data_Control_Out <= '0';
+                    Data_Out(63 downto 0) <= Data_In(63 downto 0) xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
+                    Data_Out(65 downto 64) <= "01";
                 end if;
                 Data_Valid_Out <= Data_Valid_In;
             end if;

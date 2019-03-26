@@ -3,31 +3,180 @@ use ieee.std_logic_1164.all;
 library unisim;
 use unisim.vcomponents.all;
 
-entity Interface_Test is
-    port(
-		System_Clock_In_P : in std_logic;
-		System_Clock_In_N : in std_logic;
+entity Core199_verification is
+--    port(
+--		System_Clock_In_P : in std_logic;
+--		System_Clock_In_N : in std_logic;
 		
-		GTREFCLK_IN_P : in std_logic;
-		GTREFCLK_IN_N : in std_logic;
+--		GTREFCLK_IN_P : in std_logic;
+--		GTREFCLK_IN_N : in std_logic;
 		
-		USER_CLK_IN_P : in std_logic;
-		USER_CLK_IN_N : in std_logic;
+--		USER_CLK_IN_P : in std_logic;
+--		USER_CLK_IN_N : in std_logic;
 		
-		USER_SMA_CLK_OUT_P : out std_logic;
-		USER_SMA_CLK_OUT_N : out std_logic;
+--		USER_SMA_CLK_OUT_P : out std_logic;
+--		USER_SMA_CLK_OUT_N : out std_logic;
 		
-		TX_Out_P     : out std_logic;
-		TX_Out_N     : out std_logic;
-		RX_In_P      : in std_logic;
-		RX_In_N      : in std_logic;
+--		TX_Out_P     : out std_logic;
+--		TX_Out_N     : out std_logic;
+--		RX_In_P      : in std_logic;
+--		RX_In_N      : in std_logic;
 		
-		Lock_Out  : out std_logic;
-		Valid_out : out std_logic
-    );
-end entity Interface_test;
+--		Lock_Out  : out std_logic;
+--		Valid_out : out std_logic
+--    );
+end entity Core199_verification;
 
-architecture Test of Interface_Test is
+architecture Test of Core199_verification is
+
+COMPONENT interlaken_0
+  PORT (
+    gt_ref_clk0_p : IN STD_LOGIC;
+    gt_ref_clk0_n : IN STD_LOGIC;
+    gt_refclk_out : OUT STD_LOGIC;
+    init_clk : IN STD_LOGIC;
+    sys_reset : IN STD_LOGIC;
+    gt_txusrclk2 : OUT STD_LOGIC;
+    gt_rxusrclk2 : OUT STD_LOGIC;
+    gt_txresetdone_int : OUT STD_LOGIC;
+    gt_rxresetdone_int : OUT STD_LOGIC;
+    gt_tx_reset_done_inv : OUT STD_LOGIC;
+    gt_rx_reset_done_inv : OUT STD_LOGIC;
+    gt0_rxp_in : IN STD_LOGIC;
+    gt0_rxn_in : IN STD_LOGIC;
+    gt0_txn_out : OUT STD_LOGIC;
+    gt0_txp_out : OUT STD_LOGIC;
+    rx_ovfout : OUT STD_LOGIC;
+    rx_dataout0 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+    rx_chanout0 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+    rx_enaout0 : OUT STD_LOGIC;
+    rx_sopout0 : OUT STD_LOGIC;
+    rx_eopout0 : OUT STD_LOGIC;
+    rx_errout0 : OUT STD_LOGIC;
+    rx_mtyout0 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    rx_dataout1 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+    rx_chanout1 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+    rx_enaout1 : OUT STD_LOGIC;
+    rx_sopout1 : OUT STD_LOGIC;
+    rx_eopout1 : OUT STD_LOGIC;
+    rx_errout1 : OUT STD_LOGIC;
+    rx_mtyout1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    rx_dataout2 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+    rx_chanout2 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+    rx_enaout2 : OUT STD_LOGIC;
+    rx_sopout2 : OUT STD_LOGIC;
+    rx_eopout2 : OUT STD_LOGIC;
+    rx_errout2 : OUT STD_LOGIC;
+    rx_mtyout2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    rx_dataout3 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+    rx_chanout3 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+    rx_enaout3 : OUT STD_LOGIC;
+    rx_sopout3 : OUT STD_LOGIC;
+    rx_eopout3 : OUT STD_LOGIC;
+    rx_errout3 : OUT STD_LOGIC;
+    rx_mtyout3 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+    tx_rdyout : OUT STD_LOGIC;
+    tx_ovfout : OUT STD_LOGIC;
+    tx_datain0 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+    tx_chanin0 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+    tx_enain0 : IN STD_LOGIC;
+    tx_sopin0 : IN STD_LOGIC;
+    tx_eopin0 : IN STD_LOGIC;
+    tx_errin0 : IN STD_LOGIC;
+    tx_mtyin0 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    tx_bctlin0 : IN STD_LOGIC;
+    tx_datain1 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+    tx_chanin1 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+    tx_enain1 : IN STD_LOGIC;
+    tx_sopin1 : IN STD_LOGIC;
+    tx_eopin1 : IN STD_LOGIC;
+    tx_errin1 : IN STD_LOGIC;
+    tx_mtyin1 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    tx_bctlin1 : IN STD_LOGIC;
+    tx_datain2 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+    tx_chanin2 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+    tx_enain2 : IN STD_LOGIC;
+    tx_sopin2 : IN STD_LOGIC;
+    tx_eopin2 : IN STD_LOGIC;
+    tx_errin2 : IN STD_LOGIC;
+    tx_mtyin2 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    tx_bctlin2 : IN STD_LOGIC;
+    tx_datain3 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+    tx_chanin3 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+    tx_enain3 : IN STD_LOGIC;
+    tx_sopin3 : IN STD_LOGIC;
+    tx_eopin3 : IN STD_LOGIC;
+    tx_errin3 : IN STD_LOGIC;
+    core_tx_reset : IN STD_LOGIC;
+    core_rx_reset : IN STD_LOGIC;
+    tx_mtyin3 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+    tx_bctlin3 : IN STD_LOGIC;
+    drp_clk : IN STD_LOGIC;
+    core_drp_reset : IN STD_LOGIC;
+    lockedn : IN STD_LOGIC;
+    drp_en : IN STD_LOGIC;
+    drp_we : IN STD_LOGIC;
+    drp_addr : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+    drp_di : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+    drp_do : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+    usr_tx_reset : OUT STD_LOGIC;
+    usr_rx_reset : OUT STD_LOGIC;
+    drp_rdy : OUT STD_LOGIC;
+    core_clk : IN STD_LOGIC;
+    lbus_clk : IN STD_LOGIC;
+    ctl_tx_enable : IN STD_LOGIC;
+    gt_loopback_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+    gtwiz_reset_tx_datapath : IN STD_LOGIC;
+    gtwiz_reset_rx_datapath : IN STD_LOGIC;
+    ctl_tx_diagword_lanestat : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
+    ctl_tx_diagword_intfstat : IN STD_LOGIC;
+    ctl_tx_mubits : IN STD_LOGIC_VECTOR(7 DOWNTO 0);
+    stat_tx_underflow_err : OUT STD_LOGIC;
+    stat_tx_burst_err : OUT STD_LOGIC;
+    stat_tx_overflow_err : OUT STD_LOGIC;
+    ctl_rx_force_resync : IN STD_LOGIC;
+    stat_rx_diagword_lanestat : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_diagword_intfstat : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_crc32_valid : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_crc32_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_mubits : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+    stat_rx_mubits_updated : OUT STD_LOGIC;
+    stat_rx_word_sync : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_synced : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_synced_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_framing_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_bad_type_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_mf_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_descram_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_mf_len_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_mf_repeat_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+    stat_rx_aligned : OUT STD_LOGIC;
+    stat_rx_misaligned : OUT STD_LOGIC;
+    stat_rx_aligned_err : OUT STD_LOGIC;
+    stat_rx_crc24_err : OUT STD_LOGIC;
+    stat_rx_msop_err : OUT STD_LOGIC;
+    stat_rx_meop_err : OUT STD_LOGIC;
+    stat_rx_overflow_err : OUT STD_LOGIC;
+    stat_rx_burstmax_err : OUT STD_LOGIC;
+    stat_rx_burst_err : OUT STD_LOGIC;
+    gtpowergood_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+  );
+END COMPONENT;
+
+    -------------------------- Generate System Clock ---------------------------
+    component clk_40MHz
+    port (
+        --Clock in- and output signals
+        clk_in1_p         : in     std_logic;
+        clk_in1_n         : in     std_logic;
+        clk_out1          : out    std_logic;
+        clk_out2          : out    std_logic;
+        
+        -- Status and control signals
+        reset             : in     std_logic;
+        locked            : out    std_logic
+    );
+    end component;
     
     signal TX_Data 	: std_logic_vector(63 downto 0);            -- Data transmitted
     signal RX_Data  : std_logic_vector(63 downto 0);            -- Data received
@@ -51,67 +200,131 @@ architecture Test of Interface_Test is
     signal TX_FIFO_Write     : std_logic;
     signal RX_FIFO_Read      : std_logic;
     signal RX_FIFO_Full      : std_logic;
+    signal RX_FIFO_Empty     : std_logic;
     
     signal Decoder_lock      : std_logic;
     signal Descrambler_lock  : std_logic;
     signal CRC24_Error       : std_logic;
     signal CRC32_Error       : std_logic;
     
-    signal pipeline_length : std_logic_vector(6 downto 0);
-    signal TX_Info_Pipelined : std_logic_vector(4 downto 0);
-    signal TX_Data_Pipelined : std_logic_vector(63 downto 0);
-    signal RX_Info : std_logic_vector(4 downto 0);
-    signal System_Clock : std_logic;
+--    signal pipeline_length : std_logic_vector(6 downto 0);
+--    signal TX_Info_Pipelined : std_logic_vector(4 downto 0);
+--    signal TX_Data_Pipelined : std_logic_vector(63 downto 0);
+--    signal RX_Info : std_logic_vector(4 downto 0);
+--    signal System_Clock : std_logic;
 	
-	signal valid_probe, RX_Valid : std_logic_vector(0 downto 0);
-	signal packet_length : std_logic_vector(6 downto 0);
+--	signal valid_probe, RX_Valid : std_logic_vector(0 downto 0);
+	constant packet_length : std_logic_vector(6 downto 0) := "0001000";
 	signal RX_in: std_logic_vector(63 downto 0); --Debug
     signal TX_out: std_logic_vector(63 downto 0); --Debug
-    signal Data_Descrambler : std_logic_vector(63 downto 0);
-    signal Data_Decoder : std_logic_vector(63 downto 0);
-            
-	COMPONENT ILA_Data
-	PORT (
-		clk : IN STD_LOGIC;
-		probe0 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-		probe1 : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
-		probe2 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-		probe3 : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
-        probe4 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-        probe5 : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
-        probe6 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-        probe7 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-        probe8 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-        probe9 : IN STD_LOGIC_VECTOR(63 DOWNTO 0);
-        probe10 : IN STD_LOGIC_VECTOR(63 DOWNTO 0)
-	);
-	END COMPONENT;
-	    
-    COMPONENT vio_0
-    PORT (
-        clk : IN STD_LOGIC;
-        probe_out0 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0);
-        probe_out1 : OUT STD_LOGIC_VECTOR(6 DOWNTO 0)
-    );
-    END COMPONENT;
+    signal Data_Descrambler : std_logic_vector(66 downto 0);
+    signal Data_Decoder : std_logic_vector(66 downto 0);
 
-    signal USER_CLK, USER_SMA_CLK: std_logic;
+
+--    signal USER_CLK, USER_SMA_CLK: std_logic;
+
+signal clk40: std_logic;
+signal clk150: std_logic;
+signal reset: std_logic;
+signal locked: std_logic;
+
+signal System_Clock_In_P : std_logic;
+signal System_Clock_In_N : std_logic;
+constant System_Clock_In_period : time := 5 ns;
+
+signal C1990RX_IL150GTX_N : std_logic;
+signal C1990RX_IL150GTX_P : std_logic;
+signal C1990TX_IL150GRX_N : std_logic;
+signal C1990TX_IL150GRX_P : std_logic;
+
+signal GTREFCLK_IN_P: std_logic;
+signal GTREFCLK_IN_N: std_logic;
+constant GTREFCLK_IN_period : time := 6.4 ns;
+signal clk300: std_logic;
+constant clk300_period: time := 3.333 ns;
+signal data0: std_logic_vector(127 downto 0);
+signal chan0: std_logic_vector(10 downto 0);
+signal ena0: std_logic;
+signal sop0: std_logic;
+signal eop0: std_logic;
+signal err0: std_logic;
+signal mty0: std_logic_vector(3 downto 0);
+
+signal data1: std_logic_vector(127 downto 0);
+signal chan1: std_logic_vector(10 downto 0);
+signal ena1: std_logic;
+signal sop1: std_logic;
+signal eop1: std_logic;
+signal err1: std_logic;
+signal mty1: std_logic_vector(3 downto 0);
+
+signal data2: std_logic_vector(127 downto 0);
+signal chan2: std_logic_vector(10 downto 0);
+signal ena2: std_logic;
+signal sop2: std_logic;
+signal eop2: std_logic;
+signal err2: std_logic;
+signal mty2: std_logic_vector(3 downto 0);
+
+signal data3: std_logic_vector(127 downto 0);
+signal chan3: std_logic_vector(10 downto 0);
+signal ena3: std_logic;
+signal sop3: std_logic;
+signal eop3: std_logic;
+signal err3: std_logic;
+signal mty3: std_logic_vector(3 downto 0);
+
+
+
+
+
+
+
 begin
+    
+    
+    sysclk_proc: process
+    begin
+        System_Clock_In_P <= '0';
+        System_Clock_In_N <= '1';
+        wait for System_Clock_In_period / 2;
+        System_Clock_In_P <= '1';
+        System_Clock_In_N <= '0';
+        wait for System_Clock_In_period / 2;
+    end process;
+    
+    
+    dbusclk_proc: process
+    begin
+        clk300 <= '0';
+        wait for clk300_period / 2;
+        clk300 <= '1';
+        wait for clk300_period / 2;
+    end process;
+    
+    
+    refclk_proc: process
+    begin
+        GTREFCLK_IN_P <= '0';
+        GTREFCLK_IN_N <= '1';
+        wait for GTREFCLK_IN_period / 2;
+        GTREFCLK_IN_P <= '1';
+        GTREFCLK_IN_N <= '0';
+        wait for GTREFCLK_IN_period / 2;
+    end process;
 
-    -------Reference clock routing
-    user_clk_ibuf : IBUFDS port map(
-        I => USER_CLK_IN_P, 
-        IB => USER_CLK_IN_N,
-        O => USER_CLK
-    ); 
-
-    USER_SMA_CLK <= USER_CLK;
-
-    user_sma_clk_obuf: OBUFDS port map(
-        I => USER_SMA_CLK,
-        O => USER_SMA_CLK_OUT_P, 
-        OB => USER_SMA_CLK_OUT_N
-    ); 
+    System_Clock : clk_40MHz
+    port map (
+        clk_in1_p => System_Clock_In_P,
+        clk_in1_n => System_Clock_In_N, 
+        clk_out1 => clk40,
+        clk_out2 => clk150,
+                    
+        reset => '0',
+        locked => locked
+    );
+    
+    reset <= not locked;
         
 	------- The Interlaken Interface -------
     interface : entity work.interlaken_interface
@@ -121,20 +334,20 @@ begin
          PacketLength => 2028 --(Packets)
     )
     port map (
-        System_Clock_In_P => System_Clock_In_P,
-        System_Clock_In_N => System_Clock_In_N,
+        clk40 => clk40,
+        clk150 => clk150,
+        reset => reset,
         GTREFCLK_IN_P => GTREFCLK_IN_P,
         GTREFCLK_IN_N => GTREFCLK_IN_N,
         
-        System_Clock_Gen => System_Clock,
         
         TX_Data => TX_Data,
         RX_Data => RX_Data,
         
-        RX_In_N => RX_In_N,
-        RX_In_P => RX_In_P,  
-        TX_Out_N => TX_Out_N,
-        TX_Out_P => TX_Out_P,  
+        RX_In_N =>   C1990RX_IL150GTX_N,
+        RX_In_P =>   C1990RX_IL150GTX_P,  
+        TX_Out_N =>  C1990TX_IL150GRX_N,
+        TX_Out_P =>  C1990TX_IL150GRX_P,  
         
         TX_FIFO_Write => TX_FIFO_Write,
         TX_SOP => TX_SOP,
@@ -144,6 +357,7 @@ begin
         TX_Channel => TX_Channel,
         
         RX_FIFO_Read => RX_FIFO_Read,
+        RX_FIFO_Empty => RX_FIFO_Empty,
         RX_SOP => RX_SOP, 
         RX_EOP => RX_EOP,
         RX_EOP_Valid => RX_EOP_Valid,
@@ -170,7 +384,7 @@ begin
     ---- Generates input data and interface signals ----
     generate_data : entity work.data_generator
     port map (
-		clk => System_Clock,
+		clk => clk150,
 	    Packet_length => packet_length,
 	    --link_up => Link_up,
 	    TX_FIFO_Full => TX_FIFO_progfull,
@@ -183,73 +397,152 @@ begin
         channel	 => TX_Channel
     );
     
-    ---- Pipelines input data for alignment with output data ----
-    pipeline_data : entity work.pipe
-    generic map (
-		Nmax => 128
-	)
-	port map (
-	    N => pipeline_length,
-        clk => System_Clock,
-        pipe_in(68 downto 66) => TX_EOP_Valid,
-        pipe_in(65) => TX_EOP,
-        pipe_in(64) => TX_SOP,
-	    pipe_in(63 downto 0) => TX_Data,
-	    
-	    pipe_out(68 downto 64) => TX_Info_Pipelined,
-	    pipe_out(63 downto 0) => TX_Data_Pipelined
-	);
-	RX_Info <= RX_EOP_valid & RX_EOP & RX_SOP;
-	
-	-------- Integrated Logic Analyzer --------
-	probe_data : ILA_Data
-	PORT MAP (
-		clk => System_Clock,
-		probe0 => TX_Data_Pipelined,
-		probe1 => TX_Info_Pipelined,
-		probe2 => RX_Data,
-		probe3 => RX_Info,
-		probe4 => valid_probe,
-		probe5 => TX_FIFO_progfull & Decoder_Lock & Descrambler_Lock,
-		probe6 => RX_Valid,
-		probe7 => RX_in,
-		probe8 => TX_out,
-		probe9 => Data_Descrambler,
-		probe10  => Data_Decoder
-	);
-	RX_Valid(0) <= RX_Valid_Out;
-	
-	-------- Validates the data integrity ---------
-	valid : process (TX_data_pipelined, RX_data, TX_info_pipelined, RX_info)
-	begin
-	   if(TX_Data_Pipelined = RX_Data and TX_info_pipelined = RX_info) then
-	       valid_out <= '1';
-	       valid_probe <= "1";
-       else 
-           valid_out <= '0';
-           valid_probe <= "0";
-       end if;
-    end process;
     
-    RX_FIFO_Read <= not TX_FIFO_progfull;
-    --packet_length <= "111111";
-    --pipeline_length <= "0111110";
-    ------------- Virtual input/output -------------
-    VIO : vio_0
-    PORT MAP (
-        clk => System_Clock,
-        probe_out0 => packet_length,
-        probe_out1 => pipeline_length
-    );
+--    leo:  Loopback 
+    C1990RX_IL150GTX_N <= C1990TX_IL150GRX_N;
+    C1990RX_IL150GTX_P <= C1990TX_IL150GRX_P;
     
-    --------------- Lock detection ---------------
-    lock : process (Descrambler_Lock) 
-    begin
-        if (Descrambler_Lock = '1') then
-            Lock_Out <= '1';
-        else
-            Lock_Out <= '0';
-        end if;
-    end process;
+    RX_FIFO_Read <= not RX_FIFO_Empty;
+    
+    
+    --RX_Channel <= TX_Channel;
+    
+    
+    
+    
+--    interlaken_instance : interlaken_0
+--      PORT MAP (
+--        gt_ref_clk0_p => GTREFCLK_IN_P,
+--        gt_ref_clk0_n => GTREFCLK_IN_N,
+--        gt_refclk_out => open,
+--        init_clk => clk40,
+--        sys_reset => reset,
+--        gt_txusrclk2 => open,
+--        gt_rxusrclk2 => open,
+--        gt_txresetdone_int => open,
+--        gt_rxresetdone_int => open,
+--        gt_tx_reset_done_inv => open,
+--        gt_rx_reset_done_inv => open,
+--        gt0_rxp_in =>  C1990TX_IL150GRX_P,
+--        gt0_rxn_in =>  C1990TX_IL150GRX_N,
+--        gt0_txn_out => C1990RX_IL150GTX_N,
+--        gt0_txp_out => C1990RX_IL150GTX_P,
+--        rx_ovfout => open,
+--        rx_dataout0 => data0,
+--        rx_chanout0 => chan0,
+--        rx_enaout0 => ena0,
+--        rx_sopout0 => sop0,
+--        rx_eopout0 => eop0,
+--        rx_errout0 => err0,
+--        rx_mtyout0 => mty0,
+--        rx_dataout1 => data1,
+--        rx_chanout1 => chan1,
+--        rx_enaout1 => ena1,
+--        rx_sopout1 => sop1,
+--        rx_eopout1 => eop1,
+--        rx_errout1 => err1,
+--        rx_mtyout1 => mty1,
+--        rx_dataout2 => data2,
+--        rx_chanout2 => chan2,
+--        rx_enaout2 => ena2,
+--        rx_sopout2 => sop2,
+--        rx_eopout2 => eop2,
+--        rx_errout2 => err2,
+--        rx_mtyout2 => mty2,
+--        rx_dataout3 => data3,
+--        rx_chanout3 => chan3,
+--        rx_enaout3 => ena3,
+--        rx_sopout3 => sop3,
+--        rx_eopout3 => eop3,
+--        rx_errout3 => err3,
+--        rx_mtyout3 => mty3,
+--        tx_rdyout => open,
+--        tx_ovfout => open,
+--        tx_datain0 => data0,
+--        tx_chanin0 => chan0,
+--        tx_enain0 => ena0,
+--        tx_sopin0 => sop0,
+--        tx_eopin0 => TX_EOP,
+--        tx_errin0 => err0,
+--        tx_mtyin0 => mty0,
+--        tx_bctlin0 => '0',
+--        tx_datain1 => data1,
+--        tx_chanin1 => chan1,
+--        tx_enain1 => ena1,
+--        tx_sopin1 => sop1,
+--        tx_eopin1 => eop1,
+--        tx_errin1 => err1,
+--        tx_mtyin1 => mty1,
+--        tx_bctlin1 => '0',
+--        tx_datain2 => data2,
+--        tx_chanin2 => chan2,
+--        tx_enain2 => ena2,
+--        tx_sopin2 => sop2,
+--        tx_eopin2 => eop2,
+--        tx_errin2 => err2,
+--        tx_mtyin2 => mty2,
+--        tx_bctlin2 => '0',
+--        tx_datain3 => data3,
+--        tx_chanin3 => chan3,
+--        tx_enain3 => ena3,
+--        tx_sopin3 => sop3,
+--        tx_eopin3 => eop3,
+--        tx_errin3 => err3,
+--        core_tx_reset => reset,
+--        core_rx_reset => reset,
+--        tx_mtyin3 => mty3,
+--        tx_bctlin3 => '0',
+--        drp_clk => clk40,
+--        core_drp_reset => reset,
+--        lockedn => reset,
+--        drp_en => '0',
+--        drp_we => '0',
+--        drp_addr => (others => '0'),
+--        drp_di => (others => '0'),
+--        drp_do => open,
+--        usr_tx_reset => open,
+--        usr_rx_reset => open,
+--        drp_rdy => open,
+--        core_clk => clk300,
+--        lbus_clk => clk300,
+--        ctl_tx_enable => '1',
+--        gt_loopback_in => "000",
+--        gtwiz_reset_tx_datapath => reset,
+--        gtwiz_reset_rx_datapath => reset,
+--        ctl_tx_diagword_lanestat => "111111111111",
+--        ctl_tx_diagword_intfstat => '1',
+--        ctl_tx_mubits => "00000000",
+--        stat_tx_underflow_err => open,
+--        stat_tx_burst_err => open,
+--        stat_tx_overflow_err => open,
+--        ctl_rx_force_resync => '0',
+--        stat_rx_diagword_lanestat => open,
+--        stat_rx_diagword_intfstat => open,
+--        stat_rx_crc32_valid => open,
+--        stat_rx_crc32_err => open,
+--        stat_rx_mubits => open,
+--        stat_rx_mubits_updated => open,
+--        stat_rx_word_sync => open,
+--        stat_rx_synced => open,
+--        stat_rx_synced_err => open,
+--        stat_rx_framing_err => open,
+--        stat_rx_bad_type_err => open,
+--        stat_rx_mf_err => open,
+--        stat_rx_descram_err => open,
+--        stat_rx_mf_len_err => open,
+--        stat_rx_mf_repeat_err => open,
+--        stat_rx_aligned => open,
+--        stat_rx_misaligned => open,
+--        stat_rx_aligned_err => open,
+--        stat_rx_crc24_err => open,
+--        stat_rx_msop_err => open,
+--        stat_rx_meop_err => open,
+--        stat_rx_overflow_err => open,
+--        stat_rx_burstmax_err => open,
+--        stat_rx_burst_err => open,
+--        gtpowergood_out => open
+--      );
+
+
 
 end architecture Test;

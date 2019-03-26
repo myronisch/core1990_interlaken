@@ -18,9 +18,9 @@ entity Burst_Framer is
 		
 		Data_in          : in std_logic_vector(63 downto 0);  -- Input data
 		Data_in_valid    : in std_logic ;                     -- 1 means that the fifo data was successfully read
-		Data_out         : out std_logic_vector(63 downto 0); -- To scrambling/framing
+		Data_out         : out std_logic_vector(66 downto 0); -- To scrambling/framing
 		Data_valid_out   : out std_logic;				      -- Indicate data transmitted is valid
-		Data_control_out : out std_logic;                     -- Control word indication
+		--Data_control_out : out std_logic;                     -- Control word indication
 		
         TX_FlowControl  : in std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
         RX_prog_full    : in std_logic_vector(15 downto 0);    
@@ -38,21 +38,24 @@ architecture framing of Burst_Framer is
 	type state_type is (IDLE, DATA, WORD, FILL, EOP_SET, EOP_FULL, EOP_EMPTY);
 	signal pres_state, next_state : state_type;
 	
-	signal Data_Temp             : std_logic_vector(63 downto 0) := (others => '0');
+	signal Data_Temp             : std_logic_vector(66 downto 0) := (others => '0');
 	signal Byte_Counter          : integer range 0 to 80;
 	signal Word_Control_out      : std_logic;
 	signal Data_Control          : std_logic;
 	signal Data_Valid            : std_logic := '0';
 	signal FIFO_readreq          : std_logic;
-	signal Word_valid_out        : std_logic;
+	signal Word_valid_out        : std_logic;  
+	signal HDR_P1, HDR_P2 : std_logic_vector(2 downto 0);
+	signal Valid_P1, Valid_P2 : std_logic
+	;
 	
 	signal Data_P1, Data_P2                    : std_logic_vector(63 downto 0);    -- Pipelined data
-	signal ControlValid_P1, ControlValid_P2    : std_logic_vector(1 downto 0);     -- Pipelined control/valid indicator
+	--signal ControlValid_P1, ControlValid_P2    : std_logic_vector(1 downto 0);     -- Pipelined control/valid indicator
 	signal Data_valid_temp : std_logic;
 	signal valid_temp : std_logic := '0';
 	
-    signal CRC24_TX  : std_logic_vector(63 downto 0) := (others => '0');   -- Data transmitted to CRC-24
-    signal CRC24_Out : std_logic_vector(31 downto 0);   -- Calculated CRC-24 which returns
+    signal CRC24_TX  : std_logic_vector(66 downto 0) := (others => '0');   -- Data transmitted to CRC-24
+    signal CRC24_Out : std_logic_vector(23 downto 0);   -- Calculated CRC-24 which returns
     signal CRC24_En  : std_logic;                       -- Indicate the CRC-24 the data is valid
     signal CRC24_RST : std_logic;                       -- CRC24 reset
     signal CRC24_P1  : std_logic;                       -- CRC24 reset pipelining
@@ -64,13 +67,18 @@ architecture framing of Burst_Framer is
     signal Gearboxready_P1 : std_logic;
     signal CalcCrc   : std_logic;                       -- CRC24_EN and Gearboxready
     signal TX_ValidBytes_s : std_logic_vector(2 downto 0);
+    
+        -- Constants
+   -- constant SOP : std_logic_vector(2 downto 0) := "100";  -- Start Of Packet
+   -- constant EOP : std_logic_vector(2 downto 0) := "001";  -- End Of Pack
+    
 
     component CRC_24 -- Add the CRC-24 component
         generic
         (
             Nbits     : positive := 64;
             CRC_Width : positive := 24;
-            G_Poly    : Std_Logic_Vector := X"32_8B63";
+            G_Poly    : Std_Logic_Vector := X"32_8B63"; -- Polynomal for CRC24 Interlaken
             G_InitVal : std_logic_vector:=X"FF_FFFF"
         );
         port
@@ -88,14 +96,14 @@ begin
 	generic map
 	(
         Nbits       => 64,
-        CRC_Width   => 32,
-        G_Poly      => X"04C1_1DB7", --Test with CRC-32 (Interlaken-24 : X"32_8B63")
-        G_InitVal   => X"FFFF_FFFF"
+        CRC_Width   => 24,
+        G_Poly      => X"32_8B63", --Test with CRC-32 : 1EDC_6F41 (Interlaken-24 : X"32_8B63") previous: 04C11DB7
+        G_InitVal   => X"FF_FFFF"
 	)
     port map
 	(
         Clk     => Clk,
-        DIn     => CRC24_TX,
+        DIn     => CRC24_TX(63 downto 0),
         CRC     => CRC24_Out,
         Calc    => CalcCrc,
         Reset   => CRC24_RST
@@ -104,7 +112,7 @@ begin
     CalcCrc <= CRC24_EN and Gearboxready and FIFO_meta;
 	
     pipeline : process (clk, reset)
-        variable CRC24_Out_v: std_logic_vector(31 downto 0);
+        variable CRC24_Out_v: std_logic_vector(23 downto 0); 
         variable Data_valid_check : std_logic;
 	begin
         if (reset = '1') then
@@ -112,9 +120,9 @@ begin
             Data_P2          <= (others => '0');
             Data_out         <= (others => '0');
             CRC24_Stored     <= (others => '0');
-            ControlValid_P1  <= "00";
-            ControlValid_P2  <= "00";
-            Data_Control_Out <= '0';
+            --ControlValid_P1  <= "00";
+            --ControlValid_P2  <= "00";
+            --Data_Control_Out <= '0';
             Data_Valid_Out   <= '0';
             CRC24_Ready      <= '0';
             CRC24_RST_P1     <= '0';
@@ -137,7 +145,7 @@ begin
             Gearboxready_P1 <= Gearboxready;
             CRC24_Rst_P1 <= CRC24_Rst;
             
-            if(CRC24_TX(62 downto 60) = "100" or CRC24_TX(61 downto 60) = "01") then
+            if(CRC24_TX(62 downto 60) = "110" or CRC24_TX(61 downto 60) = "01") then -- leo: changed 100 and 01 to 110 and 01 -- SOP and EOP
                 CRC_P1 <= '1';
             end if;
             CRC_P2 <= CRC_P1;
@@ -145,33 +153,33 @@ begin
             if (CRC_P2 = '1') then
                 CRC24_Out_v := CRC24_Out;
             end if;
-            
+
             if(Gearboxready = '1' and FIFO_meta = '1') then
-                Data_P1  <= CRC24_TX;
+                Data_P1  <= CRC24_TX(63 downto 0);
                 Data_P2  <= Data_P1;    
-                Data_out <= Data_P2;
+                Data_out(63 downto 0) <= Data_P2;
                 
-                ControlValid_P1  <= Data_control & Data_Valid;
-                ControlValid_P2  <= ControlValid_P1;
-                Data_Control_Out <= ControlValid_P2(1);
-                Data_Valid_Out   <= ControlValid_P2(0);	  
-                Data_valid_check := ControlValid_P2(0);  
+                HDR_P1 <= CRC24_TX(66 downto 64);
+                HDR_P2  <= HDR_P1;
+                Data_Out(66 downto 64) <= HDR_P2;
                 
-                if(ControlValid_P2(1) = '1' and (Data_P2(62 downto 60) = "100" or Data_P2(61 downto 60) = "01")) then --Control word BurstMax or EOP only word 
-                    Data_out(31 downto 0) <= CRC24_Out_v; -- Include CRC in last packet of burst   
+                Valid_P1  <= Data_Valid;
+                Data_Valid_Out   <= Valid_P2;	  
+                Data_valid_check := Valid_P2;  
+                
+                if(HDR_P2 = "010" and (Data_P2(62 downto 60) = "110" or Data_P2(61 downto 60) = "01")) then --Control word BurstMax or EOP only word 
+                    Data_out(23 downto 0) <= CRC24_Out_v; -- Include CRC in last packet of burst   
                 end if;
                 
-                if(ControlValid_P2(0) = '0') then
-                    Data_Out <= X"8000_0001_0000_0000";
-                    Data_control_out <= '1';
+                if(Valid_P2 = '0') then
+                    Data_Out <= "010" & X"8000_0001_0000_0000"; -- 8000_0001_0000_0000  changed to 8000_0001
                 end if;                 
 
                 --CRC24_PP1 <= CRC24_Rst;
             end if;
             
             if(Data_valid_check = '0') then
-                Data_Out <= X"8000_0001_0000_0000";
-                Data_control_out <= '1';
+                Data_Out <= "010" & X"8000_0001_0000_0000";
             end if;   
            
 --            CRC24_RST_P1 <= CRC24_Rst;
@@ -291,22 +299,20 @@ begin
                     Data_Control <= '0';
                     valid_temp <= '0';
                     
-                    Data_temp <= Data_in;
+                    Data_temp <= "001"&Data_in;
                     Data_valid_temp <= Data_in_valid;                    
                     
                     if (TX_SOP = '1' and TX_Enable = '1') then -- Indicates the start of data flow
-                        CRC24_TX <= X"E000_0001_0000_0000"; -- Start packet
+                        CRC24_TX <= "010"&X"E000_0001_0000_0000"; -- Start packet
                         CRC24_TX(55 downto 40) <= RX_prog_full;
-                        Data_Control <= '1';
                         Data_Valid <= '1';
                         Data_valid_temp <= '1'; --Start of a new packet is always valid
                     elsif (TX_flowcontrol(0) = '0') then
-                        CRC24_TX <= X"C000_0001_0000_0000";
+                        CRC24_TX <= "010"&X"C000_0001_0000_0000";
                         CRC24_TX(55 downto 40) <= RX_prog_full;
-                        Data_Control <= '1';
+                        
                     else
-                        CRC24_TX <= (others => '0');
-                        Data_Control <= '0';
+                        CRC24_TX <= "001"&X"0000_0000_0000_0000"; ---TODO what does this case mean? error condition?
                     end if;
                     
                     if(TX_EOP = '1' and TX_SOP = '1') then
@@ -317,7 +323,7 @@ begin
                 when DATA =>  		-- Process input data, count the transmitted bytes, send data to output and CRC-24
                     Byte_Counter <= Byte_Counter + 8;
                     CRC24_TX <= Data_temp;
-                    Data_temp <= Data_in;
+                    Data_temp <= "001"&Data_in;
                     Data_valid <= Data_valid_temp;
                     Data_valid_temp <= Data_in_valid;
                     Data_Control <= '0';
@@ -367,7 +373,7 @@ begin
                     CRC24_EN <= '1';
                     
                     CRC24_TX <= Data_temp;
-                    Data_temp <= X"C000_0001_0000_0000"; -- Burst no start nor end packet 1100
+                    Data_temp <= "010"& X"C000_0001_0000_0000"; -- Burst no start nor end packet 1100
                     Data_temp(55 downto 40) <= RX_prog_full;
                     
                     Data_valid <= Data_valid_temp;
@@ -381,7 +387,7 @@ begin
                     Byte_Counter <= Byte_Counter + 8;
                     
                     CRC24_TX <= Data_temp;
-                    Data_temp <= Data_in; -- Still read out data and save because FIFO takes a cycle to respond
+                    Data_temp <= "001"&Data_in; -- Still read out data and save because FIFO takes a cycle to respond
                     
                     Data_valid <= Data_valid_temp;
                     Data_valid_temp <= Data_in_valid;
@@ -400,7 +406,7 @@ begin
                     end if; 
                     --Byte_Counter <= Byte_Counter + 8;
                     
-                    CRC24_TX <= X"9000_0001_0000_0000"; -- Burst end packet 1001
+                    CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet 1001
                     CRC24_TX(55 downto 40) <= RX_prog_full;
                     CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s; 
                     Data_Valid <= '1';
@@ -409,7 +415,7 @@ begin
                 When FILL =>		-- Continue sending idle words to fill up the minimum frame length
     --                FIFO_readreq <= '1';
                     Byte_Counter <= Byte_Counter + 8;
-                    CRC24_TX <= X"8000_0001_0000_0000"; -- Idle fill packets 1000
+                    CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
                     CRC24_TX(55 downto 40) <= RX_prog_full;
                     CRC24_EN <= '0';
                     Data_Valid <= '1';
@@ -420,7 +426,7 @@ begin
                     
                 when EOP_FULL => 	-- Send frame to CRC-24 and output burst word containing CRC and EOP
                     FIFO_readreq <= '1';
-                    CRC24_TX <= X"9000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
+                    CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
                     CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;
                     CRC24_TX(55 downto 40) <= RX_prog_full;
                     Data_Valid <= '1';

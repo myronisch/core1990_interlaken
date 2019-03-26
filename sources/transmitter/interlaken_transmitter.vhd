@@ -48,19 +48,19 @@ architecture Transmitter of Interlaken_Transmitter is
     signal Data_FIFO_In : std_logic_vector (68 downto 0);
     
     signal Data_Burst_In : std_logic_vector(68 downto 0);
-	signal Data_Burst_Out : std_logic_vector(63 downto 0);
+	signal Data_Burst_Out : std_logic_vector(66 downto 0);
 	signal Data_Valid_Burst_Out : std_logic;
 	signal Data_Control_Burst_Out : std_logic;
 	
 	signal Data_Control_Meta_Out : std_logic;
 	signal Data_Valid_Meta_Out : std_logic;
-	signal Data_Meta_Out : std_logic_vector(63 downto 0);
+	signal Data_Meta_Out : std_logic_vector(66 downto 0);
 	signal HealthStatus : std_logic_vector(1 downto 0) := "00";  --Status bits in the diagnostic word
 	signal FIFO_Read_Meta : std_logic;
 	
 	signal Data_Control_Scrambler_Out : std_logic;
     signal Data_Valid_Scrambler_Out : std_logic;
-	signal Data_Scrambler_Out : std_logic_vector(63 downto 0);
+	signal Data_Scrambler_Out : std_logic_vector(66 downto 0);
 	
 	signal Gearbox_Count : integer range 0 to 67;
 	signal Gearbox_Pause : std_logic;
@@ -133,7 +133,7 @@ begin
 		Data_in_valid     => FIFO_dout_valid,
 		Data_out          => Data_Burst_Out,
 		Data_valid_out    => Data_Valid_Burst_Out,
-		Data_control_out  => Data_Control_Burst_Out,
+		--Data_control_out  => Data_Control_Burst_Out,
 		Gearboxready      => Gearbox_Pause,
 		
 		FIFO_Empty => FIFO_Empty,	
@@ -157,8 +157,8 @@ begin
 		Data_Out          => Data_Meta_Out,--TX_Data_Out,
 		Data_Valid_In     => Data_Valid_Burst_Out,
 		Data_Valid_Out    => Data_Valid_Meta_Out,
-		Data_Control_In   => Data_Control_Burst_Out,
-		Data_Control_Out  => Data_Control_Meta_Out,
+		--Data_Control_In   => Data_Control_Burst_Out,
+		--Data_Control_Out  => Data_Control_Meta_Out,
 		
 		Gearboxready      => Gearbox_Pause,
 		
@@ -174,8 +174,8 @@ begin
         Lane_Number       => "0001",
         Scrambler_En      => '1',
         Gearboxready      => Gearbox_Pause,
-        Data_Control_In   => Data_Control_Meta_Out,
-        Data_Control_Out  => Data_Control_Scrambler_Out,
+--        Data_Control_In   => Data_Control_Meta_Out,
+  --      Data_Control_Out  => Data_Control_Scrambler_Out,
         Data_Valid_In     => Data_Valid_Meta_Out,
         Data_Valid_Out    => Data_Valid_Scrambler_Out
 	);
@@ -188,7 +188,7 @@ begin
         
         Data_valid_in   => Data_valid_scrambler_out,
         Data_valid_out  => TX_valid_out,
-        Data_Control    => Data_Control_Scrambler_Out,
+       -- Data_Control    => Data_Control_Scrambler_Out,
         Encoder_En      => '1',
         Encoder_Rst     => Reset,
         Gearboxready    => Gearbox_Pause

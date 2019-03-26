@@ -9,16 +9,15 @@ entity interlaken_interface is
          PacketLength : positive    -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
     );
 	port (
-	    ----200 MHz input, to clock generator------------
-        System_Clock_In_P : in std_logic;
-        System_Clock_In_N : in std_logic;
+	    ----40 MHz input, from clock generator------------
+        clk40 : in std_logic;
+        clk150 : in std_logic;
+        reset : in std_logic;
         
         ----125 MHz input, to transceiver (SGMII clock)--
         GTREFCLK_IN_P : in std_logic;
         GTREFCLK_IN_N : in std_logic;
         
-        ----40 Mhz output, to other logic----------------
-        System_Clock_Gen : out std_logic;
         
         ----Data signals---------------------------------
 		TX_Data 	: in std_logic_vector(63 downto 0);          -- Data transmitted
@@ -53,11 +52,12 @@ entity interlaken_interface is
         
         RX_in: out std_logic_vector(63 downto 0); --Debug
         TX_out: out std_logic_vector(63 downto 0); --Debug
-        Data_Descrambler : out std_logic_vector(63 downto 0);
-        Data_Decoder : out std_logic_vector(63 downto 0);
+        Data_Descrambler : out std_logic_vector(66 downto 0);
+        Data_Decoder : out std_logic_vector(66 downto 0);
 		
 		----Receiver status signals------------------------
 		RX_FIFO_Full      : out std_logic;
+		RX_FIFO_Empty     : out std_logic;
 		RX_FIFO_Read      : in std_logic;
 		Decoder_lock      : out std_logic;
 		Descrambler_lock  : out std_logic;
@@ -69,24 +69,10 @@ end entity interlaken_interface;
 
 architecture interface of interlaken_interface is
     
-    signal System_Clock_40, System_Clock_150: std_logic;
     signal TX_User_Clock, RX_User_Clock : std_logic;
     signal Data_Transferred : std_logic_vector(66 downto 0);    --Data in transfer
     
-    -------------------------- Generate System Clock ---------------------------
-    component clk_40MHz
-    port (
-        --Clock in- and output signals
-        clk_in1_p         : in     std_logic;
-        clk_in1_n         : in     std_logic;
-        clk_out1          : out    std_logic;
-        clk_out2          : out    std_logic;
-        
-        -- Status and control signals
-        reset             : in     std_logic;
-        locked            : out    std_logic
-    );
-    end component;
+
     
     -------------------------- Include Transceiver -----------------------------
     component Transceiver_10g_64b67b
@@ -165,14 +151,12 @@ architecture interface of interlaken_interface is
     signal Data_Transceiver_In, Data_Transceiver_Out : std_logic_vector(63 downto 0);
     signal GT0_DATA_VALID_IN : std_logic;
     signal GT0_TX_FSM_RESET_DONE_OUT : std_logic;
-    signal locked, reset : std_logic;     
     signal link_up : std_logic;
     signal Descrambler_Locked : std_logic;
             
 begin
     
-    reset <= not locked;
-
+    
     
 --    process (reset, clk) is
 --    begin
@@ -187,18 +171,8 @@ begin
 --    end process;
         
     ------------------------------ System Clock --------------------------------
-    System_Clock : clk_40MHz
-    port map (
-        clk_in1_p => System_Clock_In_P,
-        clk_in1_n => System_Clock_In_N, 
-        clk_out1 => System_Clock_40,
-        clk_out2 => System_Clock_150,
-                    
-        reset => '0',
-        locked => locked
-    );
-    System_Clock_Gen <= System_Clock_150;
-    
+
+   
     startseq : process (TX_User_Clock)
     begin
         
@@ -296,7 +270,7 @@ begin
         GT0_QPLLREFCLKLOST_OUT  => open,
         GT0_QPLLOUTCLK_OUT  => open,
         GT0_QPLLOUTREFCLK_OUT => open,
-        sysclk_in => System_Clock_40
+        sysclk_in => clk40
     );
     
     ---------------------------- Transmitting side -----------------------------
@@ -307,7 +281,7 @@ begin
         PacketLength => PacketLength -- Configurable value of PacketLength
     )
     port map (
-        write_clk => System_Clock_150,
+        write_clk => clk150,
         clk   => TX_User_Clock,
         reset => reset,
         
@@ -342,7 +316,7 @@ begin
         PacketLength => PacketLength
     )
     port map (
-        fifo_read_clk   => System_Clock_150,
+        fifo_read_clk   => clk150,
         clk             => RX_User_Clock,
         reset           => reset,
         
@@ -368,6 +342,7 @@ begin
         Data_Decoder => Data_Decoder,
         
         RX_FIFO_Full       => RX_FIFO_Full,
+        RX_FIFO_Empty      => RX_FIFO_Empty,
         RX_FIFO_Read       => RX_FIFO_Read,
            
         RX_Link_Up      => Link_Up,

@@ -11,12 +11,10 @@ entity Descrambler is
 		Clk				: in std_logic;			              -- System clock
 		Reset			: in std_logic;			              -- Descrambler reset, use for initialization
 		
-		Data_In 		: in std_logic_vector (63 downto 0);  -- Data input
-		Data_Out 		: out std_logic_vector (63 downto 0); -- Data output
+		Data_In 		: in std_logic_vector (66 downto 0);  -- Data input
+		Data_Out 		: out std_logic_vector (66 downto 0); -- Data output
 		
 		Lane_Number		: in std_logic_vector (3 downto 0);   -- Each lane number starts with different scrambler word
-		Data_Control_In : in std_logic;                       -- Indicates a control word
-		Data_Control_Out: out std_logic;                      -- Output control word indication
 		Data_Valid_In   : in std_logic;                       -- 
 		Data_Valid_Out  : out std_logic;                      -- Output data is valid for the next component/in lock
 		Lock            : out std_logic;
@@ -38,7 +36,6 @@ architecture behavior of Descrambler is
 	signal ScramblerSyncMismatch : std_logic;
 	
 	signal Data_Valid_P1, Data_Valid_P2, Data_Valid : std_logic;
-	signal Data_Control_P1, Data_Control_P2, Data_Control : std_logic;
 	signal Data_P1, Data_Descrambled : std_logic_vector(63 downto 0);
 	
 	signal Scrambler_State_Mismatch : integer range 0 to 3;
@@ -46,6 +43,7 @@ architecture behavior of Descrambler is
 	
 	signal Poly : std_logic_vector (57 downto 0);
 	signal Shiftreg : std_logic_vector (63 downto 0);	
+	signal Data_HDR_P1, Data_HDR : std_logic_vector(2 downto 0);
 begin
 	shiftreg(63) <= Poly(57) xor Poly(38);
     shiftreg(62) <= Poly(56) xor Poly(37);
@@ -117,7 +115,7 @@ begin
 		if(Reset = '1') then            
             Sync_Word_Detected <= '0';
 		elsif (rising_edge(clk)) then
-			if (Data_In = X"78f6_78f6_78f6_78f6") then
+			if (Data_In(63 downto 0) = X"78f6_78f6_78f6_78f6") then
 				Sync_Word_Detected <= '1';
 			else 
 				Sync_Word_Detected <= '0';
@@ -128,12 +126,9 @@ begin
 	data : process (clk, reset ,pres_state) is
     begin
         if (reset = '1') then
-            Data_Control_P2 <= '0';
-            Data_Control_Out <= '0';
             Data_Out <= (others => '0');
         elsif (rising_edge(clk)) then
-            Data_Out  <= Data_P1;
-            Data_Control_Out <= Data_Control_P1;
+            Data_Out  <= Data_HDR_P1 & Data_P1;
             Data_Valid_Out <= Data_Valid_P1;
             --Data_Valid_P2 <= Data_Valid_P1;
             Data_Valid_P1<= Data_Valid;
@@ -175,7 +170,7 @@ begin
 --        end case;
 --    end process state_decoder;
 
-    output : process (pres_state, clk, MetaCounter, Sync_Word_Detected, Sync_Words, Data_Control_In) is
+    output : process (clk) is
     begin
         if rising_edge(clk) then
             lock <= '0';
@@ -191,8 +186,10 @@ begin
 				Error_BadSync <= '0';
 				
 				MetaCounter <= 1;           -- Reset other values
-				Data_Control <= '0';
-				Data_Control_P1 <= '0';
+				Data_HDR <= Data_In(66)&"10";
+				Data_HDR_P1 <= Data_In(66)&"10";
+				
+				--Data_Control_P1 <= '0';
 				ScramblerSyncMismatch <= '0';
 				Scrambler_State_Mismatch <= 0;
 				Sync_Word_Mismatch <= 0;
@@ -214,8 +211,8 @@ begin
                                 Sync_Words <= 0;
                                 Data_Descrambled <= X"2800_0000_0000_0000";
                                 Data_P1 <= X"78f6_78f6_78f6_78f6";
-                                Data_Control <= '1';
-                                Data_Control_P1 <= '1';
+                                Data_HDR <= Data_In(66)&"10";
+                                Data_HDR_P1 <= Data_In(66)&"10";
                                 Poly <= Data_In(57 downto 0);
                                 pres_state <= LOCKED;
                             end if;
@@ -237,17 +234,17 @@ begin
                 Lock <= '1';
                 Data_Valid <= '0';
                 Data_P1  <= Data_Descrambled;
-                Data_Control_P1  <= Data_Control;
+                Data_HDR_P1  <= Data_HDR;
                 
                 if (Data_Valid_In = '1') then
                     Data_Valid <= '1';
                     MetaCounter <= MetaCounter + 1;
-                    Data_Control <= '1';
+                    Data_HDR <= Data_In(66)&"10";
                     --Data_Control_P1  <= Data_Control;
                     
                     if(MetaCounter = PacketLength) then
                         MetaCounter <= 1;
-                        if(Data_In = X"78f6_78f6_78f6_78f6" and Data_Control_In = '1') then
+                        if(Data_In(63 downto 0) = X"78f6_78f6_78f6_78f6" and Data_in(65 downto 64) = "10") then
                             Sync_Word_Mismatch <= Sync_Word_Mismatch;
                         else
                             Sync_Word_Mismatch <= Sync_Word_Mismatch + 1;
@@ -261,7 +258,7 @@ begin
                         Data_Descrambled <= X"78f6_78f6_78f6_78f6"; --Always outputs this value so the CRC-32 won't be influenced
                     
                     elsif(MetaCounter = 1) then
-                        if((Data_In(57 downto 0) = Poly) and Data_Control_In = '1') then 
+                        if((Data_In(57 downto 0) = Poly) and Data_in(65 downto 64) = "10") then 
                             Scrambler_State_Mismatch <= Scrambler_State_Mismatch;
                         else
                             Scrambler_State_Mismatch <= Scrambler_State_Mismatch + 1;
@@ -278,9 +275,9 @@ begin
                     
                     else
                         Poly <= shiftreg(57 downto 0);
-                        Data_Descrambled <= Data_In xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
-                        if (Data_Control_In = '0') then 
-                            Data_Control <= '0';
+                        Data_Descrambled <= Data_In(63 downto 0) xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
+                        if Data_in(65 downto 64) /= "10" then 
+                            Data_HDR <= Data_In(66)&"01";
                         end if;
                     end if;
                 end if;

@@ -1,6 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
-
+--use work.interlaken_package.all;
 entity Meta_Framer is
 	generic(
 		PacketLength : positive -- 2048 * 8 = 16KB - 128Kb each packet. Including the metaframing itself
@@ -14,12 +14,12 @@ entity Meta_Framer is
 		HealthLane       : in std_logic;                      -- Lane status bit transmitted in diagnostic
 		HealthInterface  : in std_logic;                      -- Interface status bit transmitted in diagnostic
 		
-		Data_In          : in std_logic_vector(63 downto 0);  -- Input data
-		Data_Out         : out std_logic_vector(63 downto 0); -- To scrambling/framing
+		Data_In          : in std_logic_vector(66 downto 0);  -- Input data
+		Data_Out         : out std_logic_vector(66 downto 0); -- To scrambling/framing
 		Data_Valid_In    : in std_logic;				      -- Indicate data received is valid
 		Data_Valid_Out   : out std_logic;				      -- Indicate data transmitted is valid
-		Data_Control_In  : in std_logic;                      -- Control word indication from the burst component
-		Data_Control_Out : out std_logic;                     -- Control word indication
+		--Data_Control_In  : in std_logic;                      -- Control word indication from the burst component
+		--Data_Control_Out : out std_logic;                     -- Control word indication
 		
 		Gearboxready : in std_logic;
 		
@@ -33,17 +33,18 @@ architecture framing of Meta_Framer is
 	
 	signal Packet_Counter : integer range 0 to PacketLength;
 	
-	signal Data_Control, Data_Control_Meta, Data_Control_Burst, Data_Valid : std_logic;
-		
+	signal HDR, HDR_Meta, HDR_Burst  : std_logic_vector(2 downto 0);
+	signal Data_Valid : std_logic;	
 	signal Data_P1, Data_P2, Data_P3 : std_logic_vector (63 downto 0);        -- Pipeline for framing
-	signal Control_P1, Control_P2, Control_P3 : std_logic;
-	
+	signal HDR_P1, HDR_P2, HDR_P3 : std_logic_vector(2 downto 0);
+	signal HDR_IN_P1, HDR_IN_P2, HDR_IN_P3 : std_logic_vector(2 downto 0);
+        
 	signal Data_valid_p1, Data_valid_p2, Data_valid_p3, Data_valid_framed : std_logic;
 	
 	signal Data_ControlValid_P1, Data_ControlValid_P2 : std_logic_vector (1 downto 0); --Pipeline for CRC calculation
 	signal Data_Framed, Data_Framed_P1, Data_Framed_P2: std_logic_vector (63 downto 0);
 	
---	signal CRC32_In  : std_logic_vector(63 downto 0);   -- Data transmitted to CRC-32
+	--signal CRC32_In  : std_logic_vector(63 downto 0);   -- Data transmitted to CRC-32 -- leo: uncommented
     signal CRC32_Out : std_logic_vector(31 downto 0);   -- Calculated CRC-32 which returns
     signal CRC32_En  : std_logic;                       -- Indicate the CRC-32 the data is valid
     signal CRC32_Rst : std_logic;                       -- CRC-32 reset
@@ -52,33 +53,20 @@ architecture framing of Meta_Framer is
     signal Gearboxready_P1 : std_logic;
     signal CRC32_Rst_P1 : std_logic;
     
-    
-    component CRC_32 -- Add the CRC-32 component
-        generic
-        (
-            Nbits     : positive := 64;
-            CRC_Width : positive := 24;
-            G_Poly    : Std_Logic_Vector := X"1EDC_6F41";
-            G_InitVal : std_logic_vector:=X"FFFF_FFFF"
-        );
-        port
-        (
-            CRC   : out std_logic_vector(CRC_Width-1 downto 0);
-            Calc  : in  std_logic;
-            Clk   : in  std_logic;
-            DIn   : in  std_logic_vector(Nbits-1 downto 0);
-            Reset : in  std_logic
-        );
-    end component CRC_32;
+        -- Constants
+    constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization, framing layer control word
+    constant SCRAMBLER_STATE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000";  -- scrambler state (real value will be collected later)
+    constant SKIP_WORD : std_logic_vector(63 downto 0) := X"1e1e_1e1e_1e1e_1e1e"; -- skip word, framing layer control word
+
 
 begin
     
-    CRC_32_Encoding : CRC_32 -- Define the connections of the CRC-24 component to the Burst component and generics
+    CRC_32_Encoding : entity work.CRC_32 -- Define the connections of the CRC-24 component to the Burst component and generics
     generic map
     (
         Nbits       => 64,
         CRC_Width   => 32,
-        G_Poly      => X"04C1_1DB7", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41")
+        G_Poly      => X"1EDC_6F41", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41")
         G_InitVal   => X"FFFF_FFFF"
     )
     port map
@@ -100,7 +88,7 @@ begin
             Data_ControlValid_P1 <= (others => '0');
             Data_ControlValid_P2 <= (others => '0');
             Data_Out             <= (others => '0');
-            Data_Control_Out     <= '0';
+           -- Data_Control_Out     <= '0';
             Data_Valid_Out       <= '0';
         elsif (rising_edge(clk)) then
             Gearboxready_P1 <= Gearboxready;
@@ -112,13 +100,13 @@ begin
             if(Gearboxready = '1') then
                 Data_Framed_P1  <= Data_Framed;
                 Data_Framed_P2  <= Data_Framed_P1;
-                Data_Out        <= Data_Framed_P2;
-                
-                Data_ControlValid_P1 <= Data_Control & (Data_Valid or Data_valid_framed); -- Waiting for CRC calculation to be ready
-                Data_ControlValid_P2 <= Data_ControlValid_P1;
-                Data_Control_Out     <= Data_ControlValid_P2(1);
-                Data_Valid_Out       <= Data_ControlValid_P2(0);
-
+                Data_Out(63 downto 0)   <= Data_Framed_P2;
+                Data_Valid_P1 <= (Data_Valid or Data_valid_framed);
+                Data_Valid_P2 <= Data_Valid_P1;
+                Data_Valid_Out       <= Data_Valid_P2;
+                HDR_P1 <= HDR; -- Waiting for CRC calculation to be ready
+                HDR_P2 <= HDR_P1;
+                Data_Out(66 downto 64) <= HDR_P2;
                 if((Data_ControlValid_P2(1) = '1') and (Data_Framed_P2(63 downto 58) = "011001")) then
                     Data_Out(31 downto 0) <= CRC32_Out_v;
                 end if;
@@ -126,28 +114,32 @@ begin
         end if;
 	end process diagnostic;
 	
-	control_word : process (data_control_meta, data_control_burst, gearboxready) is
+	hdr_or : process (HDR_Meta, HDR_Burst, Gearboxready) is
     begin
-        if((Data_Control_Meta = '1' or Data_Control_Burst= '1') and Gearboxready = '1') then
-            Data_Control <= '1';
+        if((HDR_Meta = "010" or HDR_Burst= "010") and Gearboxready = '1') then
+            HDR <= "010";
         else
-            Data_Control <= '0';
+            HDR <= "001";
         end if;
-    end process control_word;
+    end process;
     
     control_pipeline : process(clk, reset) is
     begin
         if(reset = '1') then
-            Data_Control_Burst <= '0';
-            Control_P3 <= '0';
-            Control_P2 <= '0';
-            Control_P1 <= '0';
+            HDR_Burst <= "010";
+            HDR_IN_P3 <= "010";
+            HDR_IN_P2 <= "010";
+            HDR_IN_P1 <= "010";
         elsif(rising_edge(clk)) then
             if(Gearboxready = '1') then
-                Data_Control_Burst <= Control_P3;
-                Control_P3 <= Control_P2;
-                Control_P2 <= Control_P1;
-                Control_P1 <= Data_Control_In;
+                HDR_Burst <= HDR_IN_P3;
+                HDR_IN_P3 <= HDR_IN_P2;
+                HDR_IN_P2 <= HDR_IN_P1;
+                if(Data_in(65 downto 64) = "1") then
+                    HDR_IN_P1 <= "010";
+                else
+                    HDR_IN_P1 <= "001";
+                end if;
             end if;
         end if;
     end process control_pipeline;
@@ -209,34 +201,34 @@ begin
                     Data_Valid <= '0';
                     Data_Framed <= (others => '0');
                     FIFO_Read <= '1';
-                    Data_Control_Meta <= '0';
+                    HDR_Meta <= "001";
                     if (TX_Enable = '1') then--and Data_valid_in = '1') then -- Only start real transmission when there is valid data
-                        Data_Framed <= X"78f6_78f6_78f6_78f6"; -- Predefined sync word
-                        Data_Control_Meta <= '1';
+                        Data_Framed <= SYNCHRONIZATION; -- Predefined sync word 78f6_78f6_78f6_78f6 
+                        HDR_Meta <= "010";
                         Data_Valid <= '1';
                         CRC32_Rst <= '1';      --CRC-32
                     end if;
                     Packet_Counter <= 1;
-                    Data_P1 <= Data_in;
+                    Data_P1 <= Data_in(63 downto 0);
                     Data_valid_p1 <= Data_Valid_In;
                     CRC32_En <= '1';        --CRC-32
                     
                 when SCRAM =>
                     Data_Valid <= '1';
                     Packet_Counter <= Packet_Counter + 1;
-                    Data_Framed <= X"2800_0000_0000_0000"; -- Scrambler state (real data added later)
+                    Data_Framed <= SCRAMBLER_STATE; -- Scrambler state (real data added later)
                     Data_P2 <= Data_P1;
-                    Data_P1 <= Data_in;
+                    Data_P1 <= Data_in(63 downto 0);
                     Data_valid_p2 <= Data_valid_p1;
                     Data_valid_p1 <= Data_Valid_In;
                     
                 when SKIP =>
                     Data_Valid <= '1';
                     Packet_Counter <= Packet_Counter + 1;
-                    Data_Framed <= X"1e1e_1e1e_1e1e_1e1e"; -- Predefined skip word
+                    Data_Framed <= SKIP_WORD; -- Predefined skip word 
                     Data_P3 <= Data_P2;
                     Data_P2 <= Data_P1;
-                    Data_P1 <= Data_in;
+                    Data_P1 <= Data_in(63 downto 0);
                     Data_valid_p3 <= Data_valid_p2;
                     Data_valid_p2 <= Data_valid_p1;
                     Data_valid_p1 <= Data_Valid_In;
@@ -244,13 +236,13 @@ begin
                 when DATA =>
                     CRC32_EN <= '1';
                     Packet_Counter <= Packet_Counter + 1;
-                    Data_Control_Meta <= '0';
+                    HDR_Meta <= "001";
                     Data_valid <= '0';
                     
                     Data_Framed <= Data_P3; 
                     Data_P3 <= Data_P2;
                     Data_P2 <= Data_P1;
-                    Data_P1 <= Data_in;
+                    Data_P1 <= Data_in(63 downto 0);
                     Data_valid_framed <= Data_valid_p3;
                     Data_valid_p3 <= Data_valid_p2;
                     Data_valid_p2 <= Data_valid_p1;
@@ -291,7 +283,7 @@ begin
                     --FIFO_Read <= '1';
                     Data_Framed <= X"6400_0000_0000_0000"; -- Diagnostic word including CRC32
                     Data_Framed(33 downto 32) <= HealthLane & HealthInterface;
-                    Data_Control_Meta <= '1';
+                    HDR_Meta <= "010";
                 end case;
             end if;
 	    end if;

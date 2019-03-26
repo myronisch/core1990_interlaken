@@ -7,11 +7,11 @@ entity Meta_Deframer is
         Clk              : in std_logic;                     -- Clock input
         Reset		     : in std_logic;					 -- Reset decoder
         
-        Data_In          : in std_logic_vector(63 downto 0); -- Data input
-        Data_Out         : out std_logic_vector(63 downto 0);-- Decoded 64-bit output
+        Data_In          : in std_logic_vector(66 downto 0); -- Data input
+        Data_Out         : out std_logic_vector(66 downto 0);-- Decoded 64-bit output
         
-        Data_Control_In  : in std_logic;                     --	Indicates whether the word is data or control
-        Data_Control_Out : out std_logic;                    --	Indicates whether the word is data or control
+        --Data_Control_In  : in std_logic;                     --	Indicates whether the word is data or control
+        --Data_Control_Out : out std_logic;                    --	Indicates whether the word is data or control
         
         CRC32_Error      : out std_logic;
         
@@ -41,12 +41,21 @@ architecture Deframing of Meta_Deframer is
     signal CRC32_Check1, CRC32_Check2 : std_logic;
     signal CRC32_Good : std_logic;
     
+    -- Constants
+    constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization framing layer control word
+    constant META_TYPE_SYNCHRONIZATION: std_logic_vector(4 downto 0) := "11110";
+    constant META_TYPE_SCRAM_STATE: std_logic_vector(4 downto 0) := "01010";
+    constant META_TYPE_SKIP_WORD: std_logic_vector(4 downto 0) := "01010";
+    constant META_TYPE_DIAGNOSTIC: std_logic_vector(4 downto 0) := "11001";
+
+
+    
     component CRC_32 -- Add the CRC-32 component
         generic
         (
             Nbits     : positive := 64;
-            CRC_Width : positive := 24;
-            G_Poly    : Std_Logic_Vector := X"1EDC_6F41";
+            CRC_Width : positive := 24; 
+            G_Poly    : Std_Logic_Vector := X"1EDC_6F41"; 
             G_InitVal : std_logic_vector :=X"FFFF_FFFF"
         );
         port
@@ -65,7 +74,7 @@ begin
     (
         Nbits       => 64,
         CRC_Width   => 32,
-        G_Poly      => X"04C1_1DB7", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41")
+        G_Poly      => X"1EDC_6F41", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41")
         G_InitVal   => X"FFFF_FFFF"
     )
     port map
@@ -92,7 +101,7 @@ begin
                 --Data_P4 <= Data_P3;
                 
                 Data_P2 <= Data_P1;
-                Data_P1 <= Data_In;
+                Data_P1 <= Data_In(63 downto 0);
             end if;
         end if;
     end process input;
@@ -108,7 +117,7 @@ begin
             CRC32_Error <= '0';
             CRC32_Check1 <= '0';
             CRC32_Good <= '0';
-            if(Diagnostic_Error = '0' and CRC32_In(63 downto 58) = "011001") then
+            if(Diagnostic_Error = '0' and CRC32_In(63) = '0' and CRC32_In(62 downto 58) = META_TYPE_DIAGNOSTIC) then --diagnostic
                 CRC32_Check1 <= '1';
             end if;
             
@@ -137,23 +146,18 @@ begin
     Meta_Deframing : process (clk, reset) is
     begin
         if reset = '1' then
-            Data_Out <= (others => '0');
-            Data_Control_Out <= '0';
+            Data_Out(63 downto 0) <= (others => '0');
+            Data_Out(66 downto 64) <= "010";
             Data_Valid_Out <= '0';
         elsif rising_edge(clk) then
             Data_Valid_Out <= '0';
             if(Data_Valid_in = '1') then
                 Data_Valid_Out <= '1';
-                if (Data_Control_In = '1' and Data_In(63) = '0')then
-                    Data_Out <= (others => '0');
-                    Data_Control_Out <= '1';
+                Data_Out(66 downto 64) <= Data_In(66 downto 64);
+                Data_Out(63 downto 0) <= Data_In(63 downto 0);
+                if (Data_In(65 downto 64) = "10" and Data_In(63) = '0')then
+                    Data_Out(63 downto 0) <= (others => '0');
                     Data_Valid_Out <= '0';
-                elsif (Data_Control_In = '1' and Data_In(63) = '1') then
-                    Data_Out <= Data_In;
-                    Data_Control_Out <= '1';
-                else
-                    Data_Out <= Data_In;
-                    Data_Control_Out <= '0';
                 end if;
             end if;
         end if;
@@ -187,7 +191,7 @@ begin
             if(Data_valid_in = '1') then
                 case pres_state is
                 when IDLE =>
-                    if (Data_Control_In = '1' and Data_In = X"78f6_78f6_78f6_78f6") then
+                    if (Data_In(65 downto 0) = "10"&SYNCHRONIZATION) then 
                         pres_state <= CRC;
                     else
                         pres_state <= IDLE;
@@ -219,18 +223,18 @@ begin
                 when IDLE =>
                     CRC32_In <= (others => '0');
                     Packet_Counter <= 0;
-                    if (Data_Control_In = '1' and Data_In = X"78f6_78f6_78f6_78f6") then
-                        CRC32_In <= Data_In;
+                    if (Data_In(65 downto 0) = "10"&SYNCHRONIZATION) then 
+                        CRC32_In <= Data_In(63 downto 0) ;
                         CRC32_Rst <= '1';
                         Packet_Counter <= 1;
                     end if;
                     
                 when CRC =>
-                    CRC32_In <= Data_In;    
+                    CRC32_In <= Data_In(63 downto 0);    
                     Packet_Counter <= Packet_Counter + 1;
                     
                     if(Packet_Counter = 23) then
-                        if(Data_In(63 downto 58) = "011001" and Data_Control_In = '1') then
+                        if(Data_In(65 downto 58) = "10"&"0"&META_TYPE_DIAGNOSTIC ) then
                             Diagnostic_Error <= '0';
                             CRC32_Value <= Data_In(31 downto 0);
                             CRC32_In(63 downto 32) <= Data_In(63 downto 32);
