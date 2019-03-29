@@ -123,7 +123,7 @@ begin
 		end if;
 	end process detection;
 	
-	data : process (clk, reset ,pres_state) is
+	data : process (clk, reset) is -- leo: removed pres_state from sensitivity list
     begin
         if (reset = '1') then
             Data_Out <= (others => '0');
@@ -207,9 +207,9 @@ begin
                     if(MetaCounter = 1) then
                         if(Sync_Word_Detected = '1') then --First position in metaframe should contain sync
                             Sync_Words <= Sync_Words + 1;
-                            if(Sync_Words = 3) then
+                            if(Sync_Words = 1) then --TODO 1 is only for simulation, in real world it should be 3
                                 Sync_Words <= 0;
-                                Data_Descrambled <= X"2800_0000_0000_0000";
+                                Data_Descrambled <= X"2800_0000_0000_0000"; -- 
                                 Data_P1 <= X"78f6_78f6_78f6_78f6";
                                 Data_HDR <= Data_In(66)&"10";
                                 Data_HDR_P1 <= Data_In(66)&"10";
@@ -271,7 +271,7 @@ begin
                             end if;
                             Poly <= Data_In(57 downto 0);
                         end if;
-                        Data_Descrambled <= X"2800_0000_0000_0000"; --Always outputs this value so the CRC-32 won't be influenced
+                        Data_Descrambled <= X"2800_0000_0000_0000"; --Always outputs this value so the CRC-32 won't be influenced  -- 
                     
                     else
                         Poly <= shiftreg(57 downto 0);

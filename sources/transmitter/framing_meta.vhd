@@ -36,12 +36,12 @@ architecture framing of Meta_Framer is
 	signal HDR, HDR_Meta, HDR_Burst  : std_logic_vector(2 downto 0);
 	signal Data_Valid : std_logic;	
 	signal Data_P1, Data_P2, Data_P3 : std_logic_vector (63 downto 0);        -- Pipeline for framing
-	signal HDR_P1, HDR_P2, HDR_P3 : std_logic_vector(2 downto 0);
+	signal HDR_P1, HDR_P2 : std_logic_vector(2 downto 0);
 	signal HDR_IN_P1, HDR_IN_P2, HDR_IN_P3 : std_logic_vector(2 downto 0);
         
 	signal Data_valid_p1, Data_valid_p2, Data_valid_p3, Data_valid_framed : std_logic;
-	
-	signal Data_ControlValid_P1, Data_ControlValid_P2 : std_logic_vector (1 downto 0); --Pipeline for CRC calculation
+	signal Data_valid_Framed_P1, Data_valid_Framed_P2: std_logic;
+        
 	signal Data_Framed, Data_Framed_P1, Data_Framed_P2: std_logic_vector (63 downto 0);
 	
 	--signal CRC32_In  : std_logic_vector(63 downto 0);   -- Data transmitted to CRC-32 -- leo: uncommented
@@ -49,13 +49,13 @@ architecture framing of Meta_Framer is
     signal CRC32_En  : std_logic;                       -- Indicate the CRC-32 the data is valid
     signal CRC32_Rst : std_logic;                       -- CRC-32 reset
     signal CalcCRC   : std_logic;
-    signal CRC32_Ready : std_logic;
+    --signal CRC32_Ready : std_logic;
     signal Gearboxready_P1 : std_logic;
     signal CRC32_Rst_P1 : std_logic;
     
         -- Constants
     constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization, framing layer control word
-    constant SCRAMBLER_STATE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000";  -- scrambler state (real value will be collected later)
+    constant SCRAMBLER_STATE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000";  -- scrambler state (real value will be collected later) -
     constant SKIP_WORD : std_logic_vector(63 downto 0) := X"1e1e_1e1e_1e1e_1e1e"; -- skip word, framing layer control word
 
 
@@ -85,8 +85,6 @@ begin
         if (reset = '1') then
             Data_Framed_P1       <= (others => '0');
             Data_Framed_P2       <= (others => '0');
-            Data_ControlValid_P1 <= (others => '0');
-            Data_ControlValid_P2 <= (others => '0');
             Data_Out             <= (others => '0');
            -- Data_Control_Out     <= '0';
             Data_Valid_Out       <= '0';
@@ -101,13 +99,13 @@ begin
                 Data_Framed_P1  <= Data_Framed;
                 Data_Framed_P2  <= Data_Framed_P1;
                 Data_Out(63 downto 0)   <= Data_Framed_P2;
-                Data_Valid_P1 <= (Data_Valid or Data_valid_framed);
-                Data_Valid_P2 <= Data_Valid_P1;
-                Data_Valid_Out       <= Data_Valid_P2;
+                Data_Valid_Framed_P1 <= (Data_Valid or Data_valid_framed);
+                Data_Valid_Framed_P2 <= Data_Valid_Framed_P1;
+                Data_Valid_Out       <= Data_Valid_Framed_P2;
                 HDR_P1 <= HDR; -- Waiting for CRC calculation to be ready
                 HDR_P2 <= HDR_P1;
                 Data_Out(66 downto 64) <= HDR_P2;
-                if((Data_ControlValid_P2(1) = '1') and (Data_Framed_P2(63 downto 58) = "011001")) then
+                if((Data_Valid_Framed_P2 = '1') and (Data_Framed_P2(63 downto 58) = "011001")) then
                     Data_Out(31 downto 0) <= CRC32_Out_v;
                 end if;
             end if;
@@ -135,7 +133,7 @@ begin
                 HDR_Burst <= HDR_IN_P3;
                 HDR_IN_P3 <= HDR_IN_P2;
                 HDR_IN_P2 <= HDR_IN_P1;
-                if(Data_in(65 downto 64) = "1") then
+                if(Data_in(65 downto 64) = "10") then
                     HDR_IN_P1 <= "010";
                 else
                     HDR_IN_P1 <= "001";
@@ -281,6 +279,7 @@ begin
                     Data_Valid <= '1';
                     Packet_Counter <= Packet_Counter + 1;
                     --FIFO_Read <= '1';
+
                     Data_Framed <= X"6400_0000_0000_0000"; -- Diagnostic word including CRC32
                     Data_Framed(33 downto 32) <= HealthLane & HealthInterface;
                     HDR_Meta <= "010";

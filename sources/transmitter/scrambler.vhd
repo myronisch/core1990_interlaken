@@ -103,11 +103,9 @@ begin
                 if (Data_In(65 downto 64) = "10") then                     --Checks if incoming data is control word
                     if(Data_In(63 downto 58)= "011110") then       -- Sync words are not scrambled  
                         Data_Out <= Data_In;
-                    --elsif(Data_In(63 downto 58)= "100001") then        -- leo added negative dispairity
                      --   Data_Out <= Data_In;
                     elsif (Data_In(63 downto 58) = "001010") then   -- Scrambler state words are not scrambled
                         Data_Out(63 downto 0) <= Data_In(63 downto 58) & Poly;
-                    --elsif(Data_In(63 downto 58)= "110101") then        -- leo added negative dispairity
                       --  Data_Out <= Data_In(63 downto 58) & Poly;
                     else
                         Poly <= shiftreg(57 downto 0);              -- All other control words are scrambled

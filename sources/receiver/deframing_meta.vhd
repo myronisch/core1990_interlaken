@@ -25,7 +25,7 @@ architecture Deframing of Meta_Deframer is
     signal pres_state, next_state : state_type;
     
     signal Packet_Counter : integer range 0 to 60;
-    signal Data_P1, Data_P2, Data_P3 : std_logic_vector(63 downto 0);
+    signal Data_P1, Data_P2 : std_logic_vector(63 downto 0);
     
     -- Diagnostic word related signals
     signal Diagnostic_Error : std_logic := '0';         -- In case diagnostic word disappeared
@@ -35,14 +35,15 @@ architecture Deframing of Meta_Deframer is
     -- CRC-32 related
     signal CRC32_In  : std_logic_vector(63 downto 0);   -- Data transmitted to CRC-32
     signal CRC32_Out : std_logic_vector(31 downto 0);   -- Calculated CRC-32 which returns
-    signal CRC32_En  : std_logic;                       -- Indicate the CRC-32 the data is valid
+    --signal CRC32_En  : std_logic;                       -- Indicate the CRC-32 the data is valid
     signal CRC32_Rst : std_logic;                       -- CRC-32 reset
-    signal CrcCalc   : std_logic;
-    signal CRC32_Check1, CRC32_Check2 : std_logic;
-    signal CRC32_Good : std_logic;
+    signal CrcCalc   : std_logic;                       -- Calculate the CRC-32
+    signal CRC32_Check1, CRC32_Check2, CRC32_Check3 : std_logic := '0'; -- Pipeline for CRC check 
+    signal CRC32_Good : std_logic;                      -- CRC value is checked and valid
     
     -- Constants
     constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization framing layer control word
+    constant DIAGNOSTIC : std_logic_vector(63 downto 34) := "011001"&X"000000";
     constant META_TYPE_SYNCHRONIZATION: std_logic_vector(4 downto 0) := "11110";
     constant META_TYPE_SCRAM_STATE: std_logic_vector(4 downto 0) := "01010";
     constant META_TYPE_SKIP_WORD: std_logic_vector(4 downto 0) := "01010";
@@ -86,62 +87,7 @@ begin
         Reset   => CRC32_Rst
     );
     
-    CrcCalc <= CRC32_En and Data_valid_In;
-    
-    input : process (Clk, Reset) is --Input registers
-    begin 
-        if (Reset = '1') then
-            Data_P1 <= (others => '1');
-            Data_P2 <= (others => '1');
-            Data_P3 <= (others => '1');
-            --Data_P4 <= (others => '1');
-        elsif (rising_edge(clk)) then
-            Data_P3 <= Data_P2;
-            if(Data_valid_in = '1') then
-                --Data_P4 <= Data_P3;
-                
-                Data_P2 <= Data_P1;
-                Data_P1 <= Data_In(63 downto 0);
-            end if;
-        end if;
-    end process input;
-    
-    CRC_Check : process (clk, reset) is
-    begin
-        if (Reset = '1') then
-            CRC32_Error <= '0';
-            CRC32_Check1 <= '0';
-            CRC32_Check2 <= '0';
-            CRC32_Good <= '0';
-        elsif (rising_edge(clk)) then
-            CRC32_Error <= '0';
-            CRC32_Check1 <= '0';
-            CRC32_Good <= '0';
-            if(Diagnostic_Error = '0' and CRC32_In(63) = '0' and CRC32_In(62 downto 58) = META_TYPE_DIAGNOSTIC) then --diagnostic
-                CRC32_Check1 <= '1';
-            end if;
-            
-            CRC32_Check2 <= CRC32_Check1;
-            
-            if (CRC32_Check2 = '1') then
-                if(CRC32_Out /= CRC32_Value) then
-                    CRC32_Error <= '1';
-                else
-                    CRC32_Good <= '1';
-                end if;
-            end if;
-            
---            if(Diagnostic_Error = '0' and Data_P3(63 downto 58) = "011001" and Packet_Counter = 1) then
---                if(CRC32_Out = CRC32_Value) then
---                    CRC32_Error <= '0';
---                else
---                    CRC32_Error <= '1';
---                end if;
---            else
---                CRC32_Error <= '0';
---            end if;
-        end if;
-    end process CRC_Check;
+    CrcCalc <= Data_valid_In;
     
     Meta_Deframing : process (clk, reset) is
     begin
@@ -185,69 +131,71 @@ begin
 --        end if;
 --    end process Burst_Deframing;
     
-	state_decoder : process (clk)
-    begin
-        if (rising_edge(clk)) then
-            if(Data_valid_in = '1') then
-                case pres_state is
-                when IDLE =>
-                    if (Data_In(65 downto 0) = "10"&SYNCHRONIZATION) then 
-                        pres_state <= CRC;
-                    else
-                        pres_state <= IDLE;
-                    end if;
-                when CRC =>
-                    if (Packet_Counter = 23) then
-                        pres_state <= IDLE;
-                    else 
-                        pres_state <= CRC;
-                    end if;
-                when others =>
-                    pres_state <= IDLE;
-                end case;
-            else
-                pres_state <= pres_state;
-            end if;
-        end if;
-    end process;
 
-    output : process (pres_state, clk)
+
+    crc_check : process (pres_state, clk)
     begin
-        if rising_edge(clk) then
+        if (Reset = '1') then
+            Data_P1 <= (others => '1');
+            Data_P2 <= (others => '1');
             CRC32_Rst <= '0';
-            CRC32_En <= '1';
-            
+            CRC32_Error <= '0';
+            CRC32_Good <= '0';
+        elsif rising_edge(clk) then
+            CRC32_Rst <= '0';
+            CRC32_Error <= '0';
+            CRC32_Good <= '0';
+            CRC32_Check1 <= '0'; --default
+            if(Data_valid_in = '0' and CRC32_Check1 = '1') then
+                CRC32_Check1 <= '1';
+                CRC32_Check2 <= '0';
+            else
+                CRC32_Check2 <= CRC32_Check1; --pipeline
+            end if;
+            CRC32_Check3 <= CRC32_Check2; --pipeline
+            if (CRC32_Check3 = '1') then
+                if(CRC32_Out /= CRC32_Value) then
+                    CRC32_Error <= '1';
+                else
+                    CRC32_Good <= '1';
+
+                end if;
+            end if;
+        
             if(Data_valid_in = '1') then
-                --CRC32_En <= '1';
-                case pres_state is
-                when IDLE =>
-                    CRC32_In <= (others => '0');
-                    Packet_Counter <= 0;
-                    if (Data_In(65 downto 0) = "10"&SYNCHRONIZATION) then 
-                        CRC32_In <= Data_In(63 downto 0) ;
-                        CRC32_Rst <= '1';
-                        Packet_Counter <= 1;
-                    end if;
-                    
-                when CRC =>
-                    CRC32_In <= Data_In(63 downto 0);    
-                    Packet_Counter <= Packet_Counter + 1;
-                    
-                    if(Packet_Counter = 23) then
-                        if(Data_In(65 downto 58) = "10"&"0"&META_TYPE_DIAGNOSTIC ) then
-                            Diagnostic_Error <= '0';
-                            CRC32_Value <= Data_In(31 downto 0);
-                            CRC32_In(63 downto 32) <= Data_In(63 downto 32);
-                            CRC32_In(31 downto 0)  <= (others => '0'); -- CRC was generated with field padded with zeros   
-                            HealthLane <= CRC32_In(33); 
-                            HealthInterface <= CRC32_In(32); 
-                        else
-                            Diagnostic_Error <= '1';
-                            CRC32_Value <= (others => '0');
-                            CRC32_In(63 downto 0) <= (others => '0');
-                        end if;
-                    end if;
-                end case;
+                Data_P2 <= Data_P1;
+                Data_P1 <= Data_In(63 downto 0);
+                
+
+                
+                CRC32_In <= Data_In(63 downto 0);    
+                Packet_Counter <= Packet_Counter + 1;
+                                        
+                --if (Data_In(65 downto 58) = "10"&"0"&META_TYPE_SYNCHRONIZATION) then   -- L: previous:  
+                if (Data_In(65 downto 0) = "10"&SYNCHRONIZATION)   then 
+                    CRC32_Rst <= '1';
+                    Packet_Counter <= 1;
+                    pres_state <= CRC;
+                end if;
+                
+                
+                --if(Packet_Counter = 23) then
+                --if(Data_In(65 downto 58) = "10"&"0"&META_TYPE_DIAGNOSTIC ) then  -- L: to test: 
+                if(Data_In(65 downto 34) = "10"&DIAGNOSTIC ) then
+                    Diagnostic_Error <= '0';
+                    CRC32_Value <= Data_In(31 downto 0);
+                    CRC32_In(31 downto 0)  <= (others => '0'); -- CRC was generated with field padded with zeros   
+                    HealthLane <= Data_In(33); 
+                    HealthInterface <= Data_In(32);
+                    pres_state <= IDLE; 
+                    CRC32_Check1 <= '1';
+                --    else
+                --        Diagnostic_Error <= '1';
+                --        CRC32_Value <= (others => '0');
+                --        CRC32_In(63 downto 0) <= (others => '0');
+                end if;
+                --end if;
+            
             end if;
         end if;
     end process;
