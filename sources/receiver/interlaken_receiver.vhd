@@ -225,9 +225,9 @@ begin
         if (reset = '1') then
             RX_Data_Out <= (others => '0');
         elsif (rising_edge(fifo_read_clk)) then
-            RX_SOP <= FIFO_Data_Out(65);
-            RX_EOP <= FIFO_Data_Out(64);
-            RX_EOP_Valid <= FIFO_Data_Out(68 downto 66);
+            RX_SOP <= FIFO_Data_Out(68);
+            RX_EOP <= FIFO_Data_Out(67);
+            RX_EOP_Valid <= FIFO_Data_Out(66 downto 64);
             RX_Data_Out <= FIFO_Data_Out(63 downto 0);
         end if;
     end process output;

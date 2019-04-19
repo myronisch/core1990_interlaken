@@ -51,13 +51,13 @@ architecture Deframing of Burst_Deframer is
 begin
         
     CRC_24_Encoding : entity work.CRC_24 -- Define the connections of the CRC-24 component to the Burst component and generics
-    generic map
-    (
-        Nbits       => 64,
-        CRC_Width   => 24,
-        G_Poly      => X"32_8B63", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41") -- leo: changed 04C1_1DB7 to 328B63
-        G_InitVal   => X"FF_FFFF"
-    )
+    --generic map
+    --(
+    --    Nbits       => 64,
+    --    CRC_Width   => 24,
+    --    G_Poly      => X"32_8B63", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41") -- leo: changed 04C1_1DB7 to 328B63
+    --    G_InitVal   => X"FF_FFFF"
+    --)
     port map
     (
         Clk     => Clk,
@@ -96,9 +96,8 @@ begin
                 --data_word_reg <= data_in;
                 --data_word_reg_p1 <= data_word_reg;
                 --SOP_p1 <= SOP;
+                EOP_signal <= '0';
             end if;
-            
-            
             if (Data_in(65 downto 64) = "10" and Data_valid_in = '1') then
                 SOP_signal <= Data_In(61);
                 if(Data_in(60) = '1') then
@@ -111,12 +110,18 @@ begin
             
             data_out <= data_P1(63 downto 0);
             EOP_valid <= EOP_valid_signal;
-            SOP <= SOP_signal;
-            EOP <= EOP_signal;
+            if data_valid_P1 = '1' then
+                SOP <= SOP_signal;
+                SOP_signal <= '0';
+                            
+            end if;
+            
             data_valid_out <= data_valid_P1;
             
         end if;
     end process Burst_Deframing;
+    
+    EOP <= EOP_signal;
     
 	state_register : process (clk) is
     begin
@@ -125,7 +130,7 @@ begin
         end if;
     end process state_register;
     
-    state_decoder : process (pres_state, Packet_Counter, Data_In) is
+    state_decoder : process (pres_state, Data_In) is
     begin
         case pres_state is
         when IDLE =>
@@ -154,6 +159,7 @@ begin
             CRC24_RST <= '0';
             CRC24_Good <= '0';
             CRC24_Error <= '0';
+            CRC_Check_P1 <= '0'; ---
             CRC_Check_P2 <= CRC_Check_P1;
             CRC_Check_P3 <= CRC_Check_P2;
             CRC24_Value_P2 <= CRC24_Value_P1;
@@ -168,7 +174,7 @@ begin
             end if;                            
             if Data_Valid_In = '1' then
                 CRC24_En <= '1';
-                CRC_Check_P1 <= '0'; 
+                --CRC_Check_P1 <= '0'; 
                 CRC24_RST <= CRC_Check_P1;
                 
                 
@@ -180,7 +186,7 @@ begin
                 --    end if;
                 --when CRC =>
                     CRC24_In <= Data_In(63 downto 0);
-                    if(Data_In(65 downto 63) = "101"  and Data_In(60) = '1') then -- Only start CRC check on EOP
+                    if(Data_In(65 downto 63) = "101"  and Data_In(61 downto 60) = "01") then -- Only start CRC check on EOP
                         CRC_Check_P1 <= '1';
                         CRC24_Value_P1 <= Data_In(23 downto 0); -- Copy received CRC-24 value
                         CRC24_In(63 downto 32) <= Data_In(63 downto 32); --Change to CRC-length
@@ -188,6 +194,8 @@ begin
                     end if;                
                
                 --end case;
+            else
+                CRC_Check_P1 <= CRC_Check_P1;
             end if;
         end if;
     end process output;

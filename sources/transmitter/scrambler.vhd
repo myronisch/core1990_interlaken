@@ -23,6 +23,12 @@ end Scrambler;
 architecture Scrambling of Scrambler is 
 	signal Poly : std_logic_vector (57 downto 0);
 	signal Shiftreg : std_logic_vector (63 downto 0);	
+	    -- Constants
+    constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization framing layer control word
+    constant SCRAM_STATE_INIT_VALUE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000"; -- Starting value of scrambler 
+    constant META_TYPE_SYNCHRONIZATION: std_logic_vector(4 downto 0) := "11110";
+    constant META_TYPE_SCRAM_STATE: std_logic_vector(4 downto 0) := "01010";
+
 begin
 	shiftreg(63) <= Poly(57) xor Poly(38);
     shiftreg(62) <= Poly(56) xor Poly(37);
@@ -100,23 +106,21 @@ begin
 		elsif (rising_edge(clk)) then
             --if (Data_Valid_In = '1' and Gearboxready = '1') then
             if (Gearboxready = '1') then
-                if (Data_In(65 downto 64) = "10") then                     --Checks if incoming data is control word
-                    if(Data_In(63 downto 58)= "011110") then       -- Sync words are not scrambled  
+                if (Data_In(65 downto 63) = "100") then                     --Checks if incoming data is control word
+                    if(Data_In(62 downto 58)= META_TYPE_SYNCHRONIZATION) then       -- Sync words are not scrambled  
                         Data_Out <= Data_In;
-                     --   Data_Out <= Data_In;
-                    elsif (Data_In(63 downto 58) = "001010") then   -- Scrambler state words are not scrambled
+                    elsif (Data_In(62 downto 58) = META_TYPE_SCRAM_STATE) then   -- Scrambler state words are not scrambled
                         Data_Out(63 downto 0) <= Data_In(63 downto 58) & Poly;
-                      --  Data_Out <= Data_In(63 downto 58) & Poly;
                     else
                         Poly <= shiftreg(57 downto 0);              -- All other control words are scrambled
-                        Data_Out(63 downto 0) <= Data_In(63 downto 0) xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
+                        Data_Out(63 downto 0) <= Data_In(63 downto 0) xor (Poly(57 downto 0) & Shiftreg(63 downto 58));
                     end if;
-                    Data_Out(65 downto 64) <= "10";
                 else
                     Poly <= shiftreg(57 downto 0);                  -- All data words are scrambled
-                    Data_Out(63 downto 0) <= Data_In(63 downto 0) xor (Shiftreg(63 downto 58) & Poly(57 downto 0));
-                    Data_Out(65 downto 64) <= "01";
+                    Data_Out(63 downto 0) <= Data_In(63 downto 0) xor (Poly(57 downto 0) & Shiftreg(63 downto 58));  -- correct 
+                    
                 end if;
+                Data_Out(65 downto 64) <= Data_In(65 downto 64);  -- Data word header
                 Data_Valid_Out <= Data_Valid_In;
             end if;
         end if;

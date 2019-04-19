@@ -59,10 +59,10 @@ architecture framing of Burst_Framer is
 	
     signal CRC24_TX  : std_logic_vector(66 downto 0) := (others => '0');   -- Data transmitted to CRC-24
     signal CRC24_Out : std_logic_vector(23 downto 0);   -- Calculated CRC-24 which returns
-    --signal CRC24_En  : std_logic;                       -- Indicate the CRC-24 the data is valid
+    signal CRC24_En  : std_logic;             --l          -- Indicate the CRC-24 the data is valid
     signal CRC24_RST : std_logic;                       -- CRC24 reset
     signal CRC24_P1  : std_logic;                       -- CRC24 reset pipelining
-    signal CRC24_RST_P1  : std_logic;                       -- CRC24 reset pipelining
+    --signal CRC24_RST_P1  : std_logic;                       -- CRC24 reset pipelining
     signal CRC24_Stored : std_logic_vector(31 downto 0);
     signal CRC24_Ready : std_logic;
     signal CRC_P1, CRC_P2 : std_logic;
@@ -76,33 +76,17 @@ architecture framing of Burst_Framer is
    -- constant EOP : std_logic_vector(2 downto 0) := "001";  -- End Of Pack
     
 
-    component CRC_24 -- Add the CRC-24 component
-        generic
-        (
-            Nbits     : positive := 64;
-            CRC_Width : positive := 24;
-            G_Poly    : Std_Logic_Vector := X"32_8B63"; -- Polynomal for CRC24 Interlaken
-            G_InitVal : std_logic_vector:=X"FF_FFFF"
-        );
-        port
-        (
-            CRC   : out std_logic_vector(CRC_Width-1 downto 0);
-            Calc  : in  std_logic;
-            Clk   : in  std_logic;
-            DIn   : in  std_logic_vector(Nbits-1 downto 0);
-            Reset : in  std_logic
-        );
-    end component CRC_24;
+
 begin
 
-	CRC_24_Encoding : CRC_24 -- Define the connections of the CRC-24 component to the Burst component and generics
-	generic map
-	(
-        Nbits       => 64,
-        CRC_Width   => 24,
-        G_Poly      => X"32_8B63", --Test with CRC-32 : 1EDC_6F41 (Interlaken-24 : X"32_8B63") previous: 04C11DB7
-        G_InitVal   => X"FF_FFFF"
-	)
+	CRC_24_Encoding : entity work.CRC_24 -- Define the connections of the CRC-24 component to the Burst component and generics
+	--generic map
+	--(
+    --    Nbits       => 64,
+    --    CRC_Width   => 24,
+    --    G_Poly      => X"32_8B63", --Test with CRC-32 : 1EDC_6F41 (Interlaken-24 : X"32_8B63") previous: 04C11DB7
+    --    G_InitVal   => X"FF_FFFF"
+	--)
     port map
 	(
         Clk     => Clk,
@@ -112,7 +96,8 @@ begin
         Reset   => CRC24_RST
 	);
 	
-    CalcCrc <= Gearboxready and FIFO_meta;
+    CalcCrc <= Gearboxready and FIFO_meta; -- previously     CalcCrc <=  Gearboxready and FIFO_meta;
+
 	
     pipeline : process (clk, reset)
         variable CRC24_Out_v: std_logic_vector(23 downto 0); 
@@ -128,7 +113,7 @@ begin
             --Data_Control_Out <= '0';
             Data_Valid_Out   <= '0';
             CRC24_Ready      <= '0';
-            CRC24_RST_P1     <= '0';
+            --CRC24_RST_P1     <= '0';
         elsif (rising_edge(clk)) then
 --            if (CRC24_Rst <= '1') then
 --                CRC24_PP1 <= '1';
@@ -146,7 +131,7 @@ begin
             CRC_P1 <= '0';
             
             Gearboxready_P1 <= Gearboxready;
-            CRC24_Rst_P1 <= CRC24_Rst;
+            --CRC24_Rst_P1 <= CRC24_Rst;
             
             if(CRC24_TX(62 downto 60) = "100" or CRC24_TX(61 downto 60) = "01") then
                 CRC_P1 <= '1';
@@ -291,10 +276,10 @@ begin
         if rising_edge(clk) then
             CRC24_RST <= '0'; 
             -- X"Type/SOP/EOP(2)FlowC(2)_FlowC(2)Channel(2)_Mutiple(2)CRC24(2)_CRC24(2)CRC24(2)" Structure of packet
-            if(Gearboxready = '1' and  FIFO_meta = '1') then
+            if(Gearboxready = '1' and  FIFO_meta = '1' ) then
                 case pres_state is
                 when IDLE =>  		-- Wait for SOP, start reading FIFO and save last cycle data
-                    --CRC24_EN <= '0'; -- Reset CRC calculations
+                    CRC24_EN <= '0'; -- Reset CRC calculations
                     CRC24_RST <= '1';
                     Data_Valid <= '0';
                     Word_Control_out <= '0';
@@ -309,7 +294,7 @@ begin
                     
                     if (TX_SOP = '1' and TX_Enable = '1') then -- Indicates the start of data flow
                         CRC24_TX <= "010"&X"E000_0001_0000_0000"; -- Start packet E000_0001_0000_0000
-                        CRC24_TX(55 downto 40) <= RX_prog_full;
+                        --CRC24_TX(55 downto 40) <= RX_prog_full;
                         Data_Valid <= '1';
                         Data_valid_temp <= '1'; --Start of a new packet is always valid
                    -- elsif (TX_flowcontrol(0) = '0') then  -- TODO Flowcontrol is not used? why as condition? 
@@ -317,7 +302,7 @@ begin
                      --   CRC24_TX(55 downto 40) <= RX_prog_full;
                         
                     else
-                        CRC24_TX <= "001"&X"0000_0000_0000_0000"; ---TODO what does this case mean? error condition? -- data word placeholder
+                        CRC24_TX <= "001"&X"0000_0000_0000_0000"; -- data word placeholder
                     end if;
                     
                     if(TX_EOP = '1' and TX_SOP = '1') then
@@ -337,7 +322,7 @@ begin
 --                        Data_temp <= X"8000_0001_0000_0000";
 --                    end if;
                     CRC24_RST <= '0';
-                    --CRC24_EN <= Data_in_valid;  -- <= '1' --Data_in_valid; -- Makes CRC-32 error
+                    CRC24_EN <= Data_in_valid;  -- <= '1' --Data_in_valid; -- Makes CRC-32 error
                     FIFO_readreq <= '1';
                     
                     --added
@@ -375,11 +360,11 @@ begin
                 when WORD =>        -- Reset byte count, send frame to CRC-24, stop reading FIFO to make room for output frame 
                     FIFO_readreq <= '1';
                     Byte_Counter <= 0;
-                    --CRC24_EN <= '1';
+                    CRC24_EN <= '1';
                     
                     CRC24_TX <= Data_temp;
-                    Data_temp <= "010"&X"C000_0001_0000_0000"; -- Burst no start nor end packet 1100
-                    Data_temp(55 downto 40) <= RX_prog_full;
+                    Data_temp <= "010"&X"C000_0001_0000_0000"; -- Burst no start nor end packet (Idle words)
+                    --Data_temp(55 downto 40) <= RX_prog_full;
                     
                     Data_valid <= Data_valid_temp;
                     Data_valid_temp <= '1';
@@ -401,7 +386,7 @@ begin
                     HealthInterface <= '1'; -- set status of interface to health
                     
                     Data_Control <= '0';
-                    --CRC24_EN <= '1';
+                    CRC24_EN <= '1';
                     CRC24_RST <= '0';
                     if (CRC24_P1 = '1') then
                         CRC24_RST <= '1';
@@ -412,10 +397,10 @@ begin
                     if (Byte_Counter >= BurstShort) then
                          FIFO_readreq <= '1';
                     end if; 
-                    --Byte_Counter <= Byte_Counter + 8;
+                    Byte_Counter <= Byte_Counter + 8; --
                     
                     CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet 1001
-                    CRC24_TX(55 downto 40) <= RX_prog_full;
+                    --CRC24_TX(55 downto 40) <= RX_prog_full;
                     CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s; 
                     Data_Valid <= '1';
                     Data_Control <= '1'; 
@@ -424,8 +409,8 @@ begin
     --                FIFO_readreq <= '1';
                     Byte_Counter <= Byte_Counter + 8;
                     CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
-                    CRC24_TX(55 downto 40) <= RX_prog_full;
-                    --CRC24_EN <= '0';
+                    --CRC24_TX(55 downto 40) <= RX_prog_full;
+                    CRC24_EN <= '0';
                     Data_Valid <= '1';
                     CRC24_RST <= '1';
                     if (Byte_Counter >= BurstShort-8) then
@@ -436,12 +421,13 @@ begin
                     FIFO_readreq <= '1';
                     CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
                     CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;
-                    CRC24_TX(55 downto 40) <= RX_prog_full;
+                    --CRC24_TX(55 downto 40) <= RX_prog_full;
                     Data_Valid <= '1';
                     Data_Control <= '1';
 
                 end case;
             else
+                CRC24_RST <= CRC24_RST;
                 if data_in_valid = '1' then
                     valid_temp <= '1';
                 end if;

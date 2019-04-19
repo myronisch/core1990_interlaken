@@ -55,7 +55,7 @@ architecture Transmitter of Interlaken_Transmitter is
 	signal Data_Control_Meta_Out : std_logic;
 	signal Data_Valid_Meta_Out : std_logic;
 	signal Data_Meta_Out : std_logic_vector(66 downto 0);
-	signal HealthStatus : std_logic_vector(1 downto 0) := "00";  --Status bits in the diagnostic word
+	signal HealthStatus : std_logic_vector(1 downto 0) := "11";  -- TODO: derive this from the actual transceiver (Status bits in the diagnostic word)
 	signal FIFO_Read_Meta : std_logic;
 	
 	signal Data_Control_Scrambler_Out : std_logic;

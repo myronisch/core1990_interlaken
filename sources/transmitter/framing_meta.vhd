@@ -55,20 +55,20 @@ architecture framing of Meta_Framer is
     
         -- Constants
     constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization, framing layer control word
-    constant SCRAMBLER_STATE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000";  -- scrambler state (real value will be collected later) -
+    constant SCRAM_STATE_INIT_VALUE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000"; -- Starting value of scrambler 
     constant SKIP_WORD : std_logic_vector(63 downto 0) := X"1e1e_1e1e_1e1e_1e1e"; -- skip word, framing layer control word
 
 
 begin
     
     CRC_32_Encoding : entity work.CRC_32 -- Define the connections of the CRC-24 component to the Burst component and generics
-    generic map
-    (
-        Nbits       => 64,
-        CRC_Width   => 32,
-        G_Poly      => X"1EDC_6F41", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41")
-        G_InitVal   => X"FFFF_FFFF"
-    )
+--    generic map
+--    (
+--        Nbits       => 64,
+--        CRC_Width   => 32,
+--        G_Poly      => X"1EDC_6F41", --Test with CRC-32 (Interlaken-32 : X"1EDC_6F41")
+--        G_InitVal   => X"FFFF_FFFF"
+--    )
     port map
     (
         Clk     => Clk,
@@ -214,7 +214,7 @@ begin
                 when SCRAM =>
                     Data_Valid <= '1';
                     Packet_Counter <= Packet_Counter + 1;
-                    Data_Framed <= SCRAMBLER_STATE; -- Scrambler state (real data added later)
+                    Data_Framed <= SCRAM_STATE_INIT_VALUE; -- Scrambler state (real data added later)
                     Data_P2 <= Data_P1;
                     Data_P1 <= Data_in(63 downto 0);
                     Data_valid_p2 <= Data_valid_p1;
@@ -235,7 +235,7 @@ begin
                     CRC32_EN <= '1';
                     Packet_Counter <= Packet_Counter + 1;
                     HDR_Meta <= "001";
-                    Data_valid <= '0';
+                    Data_valid <= '0'; -- why 0
                     
                     Data_Framed <= Data_P3; 
                     Data_P3 <= Data_P2;
