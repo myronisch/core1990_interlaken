@@ -1,0 +1,294 @@
+{{ tree.warning|c_comment }}
+
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+
+#include "regmap/regmap-symbol.h"
+
+
+static
+void regmap_str_upper(char *str)
+{
+  do
+    {
+      *str = toupper((unsigned char) *str);
+    } while (*str++);
+}
+
+
+int
+regmap_cfg_set_option(u_long offset, const char* key, u_long value)
+{
+  int result, found;
+  char* upper;
+
+  regmap_bitfield_t* bf;
+  u_long* address;
+  u_long mask;
+  u_int shift;
+
+  result = 0;
+
+  upper = strdup(key);
+  regmap_str_upper(upper);
+
+  found = 0;
+
+  for(bf=regmap_bitfields; bf->name != NULL; bf++) {
+    if(0 == strcmp(upper, bf->name)) {
+      found = 1;
+
+      if(!(bf->flags & REGMAP_REG_WRITE)) {
+        result = REGMAP_CFG_ERROR_NOT_WRITABLE;
+        printf("Bitfield not writable!\n");
+        break;
+      }
+
+      address = (u_long*)(offset + bf->address);
+      mask = bf->mask;
+      shift = bf->shift;
+      /* zero the bits we're writing to... */
+      *address &=~ mask;
+      /* then OR the previous address with the value we're writing */
+      *address |= (value << shift) & mask;
+      break;
+    }
+  }
+
+  if(!found) {
+    result = REGMAP_CFG_ERROR_NO_EXIST;
+    printf("Bitfield %s does not exist!\n", key);
+  }
+
+  free(upper);
+  return result;
+}
+
+int
+regmap_cfg_get_option(u_long offset, const char* key, u_long* value)
+{
+  int result, found;
+  char* upper;
+
+  regmap_bitfield_t* bf;
+  u_long* address;
+  u_long mask;
+  u_int shift;
+
+  result = 0;
+
+  upper = strdup(key);
+  regmap_str_upper(upper);
+
+  found = 0;
+
+  for(bf=regmap_bitfields; bf->name != NULL; bf++) {
+    if(0 == strcmp(upper, bf->name)) {
+      found = 1;
+
+      if(!(bf->flags & REGMAP_REG_READ)) {
+        result = REGMAP_CFG_ERROR_NOT_READABLE;
+        printf("Bitfield not readable!\n");
+        break;
+      }
+
+      address = (u_long*)(offset + bf->address);
+      mask = bf->mask;
+      shift = bf->shift;
+      *value = (*address & mask) >> shift;
+      break;
+    }
+  }
+
+  if(!found) {
+    result = REGMAP_CFG_ERROR_NO_EXIST;
+    printf("Bitfield does not exist!\n");
+  }
+
+  free(upper);
+  return result;
+}
+
+int
+regmap_cfg_set_reg(u_long offset, const char* key, u_long value)
+{
+  int result, found;
+  char* upper;
+
+  regmap_register_t* reg;
+  u_long* address;
+
+  result = 0;
+
+  upper = strdup(key);
+  regmap_str_upper(upper);
+
+  found = 0;
+
+  for(reg=regmap_registers; reg->name != NULL; reg++) {
+    if(0 == strcmp(upper, reg->name)) {
+      found = 1;
+
+      if(!(reg->flags & REGMAP_REG_WRITE)) {
+        result = REGMAP_CFG_ERROR_NOT_WRITABLE;
+        printf("Register not writable!\n");
+        break;
+      }
+
+      address = (u_long*)(offset + reg->address);
+      *address = value;
+      break;
+    }
+  }
+
+  if(!found) {
+    result = REGMAP_CFG_ERROR_NO_EXIST;
+    printf("Register %s does not exist!\n", key);
+  }
+
+  free(upper);
+  return result;
+}
+
+int
+regmap_cfg_get_reg(u_long offset, const char* key, u_long* value)
+{
+  int result, found;
+  char* upper;
+
+  regmap_register_t* reg;
+  u_long* address;
+
+  result = 0;
+
+  upper = strdup(key);
+  regmap_str_upper(upper);
+
+  found = 0;
+
+  for(reg=regmap_registers; reg->name != NULL; reg++) {
+    if(0 == strcmp(upper, reg->name)) {
+      found = 1;
+
+      if(!(reg->flags & REGMAP_REG_READ)) {
+        result = REGMAP_CFG_ERROR_NOT_READABLE;
+        printf("Register not readable!\n");
+        break;
+      }
+
+      address = (u_long*)(offset + reg->address);
+      *value = *address;
+      break;
+    }
+  }
+
+  if(!found) {
+    result = REGMAP_CFG_ERROR_NO_EXIST;
+    printf("Register does not exist!\n");
+  }
+
+  free(upper);
+  return result;
+}
+
+/* ================================ */
+/* BELOW is ONLY generated CODE !   */
+/* ================================ */
+regmap_register_t regmap_registers[] =
+  {
+{% for item in nodes['Bar2']|list_nodes_recursively %}
+{% if item.is_group %}
+    /* {{ item.full_name|e }} */
+{% endif %}
+{% if item.is_register %}
+    { REG_{{ item.prefix_name }},
+      "Full Register",
+      {{ item.address|c_hex(5) }},
+      REGMAP_REG_READ{% if item.has_write_bitfields or item.has_trigger_bitfields %}|REGMAP_REG_WRITE{% endif %},
+      REGMAP_ENDPOINT_0{% if item.has_endpoint(1) == '0,1' %}|REGMAP_ENDPOINT_1{% endif %}
+
+    },
+{% endif %}
+{% endfor %}
+    { NULL,
+      NULL,
+      0,
+      0,
+      0
+    }
+  };
+
+
+regmap_bitfield_t regmap_bitfields[] =
+  {
+{% for item in nodes['Bar2']|list_nodes_recursively %}
+{% if item.is_group %}
+    /* {{ item.full_name|e }} */
+{% endif %}
+{% if item.is_register %}
+{% for bf in item.bitfield %}
+    { BF_{{ bf.full_name }},
+      "{{ bf.desc|c_string }}",
+      {{ item.address|c_hex(5) }},
+      {{ bf|c_mask|c_hex(16) }},
+      {{ bf.lo }},
+      {{ bf.hi }},
+      REGMAP_REG_READ{% if bf.is_write or bf.is_trigger %}|REGMAP_REG_WRITE{% endif %},
+      REGMAP_ENDPOINT_0{% if bf.has_endpoint(1) == '0,1' %}|REGMAP_ENDPOINT_1{% endif %}
+      
+    },
+{% endfor %}
+{% endif %}
+{% endfor %}
+    { NULL,
+      NULL,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    }
+  };
+
+
+regmap_group_t regmap_groups[] =
+  {
+{% set _index = [0] %}
+{% set _col = [0] %}
+{% for item in nodes['Bar2']|list_nodes_recursively %}
+{% set index = _index.pop() %}
+{% set col = _col.pop() %}
+{% if item.has_groupname %}
+{% if index > 0  %}
+{% set col = 0 %}
+ -1 }
+    },
+{% endif %}
+    /* {{ item.full_name|e }} */
+    { GRP_{{ item.group }},
+      "{{ item.desc }}",
+      {
+{%- endif %}
+{%- if item.is_register %}
+ {{ index }},
+{%- set index = index + 1  %}
+{%- set col = col + 1 %}
+{% if col % 10 == 0 %}
+{% set col = 0 %}
+
+{% endif %}
+{%- endif %}
+{% if _index.append(index) %}{% endif %}
+{% if _col.append(col) %}{% endif %}
+{%- endfor %}
+ -1 }
+    },
+    { NULL,
+      NULL,
+      { -1 }
+    }
+  };

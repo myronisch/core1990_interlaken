@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{{ tree.warning|html_comment }}
+<html>
+<head>
+<style>
+table {
+    width: 100%;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+    vertical-align: top;
+}
+th {
+    text-align: left;
+}
+.group {
+    text-align: left;
+    font-weight: bold;
+}
+.type, .range, .endpoints {
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+  <table>
+    <tr>
+      <th>Address</th>
+      <th>PCIe</th>
+      <th>Name</th>
+      <th>Field</th>
+      <th>Bits</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+{% for item in tree|list_nodes_recursively(True) %}
+{% if item.is_group %}
+    <tr>
+      <td colspan="7" class="group">{{ item.full_name | camel_case_to_space }}</td>
+    </tr>
+{% endif %}
+{% if item.is_register %}
+{% for bf in item.bitfield %}
+    <tr>
+{% if loop.first %}
+      <td rowspan="{{item.bitfield|count}}">{{item.address|c_hex}}</td>
+      <td rowspan="{{item.bitfield|count}}">{{item.endpoints}}</td>
+      <td rowspan="{{item.bitfield|count}}">{{item.prefix_name}}</td>
+{% endif %}
+      <td class="name">{{bf.name}}</td>
+      <td class="range">{{bf.range}}</td>
+      <td class="type">{{bf.type}}</td>
+      <td class="desc">{{bf.desc|html_string}}</td>
+    </tr>
+{% endfor %}
+{% endif %}
+{% endfor %}
+  </table>
+
+</body>
+</html>

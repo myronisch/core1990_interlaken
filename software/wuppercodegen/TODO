@@ -1,0 +1,26 @@
+- example simple_vhdl.vhd is messed up
+
+- properly handle <o>write</o> for latex into \overline{write}
+- array with one element generates "-1" item on top of "0" item
+
+- handle formatting indent of tags
+To get the output formatting right we currently need to put all the statements at the beginning of the line:
+
+{% for item in tree|list_nodes_recursively %}
+{% if item.is_group %}
+    Some indented line
+{% endif %}
+{% if item.is_register %}
+    Another indented line
+{% endif %}
+{% endfor %}
+
+rather than:
+{% for item in tree|list_nodes_recursively %}
+  {% if item.is_group %}
+    Some indented line
+  {% endif %}
+  {% if item.is_register %}
+    Another indented line
+  {% endif %}
+{% endfor %}

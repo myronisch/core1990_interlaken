@@ -1,0 +1,48 @@
+\section{Customizing the application}
+\subsection{connection of the DMA FIFOs}
+Wupper comes with an example application that is described in \ref{sec:ExampleApp}. The toplevel file for the user application is application.vhd
+
+If you want to customize the example application for your own needs, the application can be stripped down to only containing the two FIFO cores. The application can be controlled and monitored by the records "registermap\_control" and "registermap\_monitor". These records contain all the read/write register and the read only registers respectively, the registers are defined in the file pcie\_package.vhd.
+
+This file contains a read and a write port for a FIFO. This FIFO has a port width of 256 bit and is read or written at 250 MHz, resulting in a theoretical throughput of 60Gbit/s.
+
+\subsection{Application specific registers}
+Besides DMA memory reads and writes, the PCIe Engine also provides means to create a custom application specific register map. By default, the BAR2 register space is reserved for this purpose.
+
+\begin{lstlisting}[language=VHDL, frame=single, caption=custom register types]
+  type register_map_control_type is record
+	STATUS_LEDS                    : std_logic_vector(7 downto 0);    -- Board GPIO Leds
+	LFSR_SEED_0                    : std_logic_vector(63 downto 0);   -- Least significant 64 bits of the LFSR seed
+	LFSR_SEED_1                    : std_logic_vector(63 downto 0);   -- Bits 127 downto 64 of the LFSR seed
+	LFSR_SEED_2                    : std_logic_vector(63 downto 0);   -- Bits 191 downto 128 of the LFSR seed
+	LFSR_SEED_3                    : std_logic_vector(63 downto 0);   -- Bits 255 downto 192 of the LFSR seed
+	APP_MUX                        : std_logic_vector(0 downto 0);    -- Switch between multiplier or LFSR.
+	--   * 0 LFSR
+	--   * 1 Loopback
+	
+	LFSR_LOAD_SEED                 : std_logic_vector(64 downto 64);  -- Writing any value to this register triggers the LFSR module to reset to the LFSR_SEED value
+	APP_ENABLE                     : std_logic_vector(0 downto 0);    -- 1 Enables LFSR module or Loopback (depending on APP_MUX)
+	-- 0 disable application
+	
+	I2C_WR                         : bitfield_i2c_wr_t_type;       
+	I2C_RD                         : bitfield_i2c_rd_t_type;       
+	INT_TEST_4                     : std_logic_vector(64 downto 64);  -- Fire a test MSIx interrupt #4
+	INT_TEST_5                     : std_logic_vector(64 downto 64);  -- Fire a test MSIx interrupt #5
+  end record;
+
+\end{lstlisting}
+
+The VHDL files containing the registermap are not supposed to be modified by hand. Instead WupperCodeGen can be used.
+
+Inside the source tree you will find the directory WupperCodeGenScripts containing the YAML file with application specific registers, and a set of scripts to generate VHDL sources, C++ headers and Latex and HTML documentation.
+\begin{itemize}
+	\item \textbf{registers-1.0.yaml: }This is the database of registers 
+	\item \textbf{build-doc.sh }Run this script to generate the table of registers in \ref{App:Regmap}
+	\item \textbf{build-firmware.sh }Regenerate the firmware (pcie\_control.vhd and pcie\_package.vhd) from the yaml file
+	\item \textbf{build-software.sh }Regenerate the sources in software/regmap from the yaml file.
+
+\end{itemize}
+
+For more information see the documentation in software/wuppercodegen/doc
+
+\newpage

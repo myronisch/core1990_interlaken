@@ -1,0 +1,241 @@
+\section{Wupper package}
+
+In this section, the firmware, drivers, and tools of Wupper together with its working principle are explained. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 0.8 \textwidth]{figures/full_application_structure.pdf}	
+	\caption{Overview of the HDL modules in the Wupper package}
+	\label{fig:wupperpackage}
+\end{figure}
+
+
+\subsection {Wupper core}
+A DMA Engine, like Wupper, moves data bidirectionally to a memory buffer without CPU intervention. This efficient method is used for handling large amounts of data, which is crucial for throughput intensive applications. During a DMA tranfer, the DMA control core will take control according to the information provided by a DMA descriptor, and by flagging completion of operations in a per descriptor status register. By providing user data into the FIFO's, the core starts the DMA transfer over the PCIe lanes. Figure~\ref{fig:wupperpackage} shows a simplified diagram of the of the HDL modules of the Wupper package; including the HDL modules for the Wupper core and the example application, together with the host PC memory. Figure ~\ref{fig:pcie_core_structure} shows a more detailed block diagram of the Wupper core.
+\newpage
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[trim=0mm 0cm 0mm 1cm,width=0.75\textwidth, page=1]{figures/wupper_structure.pdf}
+	\caption{Structure of the PCIe Engine}
+	\label{fig:pcie_core_structure}
+\end{figure}
+
+Xilinx has introduced the AXI4-Stream interface \cite{ug761} for the Virtex-7 PCIe core, this is a simplified version of the ARM AMBA AXI bus \cite{arm}  which doesn't contain any address lines. Instead the Address and other information are supplied in the header of each PCIe package (TLP). 
+
+The Wupper Core is divided into two parts:
+
+\begin{enumerate}
+	\item DMA Control \\This is the entity in which the descriptors are parsed and fed to the engine, and where the status register of every descriptor can be read back through PCIe. DMA control contains a register map, with addresses to the descriptors, status registers and external registers for the user application.
+	\item DMA Read Write \\This entity contains the processess to parse the DMA descriptors and transfer the data from the FIFO to the AXI stream bus and vise versa.
+\end{enumerate}
+
+Figure~\ref{fig:pcie_core_structure} also shows the sync stage for the IO and external registers. The user space registers are synchronized to a slower clock (41.66MHz or 250MHz/6) in order to relax timing closure of the design. 
+
+\subsubsection {DMA control} 
+The DMA control (DMA\_control in Figure~\ref{fig:wupperpackage}) process consists of a register map which can be configured from a PC using the Wupper tools. The registermap is divided in three regions: BAR0, BAR1 and BAR2. BAR stands for Base Address Region. Every BAR has 1 MB of address space.
+
+BAR0 contains registers associated with DMA like the DMA descriptors. The descriptors specify the addresses, transfer direction, size of the data and an enable line. Figure~\ref{fig:wupperpackage} shows that the information is fed to the DMA\_read\_write core.
+
+BAR1 is reserved for the interrupt mechanism and consists of 8 vectors.
+
+BAR2 is used for the benchmark application and is dedicated to user applications. The implemented registers are summarized in Appendix ~\ref{App:Regmap}. 
+
+The dma control module has the functionality to implement and manage the DMA descriptors, the interrupt vector and also the application specific registers.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[trim=0mm 2cm 0mm 1cm, width=0.75\textwidth, page=3]{figures/wupper_structure.pdf}
+	\caption{Flow of a Register / Descriptor Read or Write process}
+	\label{fig:flow_dma_control}
+\end{figure}
+The DMA Control process always responds to a request with a certain req\_type from the PC. It does only respond to IO and Memory reads and writes, for all other request types it will send an unknown request reply. If the data in the payload contains more than 128 bits, the process will only process the first 128 bits and go back to idle state. The maximum register size has been set to 128 bits because this is a convenient maximum register size; it is also the maximum payload that fits in one 250 MHz clock cycle of the AXI4-Stream interface. For most PC applications, a 64 bit register size is more practical, for that purpose, the registers can be read and written in parts of 32, 64 or 128 bits at the time.
+
+\subsubsection {DMA read/write}
+The DMA read and write (DMA\_read\_write in Figure~\ref{fig:wupperpackage}) module handles the transfer from the FIFO's according to the direction specified by the descriptors. If data shifts into the ToHost FIFO, a non-empty flag will be asserted to start the DMA write process, this direction of the flow is defined as the "ToHost". This process reads the descriptors and creates a header with the information. The header is added when the data shifts out of the ToHost FIFO. For the reversed situation, the data with a header is read from the PC memory. This direction of the flow is then defined as "FromHost". The information in the header will be parsed by the DMA control and the payload fed to the FromHost FIFO.
+
+The DMA Read / Write Module contains two important processes:
+\begin{itemize}
+	\item Add Header\\In the first process the descriptors are read and a header is created according to the descriptor. If the descriptor is a write descriptor, the payload data is read from the FIFO and added after the header.
+	\item Strip Header\\In the second process the header of the received data is checked against the tag of the request, and the payload is shifted into the FIFO.
+\end{itemize}
+Both processes can fire an MSI-X type interrupt through the interrupt controller when the processing of a descriptor is completed.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[trim=0mm 1cm 0mm 0cm, width=0.75\textwidth, page=4]{figures/wupper_structure.pdf}
+	\caption{Flow of the DMA To Host action, or From Host request process}
+	\label{fig:flowdma_write}
+\end{figure}
+The DMA To Host process reads the current descriptor and requests a read or write to the PC memory. For a write it also initiates a FIFO read and adds the data into the payload of the PCIe packet. When initiating a read request, this process will additionally copy the current $tag$ into an array of tags which will be used in the DMA read process in order to check a matching reply. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[trim=0mm 3cm 0mm 1cm, width=0.75\textwidth, page=5]{figures/wupper_structure.pdf}
+	\caption{Flow of the DMA From Host process}
+	\label{fig:flow_dma_read}
+\end{figure}
+The DMA From Host process checks the header for a valid tag, created by the DMA Write process, if this header and tag is valid, the data will be pushed into the FIFO.
+
+
+\subsubsection {Xilinx PCIe End Point}
+
+
+The Virtex-7 XC7VX690T-2FFG1761C which is used on one of the Wupper target platforms, the VC-709 board has an integrated endpoint for PCI Express Gen3~\cite{pg023}. This black box handles the traffic over the PCI Express bus. Inside the Wupper core a DMA read/write process, sends and receives AXI4 commands over the AXI4-Stream bus. The black box translates this into differential electrical signals. Figure~\ref{fig:pciexpressendpoint} shows a simplified model of the firmware stack. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width = 1 \textwidth]{figures/PG023.pdf}	
+	\caption{Block diagram of the logic in the VC-709 FPGA}
+	\label{fig:pciexpressendpoint}
+\end{figure}
+
+The Configuration of the PCIe Gen3 endpoint IP Core from Xilinx is described in Appendix \ref{App:PcieCoreConfig}
+
+\subsection{Xilinx AXI4-Stream interface}
+Wupper communicates through the AXI4 Stream interface with the Xilinx PCIe Gen3 endpoint. 
+The interface has the advantage that it has two separate bidirectional AXI4-Stream interfaces. The two interfaces are the requester interface, with which the FPGA issues the requests and the PC replies, and the completer interface where the PC takes initiative.
+\begin{table}[H]
+	\centering
+	\begin{tabularx}{\textwidth}{|l|X|l|}
+		\hline
+		\textbf{bus} & \textbf{Description} &\textbf{Direction}\\
+		\hline
+		\texttt{axis\_rq} & \textbf{R}equester re\textbf{Q}uest. This interface is used for DMA, the FPGA takes the initiative to write to this AXI4-Stream interface and the PC has to answer. &FPGA $\rightarrow$ PC\\
+		\hline
+		\texttt{axis\_rc} & \textbf{R}equester \textbf{C}ompleter. This interface is used for DMA reads (from PC memory to FPGA), this interface also receives a reply message from the PC after a DMA write.&PC $\rightarrow$ FPGA\\
+		\hline
+		\texttt{axis\_cq} & \textbf{C}ompleter re\textbf{Q}uest. This interface is used to write the DMA descriptors as well as some other registers. & PC $\rightarrow$ FPGA\\
+		\hline
+		\texttt{axis\_cc} & \textbf{C}ompleter \textbf{C}ompleter. This interface is used as a reply inteface for register reads, as well as a reply header for a register write. & FPGA $\rightarrow$ PC\\
+		\hline
+		
+	\end{tabularx}
+	\caption{AXI4-Stream streams}\label{tab:axi_streams}
+\end{table}
+
+
+\newpage
+\subsection{DMA descriptors}
+\label{sec:dma_descriptors}
+Each transfer To and From Host is achieved by means of setting up descriptors on the PC side, which are then processed by Wupper.
+The descriptors are set in the BAR0 section of the register map (see Appendix~\ref{App:Regmap}). An extract of the descriptors and their registers is shown in Table~\ref{tab:dma_descriptors_types} below.
+
+\begin{longtabu} to \textwidth {|X[1.5,l]|X[4,l]|X[2,l]|X[1,l]|X[4,l]|}
+	\hline
+	\textbf{Address} &\multicolumn{1}{|l|}{\textbf{Name/Field}} &\textbf{Bits} &{\textbf{Type}} &{\textbf{Description}} \\
+	\hline
+	0x0000 & \multicolumn{4}{|c|}{DMA\_DESC\_0} \\
+	\cline{2-5}
+	& END\_ADDRESS & 127:64 & W & End Address \\
+	& START\_ADDRESS & 63:0 & W & Start Address \\
+	\hline
+	0x0010 & \multicolumn{4}{|c|}{DMA\_DESC\_0a} \\
+	\cline{2-5}
+	& RD\_POINTER & 127:64 & W & PC Read Pointer \\
+	& WRAP\_AROUND & 12 & W & Wrap around \\
+	& READ\_WRITE & 11 & W & 1: FromHost/ 0: ToHost \\
+	& NUM\_WORDS & 10:0 & W & Number of 32 bit words \\
+	\hline
+	\multicolumn{5}{|c|}{\ldots} \\
+	\hline
+	0x0200 & \multicolumn{4}{|c|}{DMA\_DESC\_STATUS\_0} \\
+	\cline{2-5}
+	& EVEN\_PC & 66 & R & Even address cycle PC \\
+	& EVEN\_DMA & 65 & R & Even address cycle DMA \\
+	& DESC\_DONE & 64 & R & Descriptor Done \\
+	& CURRENT\_ADDRESS & 63:0 & R & Current Address \\
+	\hline
+	\multicolumn{5}{|c|}{\ldots} \\
+	\hline
+	0x0400 & \multicolumn{1}{|c|}{DMA\_DESC\_ENABLE} & 7:0 & W & Enable descriptors 7:0. One bit per descriptor. Cleared when Descriptor is handled. \\
+	\hline
+	\caption{DMA descriptors types}\label{tab:dma_descriptors_types} \\
+\end{longtabu}
+
+Every descriptor has a set of registers, with the following specific functions:
+\begin{itemize}
+	\item DMA\_DESC: the register containing the start ($start\_address$) and the end ($end\_address$) memory addresses of a DMA transfer; both handled by the PC (device driver).
+	\item DMA\_DESC\_a: integrates the information above by adding (i) the status of the read pointer on the PC side ($rd\_pointer$), (ii) the wrap around functionality enabling ($wrap\_around$, see Section~\ref{sec:endless_dma} below), (iii) the FromHost ("1") and ToHost ("0") transfer direction bit ($read\_write$), and (iv) the number of 32 bits words to be transferred ($num\_words$)
+	\item DMA\_DESC\_STATUS: status of a specific descriptor including (i) wrap around information bits ($even\_pc$ and $even\_dma$), (ii) completion bit ($desc\_done$, (iii) DMA pointer current address ($current\_address$)
+	\item DMA\_DESC\_ENABLE: the descriptors enable register ($dma\_desc\_enable$), one bit per descriptor 
+\end{itemize}
+
+\newpage
+\subsection{Endless DMA with a circular buffer and wrap around}
+\label{sec:endless_dma}
+In $single\ shot$ transfer, the DMA ToHost process continues sending data TLPs (Transaction Layer Packets) until the end address ($end\_address$) is reached.
+The PC can check the status of a certain DMA transaction by looking at the $desc\_done$ flag and the $current\_address$. Another possible operation mode is the so called $endless\ DMA$: the DMA continues its action and starts over (wrap-around) at start address ($start\_address$) whenever the end address ($end\_address$) is reached. The second mode is enabled by asserting the wrap-around ($wrap\_around$) bit. In this mode the PC has to provide another address named PC pointer ($PC\_read\_pointer$): indicating where it has last read out the memory. After wrapping around the DMA core will transfer To Host memory until the $PC\_read\_pointer$ is reached. The PC read pointer should be updated more often than the wrap-around time of the DMA, however it should not be read too often as that would take up all the bandwidth, limiting the speed of the DMA transfer in progress. In order to determine whether Wupper is processing an address behind or in front of the PC, Wupper keeps track of the number of wrap around occurrences. In the DMA status registers the even\_cycle bits displays the status of the wrap-around cycle. In every even cycle (starting from 0), the bits are 0, and every wrap around the status bits will toggle. The $even\_pc$ bit flags a $PC\_read\_pointer$ wrap-around, the $even\_dma$ a Wupper wrap-around. By looking at the wrap-around flags the PC can also keep track of its own wrap-arounds. Note that while in the $endless\ DMA$ mode ($wrap\_around$ bit set), the $PC\_read\_pointer$ has to be maintained by the PC (device driver) and kept within the start and end address range for Wupper to function correctly. Figure~\ref{fig:endless_dma_diagram_tohost} below shows a diagram of the two pointers racing each other, and the different scenarios in which they can be found with respect to each other. 
+\newpage
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth, page=1]{figures/Endless_DMA_diagram.pdf}
+\caption{Endless DMA buffer and pointers representation diagram in ToHost mode}
+\label{fig:endless_dma_diagram_tohost}
+\end{figure}
+
+Looking at Figure~\ref{fig:endless_dma_diagram_tohost} above, the following scenarios can be described:
+\begin{itemize}
+	\item $A:$ start condition, both the PC and the DMA have not started their operation.
+	\item $B:$ normal condition, the PC\_read\_pointer stays behind the DMA's current\_address
+	\item $C:$ normal condition, the DMA's current\_address has wrapped around and has to stay behind the PC\_read\_pointer
+	\item $D:$ the PC is reading too slow, the DMA is stalled because the PC read pointer is not advancing fast enough, the DMA current\_address has to stay behind.
+\end{itemize}
+
+\newpage
+If the DMA descriptor is set to FromHost, the comparison of the even bits is inverted, as the PC has to fill the buffer before it is processed in the same cycle. In this mode the $pc\_read\_pointer$ is also maintained by the device driver, however it is indicating the address up to where the PC has filled the memory. In the first cycle the DMA has to stay behind the read pointer, when the PC has wrapped around, the dma can process memory up to $end\_address$ until it also wraps around.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth, page=2]{figures/Endless_DMA_diagram.pdf}
+	\caption{Endless DMA buffer and pointers representation diagram in FromHost mode}
+	\label{fig:endless_dma_diagram_fromhost}
+\end{figure}
+Looking at Figure~\ref{fig:endless_dma_diagram_fromhost} above, the following scenarios can be described:
+\begin{itemize}
+	\item $A:$ start condition, both the PC and the DMA have not started their operation.
+	\item $B:$ normal condition, the DMA's current\_address stays behind the PC\_read\_pointer 
+	\item $C:$ normal condition, the PC\_read\_pointer has wrapped around and has to stay behind the DMA's current\_address 
+	\item $D:$ the PC is writing too slow, the DMA is stalled because the PC read pointer is not advancing fast enough, the DMA current\_address has to stay behind.
+\end{itemize}
+
+\newpage
+\subsection{Interrupt controller}
+\label{sec:interrupt_controller}
+
+Wupper is equipped with an interrupt controller supporting the MSI-X (Message Signaled Interrupt eXtended) as described in "Chapter 17: Interrupt Support" page 812 and onwards of \cite{PCIe_technology}. In particular the chapter and tables in "MSI-X Capability Structure". 
+
+The MSI-X Interrupt table contains 8 interrupts, this number can be extended by a generic parameter in the firmware. 4 of the interrupts [0..3] are dedicated to Wupper, 4 interrupts [4..7] are called from CentralRouter:
+
+
+\begin{longtabu} to \textwidth {|X[1,l]|X[2,l]|X[4.5,l]|}
+	\hline
+	\textbf{Interrupt} &\textbf{Name} &\textbf{Description} \\	\hline
+	0 & FromHost wrap around & This interrupt is fired when the FromHost descriptor reaches the end address, or wraps around \\ \hline
+	1 & ToHost wrap around & This interrupt is fired when the ToHost descriptor reaches the end address, or wraps around \\ \hline
+	2 & ToHost Available & Fired when data becomes available in the ToHost fifo (falling edge of ToHostFifoProgEmpty) \\ \hline
+	3 & FromHost Full & Fired when the FromHost fifo becomes full (rising edge of FromHostAppFifoProgFull) \\ \hline
+	4 & Test interrupt \#4 & Fired when writing data to address BAR2 + 0x7800 \\ \hline
+	5 & Test interrupt \#5 & Fired when writing data to address BAR2 + 0x7810 \\ \hline	
+	6 & ToHost Full & Fired when the ToHost fifo becomes full (rising edge of ToHostFifoProgFull) \\ \hline
+	7 & GBT LOL & Currently reserved, but in the future this interrupt will be fired when a loss of lock occurs in one of the GBT channels. \\ \hline
+	\caption{Interrupts}\label{tab:dma_interrupts} \\
+\end{longtabu}
+
+%A description of how the software is initializing and handling the interrupts is described in Section~\ref{sec:controlling_interrupts}.
+\newpage
+\subsection{Wishbone}
+\begin{flushleft}
+The Wishbone protocol is a design method to connect IP cores with a common interface.
+The Wishbone can be used for soft, firm core or hard core IP and can be used with the VHDL language. The main purpose is to make an interconnection between IP cores and make it more compatible with each other. \newline
+The Wishbone bus is added because of a needed connection between the register map of the Wupper core and an external SLAVE. In this connection a Wishbone crossbar is added so that multiple SLAVEs can be attached. As a SLAVE example a 32 bits block memory was added. The memory has a data input to receive and a data output to send the data back to the crossbar. \newline
+The wupper\_to\_wb.vhd makes Wupper data Wishbone compatible. Also, two FIFOs are added to synchronize the Wupper clock  with an external clock. One FIFO is to send data from Wupper to the crossbar. And one FIFO is to receive  data from the crossbar to the Wupper. \newline
+The system controller makes the external clock and the external reset Wishbone compatible.
+\begin{figure}[H]
+	\centering
+	\input{figures/wupper_to_wishbone.tex}
+	\caption{Block diagram of Wupper to Wishbone}
+	\label{fig:wupper_to_wishbone}
+\end{figure}
+\end{flushleft}
+
+\newpage

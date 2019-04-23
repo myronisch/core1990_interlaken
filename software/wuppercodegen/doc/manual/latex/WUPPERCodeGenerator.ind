@@ -1,0 +1,133 @@
+\begin{sphinxtheindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter A
+  \item append() (in module wuppercodegen.filter), \hyperpage{11}
+
+  \indexspace
+  \bigletter B
+  \item BitField (class in wuppercodegen.classes), \hyperpage{9}
+  \item bits() (wuppercodegen.classes.BitField method), \hyperpage{9}
+  \item bits() (wuppercodegen.classes.Register method), \hyperpage{10}
+
+  \indexspace
+  \bigletter C
+  \item c\_comment() (in module wuppercodegen.filter), \hyperpage{11}
+  \item c\_hex() (in module wuppercodegen.filter), \hyperpage{11}
+  \item c\_mask() (in module wuppercodegen.filter), \hyperpage{11}
+  \item c\_string() (in module wuppercodegen.filter), \hyperpage{11}
+  \item camel\_case\_to\_space() (in module wuppercodegen.filter), \hyperpage{11}
+  \item cpp\_comment() (in module wuppercodegen.filter), \hyperpage{11}
+
+  \indexspace
+  \bigletter D
+  \item dec() (in module wuppercodegen.filter), \hyperpage{11}
+  \item dot\_name() (wuppercodegen.classes.BitField method), \hyperpage{9}
+
+  \indexspace
+  \bigletter E
+  \item Entry (class in wuppercodegen.classes), \hyperpage{10}
+
+  \indexspace
+  \bigletter F
+  \item full\_name() (wuppercodegen.classes.BitField method), \hyperpage{9}
+  \item full\_name() (wuppercodegen.classes.Node method), \hyperpage{8}
+  \item full\_name() (wuppercodegen.classes.Register method), \hyperpage{10}
+  \item full\_name() (wuppercodegen.classes.Sequence method), \hyperpage{10}
+
+  \indexspace
+  \bigletter G
+  \item Group (class in wuppercodegen.classes), \hyperpage{10}
+
+  \indexspace
+  \bigletter H
+  \item has\_endpoint() (wuppercodegen.classes.Node method), \hyperpage{9}
+  \item has\_groupname() (wuppercodegen.classes.Node method), \hyperpage{9}
+  \item has\_read\_bitfields() (wuppercodegen.classes.Node method), \hyperpage{9}
+  \item has\_trigger\_bitfields() (wuppercodegen.classes.Node method), \hyperpage{9}
+  \item has\_write\_bitfields() (wuppercodegen.classes.Node method), \hyperpage{9}
+  \item hex() (in module wuppercodegen.filter), \hyperpage{11}
+  \item hi() (wuppercodegen.classes.BitField method), \hyperpage{9}
+  \item hi() (wuppercodegen.classes.Register method), \hyperpage{10}
+  \item html\_comment() (in module wuppercodegen.filter), \hyperpage{11}
+  \item html\_string() (in module wuppercodegen.filter), \hyperpage{11}
+
+  \indexspace
+  \bigletter I
+  \item in\_group() (in module wuppercodegen.test), \hyperpage{11}
+  \item inc() (in module wuppercodegen.filter), \hyperpage{11}
+  \item index (wuppercodegen.classes.Entry attribute), \hyperpage{10}
+  \item is\_bitfield (wuppercodegen.classes.Node attribute), \hyperpage{9}
+  \item is\_group (wuppercodegen.classes.Node attribute), \hyperpage{9}
+  \item is\_read() (wuppercodegen.classes.Node method), \hyperpage{9}
+  \item is\_register (wuppercodegen.classes.Node attribute), \hyperpage{9}
+  \item is\_sequence (wuppercodegen.classes.Node attribute), \hyperpage{9}
+  \item is\_trigger() (wuppercodegen.classes.Node method), \hyperpage{9}
+  \item is\_write() (wuppercodegen.classes.Node method), \hyperpage{9}
+
+  \indexspace
+  \bigletter L
+  \item line\_comment() (in module wuppercodegen.filter), \hyperpage{11}
+  \item list\_nodes\_and\_sequences() (in module wuppercodegen.filter), \hyperpage{11}
+  \item list\_nodes\_recursively() (in module wuppercodegen.filter), \hyperpage{11}
+  \item list\_sequences() (in module wuppercodegen.filter), \hyperpage{12}
+  \item lo() (wuppercodegen.classes.BitField method), \hyperpage{9}
+  \item lo() (wuppercodegen.classes.Register method), \hyperpage{10}
+
+  \indexspace
+  \bigletter M
+  \item multi\_line\_comment() (in module wuppercodegen.filter), \hyperpage{12}
+
+  \indexspace
+  \bigletter N
+  \item Node (class in wuppercodegen.classes), \hyperpage{8}
+  \item number (wuppercodegen.classes.Sequence attribute), \hyperpage{10}
+
+  \indexspace
+  \bigletter P
+  \item prefix\_name() (wuppercodegen.classes.Register method), \hyperpage{10}
+  \item prepend() (in module wuppercodegen.filter), \hyperpage{12}
+  \item print\_name() (wuppercodegen.classes.BitField method), \hyperpage{9}
+  \item print\_name() (wuppercodegen.classes.Node method), \hyperpage{9}
+
+  \indexspace
+  \bigletter R
+  \item Register (class in wuppercodegen.classes), \hyperpage{10}
+
+  \indexspace
+  \bigletter S
+  \item semi() (in module wuppercodegen.filter), \hyperpage{12}
+  \item Sequence (class in wuppercodegen.classes), \hyperpage{10}
+  \item size() (wuppercodegen.classes.Entry method), \hyperpage{10}
+  \item size() (wuppercodegen.classes.Group method), \hyperpage{10}
+  \item size() (wuppercodegen.classes.Register method), \hyperpage{10}
+  \item sort\_by\_address() (wuppercodegen.classes.Register method), \hyperpage{10}
+
+  \indexspace
+  \bigletter T
+  \item tex\_comment() (in module wuppercodegen.filter), \hyperpage{12}
+  \item tex\_escape() (in module wuppercodegen.filter), \hyperpage{12}
+  \item tex\_string() (in module wuppercodegen.filter), \hyperpage{12}
+  \item tex\_yaml\_encode() (in module wuppercodegen.filter), \hyperpage{12}
+
+  \indexspace
+  \bigletter V
+  \item value\_string() (wuppercodegen.classes.BitField method), \hyperpage{10}
+  \item version() (in module wuppercodegen.filter), \hyperpage{12}
+  \item vhdl\_comment() (in module wuppercodegen.filter), \hyperpage{12}
+  \item vhdl\_constant() (in module wuppercodegen.filter), \hyperpage{12}
+  \item vhdl\_downto() (in module wuppercodegen.filter), \hyperpage{12}
+  \item vhdl\_logic\_vector() (in module wuppercodegen.filter), \hyperpage{12}
+  \item vhdl\_value() (in module wuppercodegen.filter), \hyperpage{12}
+
+  \indexspace
+  \bigletter W
+  \item wuppercodegen.classes (module), \hyperpage{8}
+  \item wuppercodegen.filter (module), \hyperpage{11}
+  \item wuppercodegen.test (module), \hyperpage{11}
+
+  \indexspace
+  \bigletter X
+  \item xhex() (in module wuppercodegen.filter), \hyperpage{12}
+
+\end{sphinxtheindex}

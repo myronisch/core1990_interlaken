@@ -1,0 +1,135 @@
+{{ tree.warning|c_comment }}
+
+#ifndef REGMAP_STRUCT_H
+#define REGMAP_STRUCT_H
+
+#include <sys/types.h>
+
+#include "regmap/regmap-common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#pragma GCC diagnostic ignored "-Wpedantic"
+
+/**************************************/
+/* Bitfields                          */
+/**************************************/
+
+{% for item in nodes['Bar2']|list_nodes_recursively(True) %}
+{% if item.is_register
+  and item.bitfield|count > 1
+  and (not item.parent.is_sequence or item.index == 0) %}
+typedef struct
+{
+{% set _count = [0] %}
+{% set _lo = [0] %}
+{% for bf in item.bitfield|reverse %}
+{% set count = _count.pop() %}
+{% set lo = _lo.pop() %}
+{% if bf.lo > lo %}
+  {{ "%-40s"|format(count|string|prepend("volatile u_long unused")) }} : {{ "%2d"|format(bf.lo - lo) }};  /* bits  {{ "%2d"|format(bf.lo-1) }}:{{ "%2d"|format(lo) }} */
+{% set lo = bf.lo %}
+{% set count = count + 1 %}
+{% endif %}
+{% if bf.hi >= bf.lo %}
+  {{ "%-40s"|format(bf.name|prepend("volatile u_long ")) }} : {{ "%2d"|format(bf.hi - bf.lo + 1) }};  /* bits  {{ "%2d"|format(bf.hi) }}:{{ "%2d"|format(bf.lo) }} */
+{% set lo = bf.hi+1 %}
+{% endif %}
+{% if _count.append(count) %}{% endif %}
+{% if _lo.append(lo) %}{% endif %}
+{% endfor %}
+{% if item.parent.is_sequence %}
+} flxcard_{{ item.type_name|lower }}_t;
+{% else %}
+} flxcard_{{ item.prefix_name|lower }}_t;
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+
+/**************************************/
+/* Structs for arrays                 */
+/**************************************/
+
+
+{% for item in nodes['Bar2']|list_sequences %}
+
+{% if not open %}
+typedef struct
+{
+{% set open = True %}
+{% set count = 0 %}
+{% endif %}
+{% if item.is_sequence %}
+} flxcard_{{ item.name|lower }}_t;
+{% set open = False %}
+{% else %}
+{% if item.is_register %}
+{% if item.bitfield|count > 1 %}
+  flxcard_{{ item.type_name|lower }}_t {{ item.name }};
+{% else %}
+  volatile u_long {{ item.name }};
+{% endif %}
+  volatile u_long unused{{count}};
+{%- set count = count + 1 %}
+{% else %}
+  flxcard_{{ item.name|lower }}_t {{item.name}}[{{item.number}}];
+{%- endif %}
+{% endif %}
+{% endfor %}
+
+
+/**************************************/
+/* Main struct                        */
+/**************************************/
+
+typedef struct
+{
+{% set _count = [0] %}
+{% set _address = [0] %}
+{% for item in nodes['Bar2']|list_nodes_and_sequences %}
+{% set count = _count.pop() %}
+{% set address = _address.pop() %}
+{% if address < item.address %}
+{% set diff = item.address - address %}
+  {{ "%-30s"|format("u_char ") }} {{ "%-30s"|format(count|string|prepend("unused")|append("[")|append(diff|c_hex)|append("];")) }} /* {{ address|c_hex }} - {{ (item.address - 1)|c_hex }} ({{diff}}) */
+
+{% set count = count + 1 %}
+{% set address = item.address %}
+{% endif %}
+{% if item.is_register %}
+{% if item.bitfield|count > 1 %}
+  {{ "%-30s"|format(item.prefix_name|lower|prepend("flxcard_")|append("_t ")) }} {{ "%-30s"|format(item.prefix_name|append(";")) }} /* {{ item.address|c_hex }} - {{ item.address|inc(7)|c_hex }} (8) */
+  {{ "%-30s"|format("u_char ") }} {{ "%-30s"|format(count|string|prepend("unused")|append("[8];")) }} /* {{ item.address|inc(8)|c_hex }} - {{ item.address|inc(15)|c_hex }} (8) */
+{% else %}
+  {{ "%-30s"|format("volatile u_long ") }} {{ "%-30s"|format(item.prefix_name|append(";")) }} /* {{ item.address|c_hex }} - {{ item.address|inc(7)|c_hex }} (8) */
+  {{ "%-30s"|format("u_char ") }} {{ "%-30s"|format(count|string|prepend("unused")|append("[8];")) }} /* {{ item.address|inc(8)|c_hex }} - {{ item.address|inc(15)|c_hex }} (8) */
+{% endif %}
+{% set count = count + 1 %}
+{% set address = address + 16 %}
+
+{% else %}
+{% if item.is_sequence %}
+  {{ "%-30s"|format(item.name|lower|prepend("flxcard_")|append("_t")) }} {{ "%-30s"|format(item.name|append("[")|append(item.number|string)|append("];")) }} /* {{ item.address|c_hex }} - {{ item.address|inc(item.size-1)|c_hex }} ({{item.size}}) */
+
+{% set address = address + item.size %}
+{% else %}
+/* {{ item.name }} */
+{% endif %}
+{% endif %}
+{% if _count.append(count) %}{% endif %}
+{% if _address.append(address) %}{% endif %}
+{% endfor %}
+} flxcard_bar2_regs_t;
+
+
+#pragma GCC diagnostic pop
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* REGMAP_STRUCT_H */

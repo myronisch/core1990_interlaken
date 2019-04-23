@@ -1,0 +1,11 @@
+Bar1:
+  entries:
+    - ref: INT_VEC
+      number: 8
+...
+
+INT_VEC:
+  entries:
+    - name: INT_VEC_%01d
+...
+

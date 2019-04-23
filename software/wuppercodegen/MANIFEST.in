@@ -1,0 +1,2 @@
+include wuppercodegen/version.py
+include DESCRIPTION.rst

@@ -1,0 +1,86 @@
+{{ tree.warning|c_comment }}
+
+#ifndef REGMAP_SYMBOL_H
+#define REGMAP_SYMBOL_H
+
+#include <sys/types.h>
+
+#include "regmap/regmap-common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/* Registers */
+#define REGMAP_REG_READ               (1)
+#define REGMAP_REG_WRITE              (2)
+#define REGMAP_CFG_ERROR_NOT_READABLE (1)
+#define REGMAP_CFG_ERROR_NOT_WRITABLE (2)
+#define REGMAP_CFG_ERROR_NO_EXIST     (3)
+#define REGMAP_ENDPOINT_0             (1)
+#define REGMAP_ENDPOINT_1             (2)
+
+/*****************************/
+typedef struct regmap_register {
+  const char* name;
+  const char* description;
+  u_long address;
+  u_int flags;
+  u_int endpoints;
+} regmap_register_t;
+
+extern regmap_register_t regmap_registers[];
+/*****************************/
+typedef struct regmap_bitfield {
+  const char* name;
+  const char* description;
+  u_long address;
+  u_long mask;
+  u_int shift;
+  u_int hi;
+  u_int flags;
+  u_int endpoints;
+} regmap_bitfield_t;
+
+extern regmap_bitfield_t regmap_bitfields[];
+/*****************************/
+typedef struct regmap_group {
+  const char* name;
+  const char* description;
+  int index[MAX_ENTRIES_IN_GROUP];
+} regmap_group_t;
+
+extern regmap_group_t regmap_groups[];
+
+
+/******************Register access*******************/
+int regmap_cfg_get_option(u_long offset, const char* key, u_long* value);
+int regmap_cfg_set_option(u_long offset, const char* key, u_long value);
+int regmap_cfg_get_reg(u_long offset, const char* key, u_long* value);
+int regmap_cfg_set_reg(u_long offset, const char* key, u_long value);
+
+
+/* Registers */
+{% for register in registers if register is in_group('Bar2') %}
+#define REG_{{ register.prefix_name }} {{ "%35s"|format('"'+register.prefix_name+'"') }}
+{% endfor %}
+
+/* Bitfields */
+{% for register in registers if register is in_group('Bar2') %}
+{% for bf in register.bitfield %}
+#define BF_{{ bf.full_name }}  {{ "%35s"|format('"'+bf.full_name+'"') }}
+{% endfor %}
+{% endfor %}
+
+/* Groups */
+{% for group in nodes['Bar2']|list_nodes_recursively if group.has_groupname %}
+#define GRP_{{ group.group }} {{ "%35s"|format('"'+group.group+'"') }}
+{% endfor %}
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* REGMAP_SYMBOL_H */

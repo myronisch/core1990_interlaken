@@ -1,0 +1,511 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. User Documentation &#8212; Wupper Code Generator 0.6.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Developer Documentation" href="developer.html" />
+    <link rel="prev" title="1. Installation" href="installation.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer.html" title="3. Developer Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="1. Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wupper Code Generator 0.6.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. User Documentation</a><ul>
+<li><a class="reference internal" href="#command-line-interface">2.1. Command Line Interface</a></li>
+<li><a class="reference internal" href="#input-files">2.2. Input Files</a><ul>
+<li><a class="reference internal" href="#group">2.2.1. Group</a></li>
+<li><a class="reference internal" href="#register-and-bitfields">2.2.2. Register and Bitfields</a></li>
+<li><a class="reference internal" href="#attributes">2.2.3. Attributes</a></li>
+<li><a class="reference internal" href="#metadata">2.2.4. Metadata</a></li>
+<li><a class="reference internal" href="#example">2.2.5. Example</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">1. Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="developer.html"
+                        title="next chapter">3. Developer Documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/user.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="user-documentation">
+<h1>2. User Documentation<a class="headerlink" href="#user-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="command-line-interface">
+<h2>2.1. Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h2>
+<p>A Makefile is provided that calls WupperCodeGen with the correct parameters to
+generate the output files. A simple <code class="docutils literal"><span class="pre">make</span></code> in the WupperCodeGen directory is
+enough to produce the output, which is stored in the directory &#8216;output&#8217;.</p>
+<p>If there is a need to do so, the tool can be called manually in the following way:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">wuppercodegen</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="n">config_file</span> <span class="n">template_file</span> <span class="n">output_file</span>
+</pre></div>
+</div>
+<p>The following parameters have to be set:</p>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">config_file</span></code></dt>
+<dd>An input file containing a description of all configuration registers and
+grouping thereof in YAML format.</dd>
+<dt><code class="docutils literal"><span class="pre">template_file</span></code></dt>
+<dd>A Jinja2 template file, used to describe the output file.</dd>
+<dt><code class="docutils literal"><span class="pre">output_file</span></code></dt>
+<dd>The filename of the output file that is to be generated.</dd>
+</dl>
+</div>
+<div class="section" id="input-files">
+<h2>2.2. Input Files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h2>
+<p>Input files are located in the current directory. There are two types of input files:</p>
+<ul class="simple">
+<li>data files, containing a description of the desired bitfields, registers and groups in YAML format,</li>
+<li>template files, describing how the generated code should look like.</li>
+</ul>
+<p>Users normally only deal with the YAML file.</p>
+<p>The Register Description File is a YAML (&#8216;registers.yaml&#8217;) file containing a
+description of Groups, Registers and Bitfields. The top-level group is named
+&#8216;Registers&#8217;. Groups are named, and
+may contain other Groups and or Registers. Groups can be repeated to create
+a Sequence of Groups/Registers. Registers are also named and contain one or more
+Bitfields. Bitfields are named if there are more than one.
+Groups, Registers and BitFields are commonly referred to as Nodes. Below a
+description of each of these types:</p>
+<div class="section" id="group">
+<h3>2.2.1. Group<a class="headerlink" href="#group" title="Permalink to this headline">¶</a></h3>
+<p>Groups are declared in yaml by their name, followed by a number of key-value
+pairs, referred to as attributes. The only obliged attribute is &#8216;entries&#8217; which
+lists all the subgroups or registers contained in this group. &#8216;entries&#8217; is a
+list. The top-level group is called &#8216;Registers&#8217;, all other groups can have
+any name, but it needs to be unique.</p>
+<p>Subgroups are declared just like groups
+and referred to by name in the &#8216;entries&#8217; array under the key &#8216;ref&#8217;. A group that
+needs repeating may contain the key &#8216;number&#8217;, which is added as a index-parameter
+in the lookup of the subgroup, and used in the name of its registers, see under registers.
+Below is group example:</p>
+<div class="code highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">Registers</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">R</span>
+  <span class="l l-Scalar l-Scalar-Plain">step</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0x010</span>
+  <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ref</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Bar0</span>
+      <span class="l l-Scalar l-Scalar-Plain">offset</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0x0000</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ref</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Bar1</span>
+      <span class="l l-Scalar l-Scalar-Plain">offset</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0x0000</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ref</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Bar2</span>
+      <span class="l l-Scalar l-Scalar-Plain">offset</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0x0000</span>
+
+<span class="l l-Scalar l-Scalar-Plain">Bar0</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+<span class="nn">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="register-and-bitfields">
+<h3>2.2.2. Register and Bitfields<a class="headerlink" href="#register-and-bitfields" title="Permalink to this headline">¶</a></h3>
+<p>Registers are declared directly inside the &#8216;entries&#8217; attribute of a group. They
+need a &#8216;name&#8217; and a &#8216;bitfield&#8217; attribute. Bitfield is in fact a list of one or
+more bitfields, which must contain &#8216;range&#8217; as attribute and &#8216;name&#8217;,
+if there is more than one bitfield in the list. Range is given as a single bit
+or as a range of high to low bits (both included in the range).</p>
+<p>Below is a register and bitfield example:</p>
+<div class="code highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">GenericBoardInformation</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">BOARD_ID</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">79..64</span>
+          <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">SVN</span>
+          <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Build SVN Revision</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">39..0</span>
+          <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">BUILD</span>
+          <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Build Date / Time in BCD format YYMMDDhhmm</span>
+
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">STATUS_LEDS</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">W</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">7..0</span>
+          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0xAB</span>
+          <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Board GPIO Leds</span>
+
+<span class="nn">...</span>
+</pre></div>
+</div>
+<p>The name attribute of a register
+may contain one % operator to use the repeat-index-parameter to give repeated registers
+a unique name.</p>
+<div class="code highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">Bar1</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ref</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">INT_VEC</span>
+      <span class="l l-Scalar l-Scalar-Plain">number</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
+<span class="nn">...</span>
+
+<span class="l l-Scalar l-Scalar-Plain">INT_VEC</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">INT_VEC_%01d</span>
+<span class="nn">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="attributes">
+<h3>2.2.3. Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<p>Attributes in Bitfields, Registers and Groups are inherited, which means that
+if you set them on a group, all sub-groups, sequences, registers and bitfield inherit them.
+This way you can set defaults for a particular group.
+The following attributes do NOT inherit: &#8216;name&#8217;, &#8216;full_name&#8217;, &#8216;offset&#8217;, &#8216;address&#8217;,
+&#8216;index&#8217;, &#8216;entries&#8217;, &#8216;number&#8217;, &#8216;ref&#8217;,
+&#8216;is_bitfield&#8217;, &#8216;is_register&#8217;, &#8216;is_group&#8217;.</p>
+<p>The following attributes are used/available:</p>
+<dl class="docutils">
+<dt>name (not inherited)</dt>
+<dd>The name of the bitfield, group or register. The name may include fields such as
+{index} for sequences and {bitfield} for bitfield names.</dd>
+<dt>full_name (not inherited)</dt>
+<dd><ul class="first last simple">
+<li>For Sequences, the formatted name of the sequence name and the index, if the
+sequence name includes {index}.</li>
+<li>For Registers, the formatted name of the register name and the index, if the
+register name includes {index}.</li>
+<li>For Bitfields, the formatted name of the parent register and the bitfield name
+if the register name includes {bitfield}. The bitfield part is separated from
+the name by an underscore.
+Bitfields of which the parent register is part of a sequence may use also
+{index} in the parent register&#8217;s name to format that name.</li>
+</ul>
+</dd>
+<dt>dot_name (not inherited)</dt>
+<dd><ul class="first last simple">
+<li>For Bitfields only, separating the bitfield part from the name by a dot.</li>
+</ul>
+</dd>
+<dt>prefix_name (not inherited)</dt>
+<dd><ul class="first last simple">
+<li>For Registers only, the part of the name without the {bitfield} specifier.
+To be used if you just want the generic name of the register.</li>
+</ul>
+</dd>
+<dt>desc</dt>
+<dd>A description of the register or bitfield. The &#8216;|&#8217; operator can be used
+for multi-line descriptions, which if used as end-of-line comments in the
+template will properly format.</dd>
+<dt>type</dt>
+<dd>The type of register/bitfield, which can be R: read-only, W: read/write or
+T: trigger (any write results in something happening, e.g. reset...)</dd>
+<dt>default</dt>
+<dd>The default value to be used to initialize the register or bitfield.
+Default can be given as an array, if needed. All fields should be supplied, for example
+a 6 entry array [0..5]:</dd>
+</dl>
+<div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0x00000124aaaa8006</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0x00000124aaaa8078</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0x00000124aaaa8001</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0x00000124aaaaff80</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0x00000124aaaae628</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">0x00000124aaaa99d0</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>value</dt>
+<dd>Value (or string) to be used for Trigger registers.</dd>
+<dt>offset (not inherited)</dt>
+<dd>Sets the offset used for a register or group.</dd>
+<dt>address (not inherited, calculated)</dt>
+<dd>Address is a calculated value. It starts at 0 for the top-level group.
+The &#8216;offset&#8217; attribute gets added to the address of a group to create
+the current address. Sub-groups and registers are located at the current
+address. The current address is incremented by &#8216;step&#8217; for every register.
+One can place any register or group at a particular address by calculating
+the needed offset from the address of the parent group.</dd>
+<dt>step</dt>
+<dd>The address increase added to offset for every register.</dd>
+<dt>entries (not inherited)</dt>
+<dd>A list of registers or references to sub-groups.</dd>
+<dt>ref (not inherited)</dt>
+<dd>A reference (by name) to a sub-group.</dd>
+<dt>number (not inherited)</dt>
+<dd>Number of times a referred group needs to be repeated in a sequence.</dd>
+<dt>index (not inherited)</dt>
+<dd>The index for this group or register inside a sequence.</dd>
+<dt>bitfield</dt>
+<dd>List of (at least one) bitfields describing the bits in a register.</dd>
+<dt>range</dt>
+<dd>The bit range (even single bit) of a bitfield. Ranges can be expressed as
+single integers, as a high..low range, or with the word &#8216;any&#8217;.</dd>
+<dt><em>any other</em></dt>
+<dd>The value given, inherited from group to group to register to bitfield.</dd>
+</dl>
+</div>
+<div class="section" id="metadata">
+<h3>2.2.4. Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h3>
+<p>You can use the following metadata which is available in the Metadata dictionary:</p>
+<dl class="docutils">
+<dt>version</dt>
+<dd>The version of WupperCodeGen</dd>
+<dt>name:</dt>
+<dd>The name of WupperCodeGen</dd>
+<dt>exec:</dt>
+<dd>The program executed</dd>
+<dt>config:</dt>
+<dd>The path of the config file</dd>
+<dt>template:</dt>
+<dd>The path of the template file</dd>
+<dt>output:</dt>
+<dd>The path of the output file</dd>
+<dt>cmdline:</dt>
+<dd>The full command line</dd>
+</dl>
+<p>Each of these can used inside the config file or in the template. Care must be
+taken when the output is in LaTeX as the codes change for LaTeX, so any variable
+in the config file (the template file is already coded for LaTeX) must be filtered
+through the tex_yaml_encode filter.</p>
+<p>Below an example of setting up a warning how the output file is generated:</p>
+<div class="code highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">Registers</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">version</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1.3.0</span>
+  <span class="l l-Scalar l-Scalar-Plain">warning</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">|</span>
+    <span class="no">This file was generated from &#39;{{ metadata.template }}&#39;, version {{ tree.version }}</span>
+    <span class="no">by the script &#39;{{ metadata.name }}&#39;, version: {{ metadata.version }}, using the following commandline:</span>
+
+    <span class="no">{{ metadata.cmdline }}</span>
+
+    <span class="no">Please do NOT edit this file, but edit the source file at &#39;{{ metadata.template }}&#39;</span>
+
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">...</span>
+</pre></div>
+</div>
+<p>and the usage in a LaTeX the template</p>
+<div class="code highlight-tex"><div class="highlight"><pre><span></span>((( tree.warning|tex<span class="nb">_</span>yaml<span class="nb">_</span>encode|tex<span class="nb">_</span>comment )))
+...
+</pre></div>
+</div>
+<p>and its output</p>
+<div class="code highlight-tex"><div class="highlight"><pre><span></span><span class="c">% This file was generated from &#39;warning.tex.template&#39;, version 1.3.0</span>
+<span class="c">% by the script &#39;WupperCodeGen&#39;, version: 0.3, using the following commandline:</span>
+<span class="c">%</span>
+<span class="c">% ../wupper_codegen.py warning.yaml warning.tex.template warning.tex</span>
+<span class="c">%</span>
+<span class="c">% Please do NOT edit this file, but edit the source file at &#39;warning.txt.template&#39;</span>
+...
+</pre></div>
+</div>
+</div>
+<div class="section" id="example">
+<h3>2.2.5. Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h3>
+<p>Below is an example of a register description file. The format is yaml.
+Yaml files can be comfortably created and edited any text editor.</p>
+<div class="code highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">Registers</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ref</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Channel</span>
+      <span class="l l-Scalar l-Scalar-Plain">offset</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0x0000</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ref</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Egroup</span>
+      <span class="l l-Scalar l-Scalar-Plain">offset</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0x1000</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ref</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">GBT</span>
+      <span class="l l-Scalar l-Scalar-Plain">offset</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0x2000</span>
+
+
+<span class="l l-Scalar l-Scalar-Plain">Channel</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">W</span>
+  <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+  <span class="l l-Scalar l-Scalar-Plain">number</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">8</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Dir</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ChWidth</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;2,4,8,16,or</span><span class="nv"> </span><span class="s">112,</span><span class="nv"> </span><span class="s">120</span><span class="nv"> </span><span class="s">bits&#39;</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">6..0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ChStart</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">first bit of the channel in the GBT word</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">6..0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Ewidth</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">width of the E-link comprising the channel</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">3..0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">hasStreams</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">hasChnkLen</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MaxChnkLen</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">null</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">15..0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">hasChkSum</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&quot;a</span><span class="nv"> </span><span class="s">16-bit</span><span class="nv"> </span><span class="s">1&#39;s-complement</span><span class="nv"> </span><span class="s">checksum</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">end</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">packet&quot;</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">FromSCA</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Decode HDLC</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">DOLL</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Direct Output Low Latency Link</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Busy</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">BUSY commands may be sent on this channel</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">TTCin</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">source of raw TTC infor</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">chk8b10b</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">use commas and check 8b/10b encoding is valid</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">dec8b10</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">forward decoded 8b/10 data</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">SOPEOP</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Start-of-Packet and End-of-Packet symbols define packet boundaries</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ToSCA</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">encode HDLC</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">TTCopt</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;if</span><span class="nv"> </span><span class="s">&gt;0,</span><span class="nv"> </span><span class="s">destination</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">TTC</span><span class="nv"> </span><span class="s">info:</span><span class="nv"> </span><span class="s">0,</span><span class="nv"> </span><span class="s">2</span><span class="nv"> </span><span class="s">(A&amp;B</span><span class="nv"> </span><span class="s">ch),</span><span class="nv"> </span><span class="s">4,</span><span class="nv"> </span><span class="s">8</span><span class="nv"> </span><span class="s">bits&#39;</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1..0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">DILL</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Direct Input Low Latency Link</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">TDAT</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">destination for scheduled data transfers</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+
+
+<span class="l l-Scalar l-Scalar-Plain">Egroup</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">W</span>
+  <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+  <span class="l l-Scalar l-Scalar-Plain">number</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">7</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">EprocEnable</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Enables for the E-procs in the group</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">14..0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">EclockRate</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">40,80,160, 320, (640)</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">2..0</span>
+
+<span class="l l-Scalar l-Scalar-Plain">GBT</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">number</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">24</span>
+  <span class="l l-Scalar l-Scalar-Plain">entries</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">gbt_format</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Wide or Normal</span>
+      <span class="l l-Scalar l-Scalar-Plain">bitfield</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">range</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">W</span>
+          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer.html" title="3. Developer Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="1. Installation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wupper Code Generator 0.6.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2016, Mark Dönszelmann, Jose Valenciano, Jörn Schumacher.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

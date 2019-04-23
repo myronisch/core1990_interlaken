@@ -1,0 +1,109 @@
+((( tree.warning|tex_yaml_encode|tex_comment )))
+\section{WUPPER register map, version (((tree.version)))}
+\label{App:Regmap}
+Starting from the offset address of BAR0, BAR1 and BAR2, the register map for BAR0 expands from 0x0000 to 0x0430 for the PCIe control registers. BAR0 only contains registers associated with DMA. The offset for BAR0 is usually 0xFBB00000.
+
+\tabulinesep=^1.0mm_0.7mm
+\begin{longtabu} to \textwidth {|X[1.7,l]|X[1.1,l]|X[0.9,l]|X[5.1,l]|X[1.3,l]|X[1.2,l]|X[5.0,l]|}
+\hline
+\textbf{Address} &\textbf{PCIe} &\multicolumn{2}{l|}{\textbf{Name/Field}} &\textbf{Bits} &{\textbf{Type}} &\textbf{Description} \\
+\hline
+\endhead
+
+((* for item in nodes['Bar0']|list_nodes_recursively(True) *))
+((* if item.is_group *))
+\multicolumn{7}{|c|}{(((item.full_name|camel_case_to_space|tex_escape )))} \\
+\hline
+((* endif *))
+((* if item.is_register *))
+((* if item.bitfield|count == 1 *))
+(((item.address|c_hex))) & (((item.endpoints))) & \multicolumn{2}{l|}{(((item.prefix_name|tex_escape)))} &
+((* else *))
+(((item.address|c_hex))) & (((item.endpoints))) & \multicolumn{5}{l|}{(((item.prefix_name|tex_escape)))} \\
+\cline{3-7}
+((* endif *))
+((* for bf in item.bitfield *))
+((* if item.bitfield|count == 1 *))
+(((bf.range|replace('..',':')))) & (((bf.type))) & (((bf.desc|tex_yaml_encode|tex_string))) \\
+((* else *))
+ & & & (((bf.name|tex_escape))) & (((bf.range|replace('..',':')))) & (((bf.type))) & (((bf.desc|tex_yaml_encode|tex_string))) \\
+((* endif *))
+((* endfor *))
+\hline
+((* endif *))
+((* endfor *))
+\caption{FELIX register map BAR0}\label{tab:dma_register_map_bar0} \\
+\end{longtabu}
+
+\newpage
+BAR1 stores registers associated with the Interrupt vector. The offset for BAR1 is usually 0xFBA00000.
+
+\begin{longtabu} to \textwidth {|X[1.7,l]|X[1.1,l]|X[0.9,l]|X[5.1,l]|X[1.3,l]|X[1.2,l]|X[5.0,l]|}
+\hline
+\textbf{Address} &\textbf{PCIe} &\multicolumn{2}{l|}{\textbf{Name/Field}} &\textbf{Bits} &{\textbf{Type}} &\textbf{Description} \\
+\hline
+\endhead
+
+((* for item in nodes['Bar1']|list_nodes_recursively(True) *))
+((* if item.is_group *))
+\multicolumn{7}{|c|}{(((item.full_name|camel_case_to_space|tex_escape )))} \\
+\hline
+((* endif *))
+((* if item.is_register *))
+((* if item.bitfield|count == 1 *))
+(((item.address|c_hex))) & (((item.endpoints))) & \multicolumn{2}{l|}{(((item.prefix_name|tex_escape)))} &
+((* else *))
+(((item.address|c_hex))) & (((item.endpoints))) & \multicolumn{5}{l|}{(((item.prefix_name|tex_escape)))} \\
+\cline{3-7}
+((* endif *))
+((* for bf in item.bitfield *))
+((* if item.bitfield|count == 1 *))
+(((bf.range|replace('..',':')))) & (((bf.type))) & (((bf.desc|tex_yaml_encode|tex_string))) \\
+((* else *))
+ & & & (((bf.name|tex_escape))) & (((bf.range|replace('..',':')))) & (((bf.type))) & (((bf.desc|tex_yaml_encode|tex_string))) \\
+((* endif *))
+((* endfor *))
+\hline
+((* endif *))
+((* endfor *))
+\caption{FELIX register map BAR1}\label{tab:dma_register_map_bar1} \\
+\end{longtabu}
+%\newpage
+
+
+BAR2 stores registers for the control and monitor of HDL modules inside the FPGA other than Wupper. A portion of this register map's section is dedicated for control and monitor of devices outside the FPGA; as for example simple SPI and I2C devices. The offset for BAR2 is usually 0xFB900000.
+
+%\begin{landscape}
+\begin{longtabu} to \textwidth {|X[1.7,l]|X[1.1,l]|X[0.9,l]|X[5.1,l]|X[1.3,l]|X[1.2,l]|X[5.0,l]|}
+\hline
+\textbf{Address} &\textbf{PCIe} &\multicolumn{2}{l|}{\textbf{Name/Field}} &\textbf{Bits} &{\textbf{Type}} &\textbf{Description} \\
+\hline
+\endhead
+
+((* for item in nodes['Bar2']|list_nodes_recursively(True) *))
+((* if item.is_group *))
+\multicolumn{7}{|c|}{(((item.full_name|camel_case_to_space|tex_escape )))} \\
+\hline
+((* endif *))
+((* if item.is_register *))
+((* if item.bitfield|count == 1 *))
+(((item.address|c_hex))) & (((item.endpoints))) & \multicolumn{2}{l|}{(((item.prefix_name|tex_escape)))} &
+((* else *))
+(((item.address|c_hex))) & (((item.endpoints))) & \multicolumn{5}{l|}{(((item.prefix_name|tex_escape)))} \\
+\cline{3-7}
+((* endif *))
+((* for bf in item.bitfield *))
+((* if item.bitfield|count == 1 *))
+(((bf.range|replace('..',':')))) & (((bf.type))) & (((bf.desc|tex_yaml_encode|tex_string))) \\
+((* else *))
+ & & & (((bf.name|tex_escape))) & (((bf.range|replace('..',':')))) & (((bf.type))) & (((bf.desc|tex_yaml_encode|tex_string))) \\
+((* endif *))
+((* endfor *))
+\hline
+((* endif *))
+((* endfor *))
+\caption{FELIX register map BAR2}\label{tab:dma_register_map_bar2} \\
+\end{longtabu}
+%\end{landscape}
+
+\newpage

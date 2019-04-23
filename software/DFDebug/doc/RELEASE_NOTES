@@ -1,0 +1,2 @@
+This is a new package aimed at replacing both ROSDebug and RCDUtilities
+It provides macros for nice debugging: DEBUG_TEXT, OUT_TEXT and ERR_TEXT

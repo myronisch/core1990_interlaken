@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Installation &#8212; Wupper Code Generator 0.6.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2. User Documentation" href="user.html" />
+    <link rel="prev" title="The Wupper Code Generator" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="user.html" title="2. User Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="The Wupper Code Generator"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wupper Code Generator 0.6.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Installation</a><ul>
+<li><a class="reference internal" href="#installation-from-pypi-using-pip">1.1. Installation from PyPI using pip</a></li>
+<li><a class="reference internal" href="#scientific-linux-and-redhat-based-distributions">1.2. Scientific Linux and RedHat-based distributions</a></li>
+<li><a class="reference internal" href="#ubuntu">1.3. Ubuntu</a></li>
+<li><a class="reference internal" href="#using-virtual-python-environments">1.4. Using Virtual Python Environments</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">The Wupper Code Generator</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="user.html"
+                        title="next chapter">2. User Documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<h1>1. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>WupperCodeGen is written in Python and was tested with versions 2.6 and 2.7.
+Additionally, you will need to install the Jinja2 template engine and the
+Python Yaml parser. In case of Python 2.6 you will have to install the
+argparse module as well.</p>
+<div class="section" id="installation-from-pypi-using-pip">
+<h2>1.1. Installation from PyPI using pip<a class="headerlink" href="#installation-from-pypi-using-pip" title="Permalink to this headline">¶</a></h2>
+<p>Installation using pip, which will install all dependencies:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">wuppercodegen</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="scientific-linux-and-redhat-based-distributions">
+<h2>1.2. Scientific Linux and RedHat-based distributions<a class="headerlink" href="#scientific-linux-and-redhat-based-distributions" title="Permalink to this headline">¶</a></h2>
+<p>Installation of system-wide Jinja2 in SLC6:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">jinja2</span> <span class="n">python</span><span class="o">-</span><span class="n">argparse</span> <span class="n">python</span><span class="o">-</span><span class="n">yaml</span> <span class="n">python</span><span class="o">-</span><span class="n">markupsafe</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ubuntu">
+<h2>1.3. Ubuntu<a class="headerlink" href="#ubuntu" title="Permalink to this headline">¶</a></h2>
+<p>Installation of system-wide Jinja2 in Ubuntu:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">jinja2</span> <span class="n">python</span><span class="o">-</span><span class="n">yaml</span> <span class="n">python</span><span class="o">-</span><span class="n">markupsafe</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-virtual-python-environments">
+<h2>1.4. Using Virtual Python Environments<a class="headerlink" href="#using-virtual-python-environments" title="Permalink to this headline">¶</a></h2>
+<p>This method allows to install the necessary dependencies in an isolated Python
+environment, without affecting system packages. The method described here is
+independent of the operating system being used, as long as it is used with
+a supported version of Python.</p>
+<p>Installation in a virtual environment:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># create the virtual environment</span>
+<span class="n">virtualenv</span> <span class="n">venv</span><span class="o">/</span> <span class="o">--</span><span class="n">python</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">python26</span><span class="o">-</span><span class="ow">or</span><span class="o">-</span><span class="mi">27</span>
+
+<span class="c1"># activate the virtual environment</span>
+<span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
+
+<span class="c1"># install Jinja2 ad other modules</span>
+      <span class="n">pip</span> <span class="n">install</span> <span class="n">Jinja2</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">argparse</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">PyYAML</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">MarkupSafe</span>
+
+<span class="c1"># you can now use WupperCodeGen</span>
+<span class="c1"># the virtual environment can be deactivated with</span>
+<span class="n">source</span> <span class="n">venv</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">deactivate</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="user.html" title="2. User Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="The Wupper Code Generator"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wupper Code Generator 0.6.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2016, Mark Dönszelmann, Jose Valenciano, Jörn Schumacher.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

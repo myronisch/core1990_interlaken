@@ -1,0 +1,9 @@
+% !TeX spellcheck = en_US
+\section{Conclusion}
+The Wupper package is published on OpenCores and includes an example application, Wupper GUI and two Wupper tools.
+The example application have two functionality, the half-loop test and full loop test. The half loop test is a write only test. The random data generator sends data to the host via the Wupper core. This test can be fired using the Wupper-dma-transfer tool.
+The second functionality, the full loop test, reads data from the PC memory through Wupper, data is multiplied and writes back via Wupper to the PC memory. In combination with the Wupper-chaintest, the Wupper core can be tested on corrupt data.
+A random data generator based on a Linear Feedback Shift Register (LFSR) is used for data generation. This is used to test the Wupper core with every combination of data.
+The Wupper tools are command line tools and are hard to handle without the manual. Wupper GUI makes it possible to give a clear graphical view of the performance of the Wupper core.
+The verification shows the expected behaviour of the complete Wupper package. By controlling, monitoring and Read/Write transfers tests, the example application benchmarks the essentials of the Wupper core. The source code of the example application, Wupper tools and Wupper GUI are open source which makes the user easier to develop an application for the Wupper core. 
+\newpage

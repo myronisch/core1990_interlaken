@@ -1,0 +1,15 @@
+Registers:
+  type: R
+  step: 0x010
+  default: 0
+  entries:
+    - ref: Bar0
+      offset: 0x0000
+    - ref: Bar1
+      offset: 0x0000
+    - ref: Bar2
+      offset: 0x0000
+
+Bar0:
+  entries:
+...

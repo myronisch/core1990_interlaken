@@ -1,0 +1,19 @@
+GenericBoardInformation:
+  entries:
+    - name: BOARD_ID
+      bitfield:
+        - range: 79..64
+          name: SVN
+          desc: Build SVN Revision
+        - range: 39..0
+          name: BUILD
+          desc: Build Date / Time in BCD format YYMMDDhhmm
+
+    - name: STATUS_LEDS
+      type: W
+      bitfield:
+        - range: 7..0
+          default: 0xAB
+          desc: Board GPIO Leds
+
+...

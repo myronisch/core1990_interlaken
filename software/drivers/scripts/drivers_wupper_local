@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# script derived from drivers_tdaq script by Markus Joos, CERN
+
+DIR="$(pwd)"
+
+export DRIVER_PATH=${DIR}/..
+KERNEL_VERSION=$(uname -r)
+
+export CMEM_PARAMS="gfpbpa_size=4096 gfpbpa_quantum=4"
+
+# See how we were called.
+case "$1" in
+  start)
+        echo "Starting cmem driver "
+        # load the module
+        insmod $DRIVER_PATH/drivers/cmem_rcc.ko $CMEM_PARAMS
+        # remove old device node
+        rm -f /dev/cmem_rcc
+        # get major number
+        major=`awk "\\$2==\"cmem_rcc\" {print \\$1}" /proc/devices`
+        echo major number for cmem_rcc is $major
+        # make device node
+        mknod /dev/cmem_rcc c $major 0
+        #give permissions
+        chmod 666 /dev/cmem_rcc
+        echo
+
+        export WUPPERCARDS=`lspci -n | grep -c -e "10ee:7039"`
+        echo $WUPPERCARDS wupper cards found
+        if [ $WUPPERCARDS -gt 0 ]; then
+          echo "Starting wupper driver "
+          # load the module
+          insmod $DRIVER_PATH/drivers/wupper.ko
+          # remove old device node
+          rm -f /dev/wupper
+          # get major number
+          major=`awk "\\$2==\"wupper\" {print \\$1}" /proc/devices`
+          echo major number for wupper is $major
+          # make device node
+          mknod /dev/wupper c $major 0
+          # give permissions
+          chmod 666 /dev/wupper
+          echo
+        fi
+        ;;
+
+  stop)
+        echo "Shutting down cmem_rcc driver "
+        rmmod cmem_rcc
+
+
+        lsmod | grep wupper
+        if [ $? = 0 ]; then
+          echo "Shutting down wupper driver "
+          rmmod wupper
+        fi
+        ;;
+
+   status)
+        lsmod | grep cmem_rcc
+        if [ $? = 0 ]; then
+          echo ""
+          echo ">>>>>> Status of the cmem_rcc driver"
+          echo ""
+          more /proc/cmem_rcc
+        fi
+
+
+        lsmod | grep wupper
+        if [ $? = 0 ]; then
+          echo ""
+          echo ">>>>>> Status of the wupper driver "
+          echo ""
+          more /proc/wupper
+        fi
+        ;;
+
+  *)
+        echo "*** Usage: drivers_wupper_local {start|stop|status}"
+        exit 1
+
+esac
+
+exit 
+0

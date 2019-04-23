@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Examples &#8212; Wupper Code Generator 0.6.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="3. Developer Documentation" href="developer.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer.html" title="3. Developer Documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wupper Code Generator 0.6.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4. Examples</a><ul>
+<li><a class="reference internal" href="#a-simple-vhdl-template">4.1. A Simple VHDL Template</a><ul>
+<li><a class="reference internal" href="#register-description-file">4.1.1. Register Description File</a></li>
+<li><a class="reference internal" href="#template-file">4.1.2. Template File</a></li>
+<li><a class="reference internal" href="#output-file">4.1.3. Output File</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#a-list-of-all-registers">4.2. A List of all Registers</a><ul>
+<li><a class="reference internal" href="#id1">4.2.1. Register Description File</a></li>
+<li><a class="reference internal" href="#id2">4.2.2. Template File</a></li>
+<li><a class="reference internal" href="#id3">4.2.3. Output File</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="developer.html"
+                        title="previous chapter">3. Developer Documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/examples.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="examples">
+<h1>4. Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="a-simple-vhdl-template">
+<h2>4.1. A Simple VHDL Template<a class="headerlink" href="#a-simple-vhdl-template" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="register-description-file">
+<h3>4.1.1. Register Description File<a class="headerlink" href="#register-description-file" title="Permalink to this headline">¶</a></h3>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">Registers</span><span class="p">:</span>
+  <span class="n">entries</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">ref</span><span class="p">:</span> <span class="n">Channel</span>
+      <span class="n">offset</span><span class="p">:</span> <span class="mh">0x0000</span>
+    <span class="o">-</span> <span class="n">ref</span><span class="p">:</span> <span class="n">Egroup</span>
+      <span class="n">offset</span><span class="p">:</span> <span class="mh">0x1000</span>
+    <span class="o">-</span> <span class="n">ref</span><span class="p">:</span> <span class="n">GBT</span>
+      <span class="n">offset</span><span class="p">:</span> <span class="mh">0x2000</span>
+
+
+<span class="n">Channel</span><span class="p">:</span>
+  <span class="nb">type</span><span class="p">:</span> <span class="n">W</span>
+  <span class="n">default</span><span class="p">:</span> <span class="mi">0</span>
+  <span class="n">number</span><span class="p">:</span> <span class="mi">8</span>
+  <span class="n">entries</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">Dir</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">null</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">ChWidth</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;2,4,8,16,or 112, 120 bits&#39;</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mf">6.</span><span class="o">.</span><span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">ChStart</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">first</span> <span class="n">bit</span> <span class="n">of</span> <span class="n">the</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">GBT</span> <span class="n">word</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mf">6.</span><span class="o">.</span><span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">Ewidth</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">width</span> <span class="n">of</span> <span class="n">the</span> <span class="n">E</span><span class="o">-</span><span class="n">link</span> <span class="n">comprising</span> <span class="n">the</span> <span class="n">channel</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mf">3.</span><span class="o">.</span><span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">hasStreams</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">null</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">hasChnkLen</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">null</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">MaxChnkLen</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">null</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mf">15.</span><span class="o">.</span><span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">hasChkSum</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="s2">&quot;a 16-bit 1&#39;s-complement checksum is at the end of the packet&quot;</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">FromSCA</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">Decode</span> <span class="n">HDLC</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">DOLL</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">Direct</span> <span class="n">Output</span> <span class="n">Low</span> <span class="n">Latency</span> <span class="n">Link</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">Busy</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">BUSY</span> <span class="n">commands</span> <span class="n">may</span> <span class="n">be</span> <span class="n">sent</span> <span class="n">on</span> <span class="n">this</span> <span class="n">channel</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">TTCin</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">source</span> <span class="n">of</span> <span class="n">raw</span> <span class="n">TTC</span> <span class="n">infor</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">chk8b10b</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">use</span> <span class="n">commas</span> <span class="ow">and</span> <span class="n">check</span> <span class="mi">8</span><span class="n">b</span><span class="o">/</span><span class="mi">10</span><span class="n">b</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="n">valid</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">dec8b10</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">forward</span> <span class="n">decoded</span> <span class="mi">8</span><span class="n">b</span><span class="o">/</span><span class="mi">10</span> <span class="n">data</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">SOPEOP</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">Start</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">Packet</span> <span class="ow">and</span> <span class="n">End</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">Packet</span> <span class="n">symbols</span> <span class="n">define</span> <span class="n">packet</span> <span class="n">boundaries</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">ToSCA</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">encode</span> <span class="n">HDLC</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">TTCopt</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;if &gt;0, destination of TTC info: 0, 2 (A&amp;B ch), 4, 8 bits&#39;</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mf">1.</span><span class="o">.</span><span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">DILL</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">Direct</span> <span class="n">Input</span> <span class="n">Low</span> <span class="n">Latency</span> <span class="n">Link</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">TDAT</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">destination</span> <span class="k">for</span> <span class="n">scheduled</span> <span class="n">data</span> <span class="n">transfers</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+
+
+<span class="n">Egroup</span><span class="p">:</span>
+  <span class="nb">type</span><span class="p">:</span> <span class="n">W</span>
+  <span class="n">default</span><span class="p">:</span> <span class="mi">0</span>
+  <span class="n">number</span><span class="p">:</span> <span class="mi">7</span>
+  <span class="n">entries</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">EprocEnable</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">Enables</span> <span class="k">for</span> <span class="n">the</span> <span class="n">E</span><span class="o">-</span><span class="n">procs</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">group</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mf">14.</span><span class="o">.</span><span class="mi">0</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">EclockRate</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span><span class="mi">80</span><span class="p">,</span><span class="mi">160</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="p">(</span><span class="mi">640</span><span class="p">)</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mf">2.</span><span class="o">.</span><span class="mi">0</span>
+
+<span class="n">GBT</span><span class="p">:</span>
+  <span class="n">number</span><span class="p">:</span> <span class="mi">24</span>
+  <span class="n">entries</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">gbt_format</span>
+      <span class="n">desc</span><span class="p">:</span> <span class="n">Wide</span> <span class="ow">or</span> <span class="n">Normal</span>
+      <span class="n">bitfield</span><span class="p">:</span>
+        <span class="o">-</span> <span class="nb">range</span><span class="p">:</span> <span class="mi">0</span>
+          <span class="nb">type</span><span class="p">:</span> <span class="n">W</span>
+          <span class="n">default</span><span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="template-file">
+<h3>4.1.2. Template File<a class="headerlink" href="#template-file" title="Permalink to this headline">¶</a></h3>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="o">--</span> <span class="n">WUPPER</span><span class="p">:</span> <span class="n">VHDL</span> <span class="n">configuration</span> <span class="n">code</span>
+
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">|</span><span class="n">list_nodes_recursively</span> <span class="k">if</span> <span class="n">group</span><span class="o">.</span><span class="n">is_sequence</span> <span class="ow">and</span> <span class="n">group</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">group</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;Registers&#39;</span> <span class="o">%</span><span class="p">}</span>
+<span class="o">-----------------------------------------------------</span>
+<span class="o">--</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">full_name</span><span class="p">}}</span> <span class="n">record</span> <span class="n">definition</span>
+<span class="o">-----------------------------------------------------</span>
+<span class="o">--</span>
+
+<span class="nb">type</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">full_name</span><span class="p">}}</span> <span class="ow">is</span>
+        <span class="n">record</span>
+                <span class="o">--</span>
+                <span class="o">--</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">full_name</span><span class="p">}}</span> <span class="n">attributes</span>
+                <span class="o">--</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">register</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">nodes</span> <span class="o">%</span><span class="p">}</span>
+                <span class="p">{{</span><span class="s2">&quot;</span><span class="si">%-30s</span><span class="s2">&quot;</span><span class="o">|</span><span class="nb">format</span><span class="p">(</span><span class="n">register</span><span class="o">.</span><span class="n">full_name</span><span class="p">)}}</span> <span class="p">:</span> <span class="p">{{</span><span class="s2">&quot;</span><span class="si">%-32s</span><span class="s2">&quot;</span><span class="o">|</span><span class="nb">format</span><span class="p">(</span><span class="n">register</span><span class="o">|</span><span class="n">vhdl_logic_vector</span><span class="o">|</span><span class="n">semi</span><span class="p">)}}</span> <span class="p">{{</span><span class="n">register</span><span class="o">.</span><span class="n">desc</span><span class="o">|</span><span class="n">vhdl_comment</span><span class="p">}}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+        <span class="n">end</span> <span class="n">record</span>
+
+
+
+<span class="o">-----------------------------------------------------</span>
+<span class="o">--</span>   <span class="n">array</span> <span class="n">of</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">full_name</span><span class="p">}}</span><span class="n">s</span> <span class="ow">in</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">full_name</span><span class="p">}}</span>
+<span class="o">-----------------------------------------------------</span>
+<span class="o">--</span>
+
+<span class="nb">type</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">full_name</span><span class="p">}}</span><span class="n">_array</span> <span class="ow">is</span> <span class="n">array</span> <span class="p">(</span><span class="mi">0</span> <span class="n">to</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">nodes</span><span class="o">|</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">}})</span> <span class="n">of</span> <span class="p">{{</span><span class="n">group</span><span class="o">.</span><span class="n">full_name</span><span class="p">}};</span>
+
+
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="output-file">
+<h3>4.1.3. Output File<a class="headerlink" href="#output-file" title="Permalink to this headline">¶</a></h3>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="o">--</span> <span class="n">WUPPER</span><span class="p">:</span> <span class="n">VHDL</span> <span class="n">configuration</span> <span class="n">code</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="a-list-of-all-registers">
+<h2>4.2. A List of all Registers<a class="headerlink" href="#a-list-of-all-registers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>4.2.1. Register Description File<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="code highlight-default"><div class="highlight"><pre><span></span>Registers:
+  default: 0
+  type: W
+  entries:
+    - ref: Channel
+      offset: 0x0000
+    - ref: GBT
+      offset: 0x1000
+
+Channel:
+  number: 2
+  entries:
+    - name: hasChkSum_{index}
+      desc: a 16-bit 1’s-complement checksum is at the end of the packet
+      bitfield:
+        - range: 15..0
+    - name: TDAT_{index}
+      desc: destination for scheduled data transfers
+      bitfield:
+        - range: 0
+
+GBT:
+  number: 4
+  entries:
+    - name: gbt_format_{index}
+      desc: Wide or Normal
+      bitfield:
+        - range: 0
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>4.2.2. Template File<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">All</span> <span class="n">Registers</span><span class="p">:</span>
+
+<span class="p">{</span><span class="o">%</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">[</span><span class="s1">&#39;Registers&#39;</span><span class="p">]</span><span class="o">|</span><span class="n">list_nodes_recursively</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">is_register</span> <span class="o">%</span><span class="p">}</span>
+    <span class="p">{{</span> <span class="s2">&quot;</span><span class="si">%-34s</span><span class="s2">&quot;</span><span class="o">|</span><span class="nb">format</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">full_name</span><span class="p">)</span> <span class="p">}}</span> <span class="o">@</span> <span class="p">{{</span> <span class="n">item</span><span class="o">.</span><span class="n">address</span><span class="o">|</span><span class="nb">hex</span><span class="p">}}</span> <span class="p">({{</span> <span class="n">item</span><span class="o">.</span><span class="n">offset</span><span class="o">|</span><span class="nb">hex</span><span class="p">}})</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endif</span> <span class="o">%</span><span class="p">}</span>
+<span class="p">{</span><span class="o">%</span> <span class="n">endfor</span> <span class="o">%</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>4.2.3. Output File<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="code highlight-default"><div class="highlight"><pre><span></span><span class="n">All</span> <span class="n">Registers</span><span class="p">:</span>
+
+    <span class="n">hasChkSum_0</span>                        <span class="o">@</span> <span class="mi">0000</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+    <span class="n">TDAT_0</span>                             <span class="o">@</span> <span class="mi">0010</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+    <span class="n">hasChkSum_1</span>                        <span class="o">@</span> <span class="mi">0020</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+    <span class="n">TDAT_1</span>                             <span class="o">@</span> <span class="mi">0030</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+    <span class="n">gbt_format_0</span>                       <span class="o">@</span> <span class="mi">1000</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+    <span class="n">gbt_format_1</span>                       <span class="o">@</span> <span class="mi">1010</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+    <span class="n">gbt_format_2</span>                       <span class="o">@</span> <span class="mi">1020</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+    <span class="n">gbt_format_3</span>                       <span class="o">@</span> <span class="mi">1030</span> <span class="p">(</span><span class="mi">0000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer.html" title="3. Developer Documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wupper Code Generator 0.6.2 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2016, Mark Dönszelmann, Jose Valenciano, Jörn Schumacher.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

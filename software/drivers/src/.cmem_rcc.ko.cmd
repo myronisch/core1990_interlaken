@@ -1,0 +1,1 @@
+cmd_/localstore/et/leover/wupper/trunk/software/drivers/src/cmem_rcc.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /localstore/et/leover/wupper/trunk/software/drivers/src/cmem_rcc.ko /localstore/et/leover/wupper/trunk/software/drivers/src/cmem_rcc.o /localstore/et/leover/wupper/trunk/software/drivers/src/cmem_rcc.mod.o
