@@ -31,6 +31,9 @@ set_property PACKAGE_PIN AP37 [get_ports emcclk]
 set_property PACKAGE_PIN AR38 [get_ports emcclk_out]
 set_property IOSTANDARD LVCMOS18 [get_ports emcclk_out] 
 
+set_property PACKAGE_PIN AT36 [get_ports si5324_reset_n]
+set_property IOSTANDARD LVCMOS18 [get_ports si5324_reset_n]
+
 
 set_property BITSTREAM.CONFIG.BPI_SYNC_MODE Type1 [current_design]
 set_property BITSTREAM.CONFIG.EXTMASTERCCLK_EN div-1 [current_design]

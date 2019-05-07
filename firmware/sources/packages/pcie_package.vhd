@@ -249,6 +249,11 @@ package pcie_package is
   constant REG_WISHBONE_WRITE                 : std_logic_vector(19 downto 0) := x"04010";
   constant REG_WISHBONE_READ                  : std_logic_vector(19 downto 0) := x"04020";
   constant REG_WISHBONE_STATUS                : std_logic_vector(19 downto 0) := x"04030";
+
+  --** Interlaken
+  constant REG_INTERLAKEN_PACKET_LENGTH       : std_logic_vector(19 downto 0) := x"05000";
+  constant REG_INTERLAKEN_CONTROL_STATUS      : std_logic_vector(19 downto 0) := x"05010";
+  constant REG_SFP_TRANSCEIVER_STATUS         : std_logic_vector(19 downto 0) := x"05020";
   -----------------------------------
   ---- GENERATED code END #1 ##  ----
   -----------------------------------
@@ -286,6 +291,10 @@ package pcie_package is
     READ_ENABLE                    : std_logic_vector(64 downto 64);  -- Any write to this register triggers a read from the Wishbone to Wupper fifo
   end record;
 
+  type bitfield_interlaken_control_status_t_type is record
+    TRANSCEIVER_RESET              : std_logic_vector(64 downto 64);  -- Any write to this register triggers a transceiver reset
+  end record;
+
 
   -- Control Record
   type register_map_control_type is record
@@ -309,6 +318,8 @@ package pcie_package is
     WISHBONE_CONTROL               : bitfield_wishbone_control_w_type;
     WISHBONE_WRITE                 : bitfield_wishbone_write_t_type;
     WISHBONE_READ                  : bitfield_wishbone_read_t_type;
+    INTERLAKEN_PACKET_LENGTH       : std_logic_vector(15 downto 0);   -- Packet length for fromhost packet (to Interlaken)
+    INTERLAKEN_CONTROL_STATUS      : bitfield_interlaken_control_status_t_type;
   end record;
   -----------------------------------
   ---- GENERATED code END #2 ##  ----
@@ -347,6 +358,8 @@ package pcie_package is
   constant REG_WISHBONE_WRITE_WRITE_ENABLE_C       : std_logic_vector(64 downto 64)   := "0";                   -- Any write to this register triggers a write to the Wupper to Wishbone fifo
   constant REG_WISHBONE_WRITE_DATA_C               : std_logic_vector(31 downto 0)    := x"00000000";           -- Wishbone
   constant REG_WISHBONE_READ_READ_ENABLE_C         : std_logic_vector(64 downto 64)   := "0";                   -- Any write to this register triggers a read from the Wishbone to Wupper fifo
+  constant REG_INTERLAKEN_PACKET_LENGTH_C          : std_logic_vector(15 downto 0)    := x"0010";               -- Packet length for fromhost packet (to Interlaken)
+  constant REG_INTERLAKEN_CONTROL_STATUS_TRANSCEIVER_RESET_C: std_logic_vector(64 downto 64)   := "0";                   -- Any write to this register triggers a transceiver reset
   -----------------------------------
   ---- GENERATED code END #3 ##  ----
   -----------------------------------
@@ -437,6 +450,26 @@ end record;
     WISHBONE_READ                  : bitfield_wishbone_read_r_type;
     WISHBONE_STATUS                : bitfield_wishbone_status_r_type;
 end record;
+--
+-- Interlaken
+--
+  -- Bitfields of Interlaken
+  type bitfield_interlaken_control_status_r_type is record
+    DECODER_LOCK                   : std_logic_vector(1 downto 1);    -- Decoder lock indication
+    DESCRAMBLER_LOCK               : std_logic_vector(0 downto 0);    -- Descrambler lock indication
+  end record;
+
+  type bitfield_sfp_transceiver_status_r_type is record
+    TX_FAULT                       : std_logic_vector(7 downto 4);    -- SFP transceiver TX fault indication
+    RX_LOS                         : std_logic_vector(3 downto 0);    -- Loss of signal indication
+  end record;
+
+
+  -- Interlaken
+  type interlaken_monitor_type is record
+    INTERLAKEN_CONTROL_STATUS      : bitfield_interlaken_control_status_r_type;
+    SFP_TRANSCEIVER_STATUS         : bitfield_sfp_transceiver_status_r_type;
+end record;
   
 
   -- Monitor interface toward the dma_control block
@@ -444,6 +477,7 @@ end record;
     register_map_gen_board_info  : register_map_gen_board_info_type;
     register_map_hk_monitor  : register_map_hk_monitor_type;
     wishbone_monitor  : wishbone_monitor_type;
+    interlaken_monitor  : interlaken_monitor_type;
   end record;
   -----------------------------------
   ---- GENERATED code END #4 ##  ----
