@@ -1,1 +1,0 @@
-cmd_/localstore/et/leover/wupper/trunk/software/drivers/src/wupper.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /localstore/et/leover/wupper/trunk/software/drivers/src/wupper.ko /localstore/et/leover/wupper/trunk/software/drivers/src/wupper.o /localstore/et/leover/wupper/trunk/software/drivers/src/wupper.mod.o

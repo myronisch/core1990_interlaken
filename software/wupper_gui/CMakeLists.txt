@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 2.8.12)
 project(WupperGui)
 
 include_directories("." "../wupper_tools/" "../drivers/" "../rcc_error/" "../regmap" "./include")
@@ -16,7 +16,7 @@ find_package(Qt5PrintSupport REQUIRED)
 
 # Stuff concerning this project
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC -std=gnu++11")
 
 set(
     HEADER_FILES 

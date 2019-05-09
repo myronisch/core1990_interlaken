@@ -38,6 +38,7 @@
 #define WUPPER_CFG_ERROR_NO_EXIST            3
 
 //Board models
+#define WUPPER_712                           712
 #define WUPPER_711                           711
 #define WUPPER_710                           710
 #define WUPPER_709                           709
