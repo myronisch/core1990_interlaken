@@ -290,9 +290,9 @@ begin
       interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0) <= Descrambler_lock_s;
       RX_FIFO_Read_s <= not RX_FIFO_Empty_s and not send_sync_word and not toHostFifo_prog_full; -- Read data when not empty and no sync_word is beiging sent
       toHostFifo_wr_en <= RX_FIFO_Read_s_p1 and (RX_FIFO_Valid_p1 or (send_sync_word_p1)); -- Write data in wupper fifo, or write sync word in fifo
-      send_sync_word <= RX_EOP_s AND NOT (send_sync_word_p1 or send_sync_word_p2);      
+      send_sync_word <= RX_EOP_s AND NOT (send_sync_word_p1) and (RX_FIFO_valid or RX_FIFO_Valid_p1);      
       RX_FIFO_Read_s_p1 <= RX_FIFO_Read_s;
-      RX_EOP_s_p1 <= RX_EOP_s;
+      
       --Interlaken to Wupper
       process(clk150)
         variable  SYNC_INFO_WORD       : std_logic_vector(63 downto 0) := X"0000_0000_0000_ABCD";
@@ -309,7 +309,7 @@ begin
                 toHostFifo_din <= (others => '0');
             else
                -- if RX_FIFO_Read_s = '1' then
-                    
+                    RX_EOP_s_p1 <= RX_EOP_s;
                     send_sync_word_p1 <= send_sync_word;
                     send_sync_word_p2 <= send_sync_word_p1;
                     RX_FIFO_Valid_p1 <= RX_FIFO_Valid or not RX_FIFO_Empty_s;
