@@ -400,10 +400,10 @@ regmap_register_t regmap_registers[] =
       REGMAP_REG_READ|REGMAP_REG_WRITE,
       REGMAP_ENDPOINT_0
     },
-    { REG_SFP_TRANSCEIVER_STATUS,
+    { REG_TRANSCEIVER,
       "Full Register",
       0x05020,
-      REGMAP_REG_READ,
+      REGMAP_REG_READ|REGMAP_REG_WRITE,
       REGMAP_ENDPOINT_0
     },
     { NULL,
@@ -864,7 +864,16 @@ regmap_bitfield_t regmap_bitfields[] =
       REGMAP_REG_READ,
       REGMAP_ENDPOINT_0      
     },
-    { BF_SFP_TRANSCEIVER_STATUS_TX_FAULT,
+    { BF_TRANSCEIVER_LOOPBACK,
+      "Interlaken",
+      0x05020,
+      0x0000000000000100,
+      8,
+      8,
+      REGMAP_REG_READ|REGMAP_REG_WRITE,
+      REGMAP_ENDPOINT_0      
+    },
+    { BF_TRANSCEIVER_TX_FAULT,
       "SFP transceiver TX fault indication",
       0x05020,
       0x00000000000000F0,
@@ -873,7 +882,7 @@ regmap_bitfield_t regmap_bitfields[] =
       REGMAP_REG_READ,
       REGMAP_ENDPOINT_0      
     },
-    { BF_SFP_TRANSCEIVER_STATUS_RX_LOS,
+    { BF_TRANSCEIVER_RX_LOS,
       "Loss of signal indication",
       0x05020,
       0x000000000000000F,

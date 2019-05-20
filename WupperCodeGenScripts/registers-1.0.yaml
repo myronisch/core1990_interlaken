@@ -523,9 +523,14 @@ Interlaken:
           type: R
           desc: Descrambler lock indication
           
-    - name: SFP_TRANSCEIVER_STATUS
-      type: R
+    - name: TRANSCEIVER
+      type: W
       bitfield:
+        - range: 8
+          type: W
+          name: LOOPBACK
+          descr: Near-End PMA loopback for transceiver
+          default: 0
         - range: 7..4
           type: R
           name: TX_FAULT

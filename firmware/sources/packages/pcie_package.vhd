@@ -253,7 +253,7 @@ package pcie_package is
   --** Interlaken
   constant REG_INTERLAKEN_PACKET_LENGTH       : std_logic_vector(19 downto 0) := x"05000";
   constant REG_INTERLAKEN_CONTROL_STATUS      : std_logic_vector(19 downto 0) := x"05010";
-  constant REG_SFP_TRANSCEIVER_STATUS         : std_logic_vector(19 downto 0) := x"05020";
+  constant REG_TRANSCEIVER                    : std_logic_vector(19 downto 0) := x"05020";
   -----------------------------------
   ---- GENERATED code END #1 ##  ----
   -----------------------------------
@@ -295,6 +295,10 @@ package pcie_package is
     TRANSCEIVER_RESET              : std_logic_vector(64 downto 64);  -- Any write to this register triggers a transceiver reset
   end record;
 
+  type bitfield_transceiver_w_type is record
+    LOOPBACK                       : std_logic_vector(8 downto 8);    -- Interlaken
+  end record;
+
 
   -- Control Record
   type register_map_control_type is record
@@ -320,6 +324,7 @@ package pcie_package is
     WISHBONE_READ                  : bitfield_wishbone_read_t_type;
     INTERLAKEN_PACKET_LENGTH       : std_logic_vector(15 downto 0);   -- Packet length for fromhost packet (to Interlaken)
     INTERLAKEN_CONTROL_STATUS      : bitfield_interlaken_control_status_t_type;
+    TRANSCEIVER                    : bitfield_transceiver_w_type;  
   end record;
   -----------------------------------
   ---- GENERATED code END #2 ##  ----
@@ -360,6 +365,7 @@ package pcie_package is
   constant REG_WISHBONE_READ_READ_ENABLE_C         : std_logic_vector(64 downto 64)   := "0";                   -- Any write to this register triggers a read from the Wishbone to Wupper fifo
   constant REG_INTERLAKEN_PACKET_LENGTH_C          : std_logic_vector(15 downto 0)    := x"0010";               -- Packet length for fromhost packet (to Interlaken)
   constant REG_INTERLAKEN_CONTROL_STATUS_TRANSCEIVER_RESET_C: std_logic_vector(64 downto 64)   := "0";                   -- Any write to this register triggers a transceiver reset
+  constant REG_TRANSCEIVER_LOOPBACK_C              : std_logic_vector(8 downto 8)     := "0";                   -- Interlaken
   -----------------------------------
   ---- GENERATED code END #3 ##  ----
   -----------------------------------
@@ -459,7 +465,7 @@ end record;
     DESCRAMBLER_LOCK               : std_logic_vector(0 downto 0);    -- Descrambler lock indication
   end record;
 
-  type bitfield_sfp_transceiver_status_r_type is record
+  type bitfield_transceiver_r_type is record
     TX_FAULT                       : std_logic_vector(7 downto 4);    -- SFP transceiver TX fault indication
     RX_LOS                         : std_logic_vector(3 downto 0);    -- Loss of signal indication
   end record;
@@ -468,7 +474,7 @@ end record;
   -- Interlaken
   type interlaken_monitor_type is record
     INTERLAKEN_CONTROL_STATUS      : bitfield_interlaken_control_status_r_type;
-    SFP_TRANSCEIVER_STATUS         : bitfield_sfp_transceiver_status_r_type;
+    TRANSCEIVER                    : bitfield_transceiver_r_type;  
 end record;
   
 

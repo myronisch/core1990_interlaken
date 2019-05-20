@@ -97,7 +97,8 @@ typedef struct
 {
   volatile u_long RX_LOS                   :  4;  /* bits   3: 0 */
   volatile u_long TX_FAULT                 :  4;  /* bits   7: 4 */
-} flxcard_sfp_transceiver_status_t;
+  volatile u_long LOOPBACK                 :  1;  /* bits   8: 8 */
+} flxcard_transceiver_t;
 
 
 
@@ -219,7 +220,7 @@ typedef struct
   flxcard_interlaken_control_status_t  INTERLAKEN_CONTROL_STATUS;     /* 0x5010 - 0x5017 (8) */
   u_char                         unused34[8];                   /* 0x5018 - 0x501F (8) */
 
-  flxcard_sfp_transceiver_status_t  SFP_TRANSCEIVER_STATUS;        /* 0x5020 - 0x5027 (8) */
+  flxcard_transceiver_t          TRANSCEIVER;                   /* 0x5020 - 0x5027 (8) */
   u_char                         unused35[8];                   /* 0x5028 - 0x502F (8) */
 
 } flxcard_bar2_regs_t;

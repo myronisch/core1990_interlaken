@@ -287,6 +287,12 @@ any & T & Fire a test MSIx interrupt \#5 \\
  & & & DECODER\_LOCK & 1 & R & Decoder lock indication \\
  & & & DESCRAMBLER\_LOCK & 0 & R & Descrambler lock indication \\
 \hline
+0x5020 & 0 & \multicolumn{5}{l|}{TRANSCEIVER} \\
+\cline{3-7}
+ & & & LOOPBACK & 8 & W & Interlaken \\
+ & & & TX\_FAULT & 7:4 & R & SFP transceiver TX fault indication \\
+ & & & RX\_LOS & 3:0 & R & Loss of signal indication \\
+\hline
 \caption{FELIX register map BAR2}\label{tab:dma_register_map_bar2} \\
 \end{longtabu}
 %\end{landscape}

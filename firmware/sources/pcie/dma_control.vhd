@@ -789,6 +789,7 @@ begin
       register_map_control_s.WISHBONE_CONTROL.ADDRESS       <= REG_WISHBONE_CONTROL_ADDRESS_C;          -- Slave address for Wishbone bus
       register_map_control_s.WISHBONE_WRITE.DATA            <= REG_WISHBONE_WRITE_DATA_C;               -- Wishbone
       register_map_control_s.INTERLAKEN_PACKET_LENGTH       <= REG_INTERLAKEN_PACKET_LENGTH_C;          -- Packet length for fromhost packet (to Interlaken)
+      register_map_control_s.TRANSCEIVER.LOOPBACK           <= REG_TRANSCEIVER_LOOPBACK_C;              -- Interlaken
       -----------------------------------
       ---- GENERATED code END #1 ##  ----
       -----------------------------------
@@ -1021,6 +1022,9 @@ begin
             when REG_INTERLAKEN_CONTROL_STATUS      => register_read_data_40_s(64 downto 64)   <= register_map_control_s.INTERLAKEN_CONTROL_STATUS.TRANSCEIVER_RESET; -- Any write to this register triggers a transceiver reset
                                                        register_read_data_40_s(1 downto 1)     <= register_map_monitor_s.interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DECODER_LOCK; -- Decoder lock indication
                                                        register_read_data_40_s(0 downto 0)     <= register_map_monitor_s.interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK; -- Descrambler lock indication
+            when REG_TRANSCEIVER                    => register_read_data_40_s(8 downto 8)     <= register_map_control_s.TRANSCEIVER.LOOPBACK;          -- Interlaken
+                                                       register_read_data_40_s(7 downto 4)     <= register_map_monitor_s.interlaken_monitor.TRANSCEIVER.TX_FAULT;          -- SFP transceiver TX fault indication
+                                                       register_read_data_40_s(3 downto 0)     <= register_map_monitor_s.interlaken_monitor.TRANSCEIVER.RX_LOS;            -- Loss of signal indication
 
             --
             -- Monitor registers
@@ -1060,8 +1064,6 @@ begin
                                                        register_read_data_40_s(0 downto 0)     <= register_map_monitor_s.wishbone_monitor.WISHBONE_STATUS.ERROR;         -- Address not mapped by the crossbar
 
 -- Interlaken
-            when REG_SFP_TRANSCEIVER_STATUS         => register_read_data_40_s(7 downto 4)     <= register_map_monitor_s.interlaken_monitor.SFP_TRANSCEIVER_STATUS.TX_FAULT; -- SFP transceiver TX fault indication
-                                                       register_read_data_40_s(3 downto 0)     <= register_map_monitor_s.interlaken_monitor.SFP_TRANSCEIVER_STATUS.RX_LOS; -- Loss of signal indication
             -----------------------------------
             ---- GENERATED code END #3 ##  ----
             -----------------------------------
@@ -1209,6 +1211,7 @@ begin
             when REG_WISHBONE_READ                  => register_map_control_s.WISHBONE_READ.READ_ENABLE      <= "1";                                     -- Any write to this register triggers a read from the Wishbone to Wupper fifo
             when REG_INTERLAKEN_PACKET_LENGTH       => register_map_control_s.INTERLAKEN_PACKET_LENGTH       <= register_write_data_40_s(15 downto 0);   -- Packet length for fromhost packet (to Interlaken)
             when REG_INTERLAKEN_CONTROL_STATUS      => register_map_control_s.INTERLAKEN_CONTROL_STATUS.TRANSCEIVER_RESET <= "1";                                     -- Any write to this register triggers a transceiver reset
+            when REG_TRANSCEIVER                    => register_map_control_s.TRANSCEIVER.LOOPBACK           <= register_write_data_40_s(8 downto 8);    -- Interlaken
             -----------------------------------
             ---- GENERATED code END #4 ##  ----
             -----------------------------------
