@@ -97,11 +97,11 @@ begin
                 --data_word_reg <= data_in;
                 --data_word_reg_p1 <= data_word_reg;
                 --SOP_p1 <= SOP;
-                EOP_signal <= '0';
+                ----EOP_signal <= '0';
             end if;
             if (Data_in(65 downto 64) = "10" and Data_valid_in = '1') then
                 --SOP_signal <= Data_In(61);
-              
+                
                 if(Data_in(60) = '1') then
                     EOP_signal <= '1';
                     EOP_Valid_signal <= Data_In(59 downto 57);
@@ -112,6 +112,12 @@ begin
                 FlowControl <= Data_In(55 downto 40);
                 Channel <= Data_In(39 downto 32);
             end if;
+            
+            if EOP_Signal = '1' then 
+                EOP_Signal <= '0';
+                EOP_Valid <= (others=>'0');
+            end if;
+            
             
             data_out <= data_P1(63 downto 0);
             --EOP <= EOP_signal;
@@ -129,8 +135,8 @@ begin
             
         end if;
     end process Burst_Deframing;
-    
-    EOP <= EOP_signal and not EOP_signal_p1;
+    ---------------------------------------------- Control header = "10"                  EOP                  not valid, force end of packet on this output.
+    EOP <= (EOP_signal and not EOP_signal_p1) or ((Data_in(65) and (not Data_in(64))) and Data_in(60)  and not data_valid_P1);
     
 	state_register : process (clk) is
     begin

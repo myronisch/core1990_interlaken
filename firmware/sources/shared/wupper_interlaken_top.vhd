@@ -174,7 +174,27 @@ architecture structure of wupper_interlaken_top is
       prog_empty              : out    std_logic);
   end component fifo128KB_256bit;
 
+component ila_top
+
+port (
+	clk : IN STD_LOGIC;
+
+	probe0 : IN STD_LOGIC_VECTOR(255 DOWNTO 0);
+	probe1 : IN STD_LOGIC_VECTOR(63 DOWNTO 0)
+);
+end component  ;
+
+
 begin
+
+FIFOAnalyzer : ila_top
+  port map (
+	  clk => toHostFifo_wr_clk,
+
+	  probe0 => fromHostFifo_din,
+	  probe1 => toHostFifo_din
+  );
+ 
   emcclk_out <= emcclk;
   si5324_reset_n <= not reset_hard;
   SFP_TX_DISABLE <= "0000";  -- Enables the SFP Transceivers

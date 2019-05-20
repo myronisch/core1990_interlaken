@@ -54,7 +54,7 @@ set_property strategy Performance_ExplorePostRoutePhysOpt $IMPL_RUN
 launch_runs $SYNTH_RUN
 wait_on_run $SYNTH_RUN
 open_run $SYNTH_RUN
-return
+#return
 #reset_run $IMPL_RUN
 launch_runs $IMPL_RUN 
 #launch_runs $IMPL_RUN  -to_step write_bitstream
