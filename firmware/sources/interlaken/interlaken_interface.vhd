@@ -63,7 +63,10 @@ entity interlaken_interface is
 		Decoder_lock      : out std_logic;
 		Descrambler_lock  : out std_logic;
 		CRC24_Error       : out std_logic;
-		CRC32_Error       : out std_logic
+		CRC32_Error       : out std_logic;
+		
+		loopback_in       : in std_logic_vector(2 downto 0)
+
 		
 	);
 end entity interlaken_interface;
@@ -106,6 +109,8 @@ component Transceiver_10g_64b67b
         gt0_drpen_in                            : in   std_logic;
         gt0_drprdy_out                          : out  std_logic;
         gt0_drpwe_in                            : in   std_logic;
+        ------------------------------- Loopback Ports -----------------------------
+        gt0_loopback_in                         : in   std_logic_vector(2 downto 0);
         --------------------- RX Initialization and Reset Ports --------------------
         gt0_eyescanreset_in                     : in   std_logic;
         gt0_rxuserrdy_in                        : in   std_logic;
@@ -164,6 +169,7 @@ component Transceiver_10g_64b67b
     );
     
     end component;
+
     
     signal RX_prog_full : std_logic_vector(15 downto 0);    
     signal FlowControl : std_logic_vector(15 downto 0);
@@ -188,7 +194,8 @@ component Transceiver_10g_64b67b
     signal   gt0_txseq_counter_r      :   unsigned(8 downto 0);
 
     signal gt0_pause_data_valid_r : std_logic;
-    signal gt0_data_valid_out_i   : std_logic;       
+    signal gt0_data_valid_out_i   : std_logic;     
+      
 begin
     
 
@@ -228,6 +235,7 @@ begin
         GT0_RXUSRCLK_OUT => open,
         GT0_RXUSRCLK2_OUT => RX_User_Clock,
         
+        gt0_loopback_in  => loopback_in,
         --_________________________________________________________________________
         --GT0  (X0Y2)
         --____________________________CHANNEL PORTS________________________________

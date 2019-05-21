@@ -176,11 +176,12 @@ architecture rtl of application is
     signal  PacketLength         : std_logic_vector(15 downto 0) := X"0010";
     
     signal  toHostFifo_din_s     : std_logic_vector(63 downto 0) ;
-    signal  clk40: std_logic;
-    signal  clk150: std_logic;
-    signal  locked: std_logic;
-    signal  reset_hard_soft: std_logic; --hard and soft reset coming from wupper, input to clk_40MHz reset. locked output is used to reset the application.
-    
+    signal  fromHostFifo_dout_s     : std_logic_vector(63 downto 0) ;
+    signal  clk40                : std_logic;
+    signal  clk150               : std_logic;
+    signal  locked               : std_logic;
+    signal  reset_hard_soft      : std_logic; --hard and soft reset coming from wupper, input to clk_40MHz reset. locked output is used to reset the application.
+    signal  loopback_in          : std_logic_vector(2 downto 0);
     
        -------------------------- Generate System Clock ---------------------------
      component clk_40MHz
@@ -238,8 +239,8 @@ begin
     	
         probe0(63 downto 0) => RX_TO_WU, 
         probe1(63 downto 0) => WU_TO_TX, 
-        probe2(63 downto 0) => (others => '0'), 
-        probe3(63 downto 0) => (others => '0'), 
+        probe2(63 downto 0) => toHostFifo_din_s, 
+        probe3(63 downto 0) => fromHostFifo_dout, 
         probe4(63 downto 0) => (others => '0'), 
         probe5(0) => send_sync_word, 
         probe6(0) => send_sync_word_p1, 
@@ -277,7 +278,7 @@ begin
     fromHostFifo_rst <= s_flush_fifo;
     
     -- Loss Of Signal register
-    interlaken_monitor.SFP_TRANSCEIVER_STATUS.RX_LOS <= SFP_RX_LOS; 
+    interlaken_monitor.TRANSCEIVER.RX_LOS <= SFP_RX_LOS; 
     
     g0: if(NUMBER_OF_INTERRUPTS>4) generate
         interrupt_call(4 downto 4) <= register_map_control.INT_TEST_4;
@@ -299,7 +300,8 @@ begin
   );
  
  reset_hard_soft <= reset_hard or reset_soft;
-  
+ 
+ loopback_in <= '0' & register_map_control.TRANSCEIVER.LOOPBACK & '0' ;  -- Assign register loopback value.
   
   il0: entity work.interlaken_interface 
       generic map(
@@ -356,16 +358,20 @@ begin
           Decoder_lock      => Decoder_lock_s ,                 
           Descrambler_lock  => Descrambler_lock_s ,--interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0),              
           CRC24_Error       => CRC24_Error_s,                   --: out std_logic;
-          CRC32_Error       => CRC32_Error_s                    --: out std_logic
+          CRC32_Error       => CRC32_Error_s,                   --: out std_logic
+          loopback_in => loopback_in
           
       );
-
+      -- Register variables
       PacketLength <= register_map_control.INTERLAKEN_PACKET_LENGTH;
       interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DECODER_LOCK(1)  <= Decoder_lock_s ;
       interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0) <= Descrambler_lock_s;
+      --
       RX_FIFO_Read_s <= not RX_FIFO_Empty_s and not send_sync_word and not toHostFifo_prog_full; -- Read data when not empty and no sync_word is beiging sent
       toHostFifo_wr_en <= toHostFifo_wr_en_s; -- Write data in wupper fifo, or write sync word in fifo
       send_sync_word <= RX_EOP_s AND (NOT send_sync_word_p1) and RX_FIFO_valid;      
+      
+      toHostFifo_din <= toHostFifo_din_s;
       
       --Interlaken to Wupper
       process(clk150)
@@ -380,7 +386,7 @@ begin
                 send_sync_word_p1 <= '0';
                 RX_EOP_s_p1 <= '0';
                 ToWupperCounter <= X"0000";
-                toHostFifo_din <= SYNC_INFO_WORD;
+                toHostFifo_din_s <= SYNC_INFO_WORD;
                 CRC24_occured <= '0';
                 CRC32_occured <= '0';
             else
@@ -409,10 +415,10 @@ begin
                         if RX_FIFO_Valid = '1'  then
                              ToWupperCounter <= ToWupperCounter + 1;
                              toHostFifo_wr_en_s <= '1';
-                             toHostFifo_din <= RX_TO_WU(63 downto 0);       -- Write the data to the ToHost FIFO of Wupper
+                             toHostFifo_din_s <= RX_TO_WU(63 downto 0);       -- Write the data to the ToHost FIFO of Wupper
                         else
                              toHostFifo_wr_en_s <= '0';  --No valid data to write
-                             toHostFifo_din <= RX_TO_WU(63 downto 0);       -- Fifo data ports will be connected but not written
+                             toHostFifo_din_s <= RX_TO_WU(63 downto 0);       -- Fifo data ports will be connected but not written
                         end if;
                         
                         
@@ -423,7 +429,7 @@ begin
                         SYNC_INFO_WORD(39) := CRC24_occured; 
                         CRC24_occured <= '0';
                         CRC32_occured <= '0';
-                        toHostFifo_din <= SYNC_INFO_WORD;                   -- Write the SYNC_INFO_WORD to the FIFO
+                        toHostFifo_din_s <= SYNC_INFO_WORD;                   -- Write the SYNC_INFO_WORD to the FIFO
                         toHostFifo_wr_en_s <= '1';
                         ToWupperCounter <= (others => '0');
                         ToWupperstate <= '1';
@@ -441,7 +447,7 @@ begin
     
     fromHostFifo_rd_en_s <= not fromHostFifo_empty_s and (not TX_FIFO_progfull_s)  and Descrambler_lock_s; 
     Wu_TO_TX <= fromHostFifo_dout;
-                          
+                   
       process(clk150)
       begin
         if(rising_edge(clk150)) then
