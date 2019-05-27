@@ -96,7 +96,7 @@ begin
         Reset   => CRC24_RST
 	);
 	
-    CalcCrc <= Gearboxready and FIFO_meta; -- previously     CalcCrc <=  Gearboxready and FIFO_meta;
+    CalcCrc <= Gearboxready and FIFO_meta; 
 
 	
     pipeline : process (clk, reset)
@@ -383,7 +383,7 @@ begin
                     Data_valid_temp <= Data_in_valid;
                     
                     HealthLane <= '1';     -- set status of lane to healthy
-                    HealthInterface <= '1'; -- set status of interface to health
+                    HealthInterface <= '1'; -- set status of interface to healthy
                     
                     Data_Control <= '0';
                     CRC24_EN <= '1';
@@ -401,7 +401,7 @@ begin
                     
                     CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet 1001
                     --CRC24_TX(55 downto 40) <= RX_prog_full;
-                    CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s; 
+                    CRC24_TX(59 downto 57) <= TX_ValidBytes_s;  -- '1' & TX_ValidBytes_s; 
                     Data_Valid <= '1';
                     Data_Control <= '1'; 
                     

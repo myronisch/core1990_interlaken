@@ -745,6 +745,60 @@ th {
       <td class="desc">Address not mapped by the crossbar</td>
     </tr>
     <tr>
+      <td colspan="7" class="group">Interlaken</td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x5000</td>
+      <td rowspan="1">0</td>
+      <td rowspan="1">INTERLAKEN_PACKET_LENGTH</td>
+      <td class="name"></td>
+      <td class="range">15..0</td>
+      <td class="type">W</td>
+      <td class="desc">Packet length for fromhost packet (to Interlaken)</td>
+    </tr>
+    <tr>
+      <td rowspan="3">0x5010</td>
+      <td rowspan="3">0</td>
+      <td rowspan="3">INTERLAKEN_CONTROL_STATUS</td>
+      <td class="name">TRANSCEIVER_RESET</td>
+      <td class="range">any</td>
+      <td class="type">T</td>
+      <td class="desc">Any write to this register triggers a transceiver reset</td>
+    </tr>
+    <tr>
+      <td class="name">DECODER_LOCK</td>
+      <td class="range">1</td>
+      <td class="type">R</td>
+      <td class="desc">Decoder lock indication</td>
+    </tr>
+    <tr>
+      <td class="name">DESCRAMBLER_LOCK</td>
+      <td class="range">0</td>
+      <td class="type">R</td>
+      <td class="desc">Descrambler lock indication</td>
+    </tr>
+    <tr>
+      <td rowspan="3">0x5020</td>
+      <td rowspan="3">0</td>
+      <td rowspan="3">TRANSCEIVER</td>
+      <td class="name">LOOPBACK</td>
+      <td class="range">8</td>
+      <td class="type">W</td>
+      <td class="desc">Interlaken</td>
+    </tr>
+    <tr>
+      <td class="name">TX_FAULT</td>
+      <td class="range">7..4</td>
+      <td class="type">R</td>
+      <td class="desc">SFP transceiver TX fault indication</td>
+    </tr>
+    <tr>
+      <td class="name">RX_LOS</td>
+      <td class="range">3..0</td>
+      <td class="type">R</td>
+      <td class="desc">Loss of signal indication</td>
+    </tr>
+    <tr>
       <td colspan="7" class="group">Monitorsections</td>
     </tr>
     <tr>
@@ -769,6 +823,15 @@ th {
       <td rowspan="1">0x0020</td>
       <td rowspan="1">0,1</td>
       <td rowspan="1">Wishbone</td>
+      <td class="name"></td>
+      <td class="range">0..0</td>
+      <td class="type">R</td>
+      <td class="desc">None</td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x0030</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">Interlaken</td>
       <td class="name"></td>
       <td class="range">0..0</td>
       <td class="type">R</td>

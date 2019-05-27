@@ -29,7 +29,10 @@ set_property PACKAGE_PIN AP37 [get_ports emcclk]
 
 #XADC GPIO
 set_property PACKAGE_PIN AR38 [get_ports emcclk_out]
-set_property IOSTANDARD LVCMOS18 [get_ports emcclk_out] 
+set_property IOSTANDARD LVCMOS18 [get_ports emcclk_out]
+
+set_property PACKAGE_PIN AT36 [get_ports si5324_reset_n]
+set_property IOSTANDARD LVCMOS18 [get_ports si5324_reset_n]
 
 
 set_property BITSTREAM.CONFIG.BPI_SYNC_MODE Type1 [current_design]
@@ -122,15 +125,20 @@ set_clock_groups -name pcieclkmux -physically_exclusive -group clk_125mhz_mux_x0
 set_false_path -to [get_pins pcie0/u1/g_virtex7.pipe_clock0/g0.pclk_i1/S0]
 set_false_path -to [get_pins pcie0/u1/g_virtex7.pipe_clock0/g0.pclk_i1/S1]
 
+set_max_delay -datapath_only -from [get_clocks clk_out40_clk_wiz_40*] -to [get_clocks *] 24.0
+set_max_delay -datapath_only -from [get_clocks *] -to [get_clocks clk_out40_clk_wiz_40*] 24.0
+
 ###############################################################################
 # Physical Constraints
 ###############################################################################
 
 set_false_path -from [get_ports sys_reset_n]
-set_false_path -reset_path -from [get_pins pcie0/u1/g_virtex7.u1/inst/gt_top_i/pipe_wrapper_i/pipe_reset_i/cpllreset_reg/C] 
+set_false_path -reset_path -from [get_pins pcie0/u1/g_virtex7.u1/inst/gt_top_i/pipe_wrapper_i/pipe_reset_i/cpllreset_reg/C]
 ###############################################################################
 # End
 ###############################################################################
+
+
 
 
 

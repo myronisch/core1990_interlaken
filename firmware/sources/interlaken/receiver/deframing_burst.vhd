@@ -37,6 +37,7 @@ architecture Deframing of Burst_Deframer is
     signal CRC24_Value_P1, CRC24_Value_P2, CRC24_Value_P3 : std_logic_vector(23 downto 0) := (others => '0'); -- CRC-24 value received
     signal SOP_signal, SOP_p1 : std_logic;
     signal EOP_signal : std_logic;
+    signal EOP_signal_p1 : std_logic;
     signal EOP_Valid_signal : std_logic_vector(2 downto 0);
     --signal FlowControl : std_logic_vector(15 downto 0);
     signal Channel : std_logic_vector(7 downto 0);
@@ -96,32 +97,46 @@ begin
                 --data_word_reg <= data_in;
                 --data_word_reg_p1 <= data_word_reg;
                 --SOP_p1 <= SOP;
-                EOP_signal <= '0';
+                ----EOP_signal <= '0';
             end if;
             if (Data_in(65 downto 64) = "10" and Data_valid_in = '1') then
-                SOP_signal <= Data_In(61);
+                --SOP_signal <= Data_In(61);
+                
                 if(Data_in(60) = '1') then
                     EOP_signal <= '1';
                     EOP_Valid_signal <= Data_In(59 downto 57);
+                end if;
+                if (Data_in(61) = '1') then
+                    SOP_signal <= '1';
                 end if;
                 FlowControl <= Data_In(55 downto 40);
                 Channel <= Data_In(39 downto 32);
             end if;
             
+            if EOP_Signal = '1' then 
+                EOP_Signal <= '0';
+                EOP_Valid <= (others=>'0');
+            end if;
+            
+            
             data_out <= data_P1(63 downto 0);
+            --EOP <= EOP_signal;
             EOP_valid <= EOP_valid_signal;
+            EOP_signal_p1 <= EOP_signal;
+
+
             if data_valid_P1 = '1' then
                 SOP <= SOP_signal;
                 SOP_signal <= '0';
-                            
+                
             end if;
             
             data_valid_out <= data_valid_P1;
             
         end if;
     end process Burst_Deframing;
-    
-    EOP <= EOP_signal;
+    ---------------------------------------------- Control header = "10"                  EOP                  not valid, force end of packet on this output.
+    EOP <= (EOP_signal and not EOP_signal_p1) or ((Data_in(65) and (not Data_in(64))) and Data_in(60)  and not data_valid_P1);
     
 	state_register : process (clk) is
     begin

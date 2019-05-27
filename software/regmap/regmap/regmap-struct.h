@@ -87,6 +87,19 @@ typedef struct
   volatile u_long INT                      :  1;  /* bits   4: 4 */
 } flxcard_wishbone_status_t;
 
+typedef struct
+{
+  volatile u_long DESCRAMBLER_LOCK         :  1;  /* bits   0: 0 */
+  volatile u_long DECODER_LOCK             :  1;  /* bits   1: 1 */
+} flxcard_interlaken_control_status_t;
+
+typedef struct
+{
+  volatile u_long RX_LOS                   :  4;  /* bits   3: 0 */
+  volatile u_long TX_FAULT                 :  4;  /* bits   7: 4 */
+  volatile u_long LOOPBACK                 :  1;  /* bits   8: 8 */
+} flxcard_transceiver_t;
+
 
 
 /**************************************/
@@ -197,6 +210,18 @@ typedef struct
 
   flxcard_wishbone_status_t      WISHBONE_STATUS;               /* 0x4030 - 0x4037 (8) */
   u_char                         unused31[8];                   /* 0x4038 - 0x403F (8) */
+
+  u_char                         unused32[0x0FC0];              /* 0x4040 - 0x4FFF (4032) */
+
+/* Interlaken */
+  volatile u_long                INTERLAKEN_PACKET_LENGTH;      /* 0x5000 - 0x5007 (8) */
+  u_char                         unused33[8];                   /* 0x5008 - 0x500F (8) */
+
+  flxcard_interlaken_control_status_t  INTERLAKEN_CONTROL_STATUS;     /* 0x5010 - 0x5017 (8) */
+  u_char                         unused34[8];                   /* 0x5018 - 0x501F (8) */
+
+  flxcard_transceiver_t          TRANSCEIVER;                   /* 0x5020 - 0x5027 (8) */
+  u_char                         unused35[8];                   /* 0x5028 - 0x502F (8) */
 
 } flxcard_bar2_regs_t;
 

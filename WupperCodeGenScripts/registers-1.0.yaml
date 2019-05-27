@@ -59,6 +59,11 @@ Monitorsections:
       bitfield:
         - range: 0..0
           type: R
+    - name: Interlaken
+      record_name: interlaken_monitor
+      bitfield:
+        - range: 0..0
+          type: R
 
 #Bar0 contains the registers dedicated to Wupper. Please only edit registers in Bar2
 #Registers in this group will not be generated with WupperCodeGen
@@ -218,6 +223,8 @@ Bar2:
       offset: 0x2000
     - ref: Wishbone
       offset: 0x4000
+    - ref: Interlaken
+      offset: 0x5000
 
 GenericBoardInformation:
   group: GEN
@@ -488,3 +495,47 @@ Wishbone:
           name: ERROR
           desc: Address not mapped by the crossbar
   
+Interlaken:
+  desc: Interlaken
+  endpoints: 0
+  entries:
+    - name: INTERLAKEN_PACKET_LENGTH
+      desc: Packet length for fromhost packet (to Interlaken)
+      type: W
+      bitfield:
+        - range: 15..0
+          default: 0x0010
+          
+    - name: INTERLAKEN_CONTROL_STATUS
+      type: W
+      bitfield:
+        - range: any
+          type: T
+          value: 1
+          name: TRANSCEIVER_RESET
+          desc: Any write to this register triggers a transceiver reset
+        - range: 1
+          name: DECODER_LOCK
+          desc: Decoder lock indication
+          type: R
+        - range: 0      
+          name: DESCRAMBLER_LOCK
+          type: R
+          desc: Descrambler lock indication
+          
+    - name: TRANSCEIVER
+      type: W
+      bitfield:
+        - range: 8
+          type: W
+          name: LOOPBACK
+          descr: Near-End PMA loopback for transceiver
+          default: 0
+        - range: 7..4
+          type: R
+          name: TX_FAULT
+          desc: SFP transceiver TX fault indication
+        - range: 3..0
+          type: R
+          name: RX_LOS
+          desc: Loss of signal indication

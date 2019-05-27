@@ -15,7 +15,7 @@ entity Interlaken_Receiver is
 		RX_Data_In 	: in std_logic_vector(66 downto 0);
 		RX_Data_Out : out std_logic_vector (63 downto 0);        -- Data ready to transmit
 		
-		RX_Valid_Out: out std_logic;
+		RX_FIFO_Valid: out std_logic;
 		
 		--RX_Enable    	: out std_logic;      --not used                   -- Enable the TX
 		RX_SOP        	: out std_logic;                         -- Start of Packet
@@ -50,21 +50,19 @@ architecture Receiver of Interlaken_Receiver is
 	
     signal FIFO_Read_Count, FIFO_Write_Count : std_logic_vector(5 downto 0);
     signal FIFO_prog_full, FIFO_prog_empty  : std_logic;
-    signal FIFO_Data_Out : std_logic_vector(68 downto 0);
+    signal FIFO_Data_Out : std_logic_vector(70 downto 0);
     
     COMPONENT RX_FIFO
 		PORT (
             rst : IN STD_LOGIC;
             wr_clk : IN STD_LOGIC;
             rd_clk : IN STD_LOGIC;
-            din : IN STD_LOGIC_VECTOR(68 DOWNTO 0);
+            din : IN STD_LOGIC_VECTOR(70 DOWNTO 0);
             wr_en : IN STD_LOGIC;
             rd_en : IN STD_LOGIC;
-            dout : OUT STD_LOGIC_VECTOR(68 DOWNTO 0);
+            dout : OUT STD_LOGIC_VECTOR(70 DOWNTO 0);
             full : OUT STD_LOGIC;
             empty : OUT STD_LOGIC;
-            rd_data_count : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
-            wr_data_count : OUT STD_LOGIC_VECTOR(5 DOWNTO 0);
             prog_full : OUT STD_LOGIC;
             prog_empty : OUT STD_LOGIC;
             valid : OUT STD_LOGIC
@@ -73,7 +71,7 @@ architecture Receiver of Interlaken_Receiver is
     
     signal Data_Burst_Out : std_logic_vector(68 downto 0);
     
-    signal RX_FIFO_Data : std_logic_vector(68 downto 0);
+    signal RX_FIFO_Data : std_logic_vector(70 downto 0);
     signal RX_FIFO_Write : std_logic;
     signal Data_valid_Burst_Out : std_logic;
     signal Flowcontrol : std_logic_vector (15 downto 0);
@@ -95,6 +93,11 @@ architecture Receiver of Interlaken_Receiver is
     signal Error_Decoder_Sync : std_logic;
     signal Descrambler_In_lock: std_logic;
     -- signal FIFO_dout_valid : std_logic;
+    signal CRC24_Error_burst : std_logic ; 
+    signal CRC24_Error_fifo : std_logic := '0';
+    
+    signal CRC32_Error_meta : std_logic;
+    signal CRC32_Error_fifo : std_logic := '0';
     
 begin
     
@@ -113,11 +116,9 @@ begin
         dout            => FIFO_Data_Out,
         full            => RX_FIFO_Full,
         empty           => RX_FIFO_Empty,
-        rd_data_count   => FIFO_Read_Count,
-        wr_data_count   => FIFO_Write_Count,
         prog_full       => FIFO_prog_full,
         prog_empty      => FIFO_prog_empty,
-        valid           => RX_Valid_Out
+        valid           => RX_FIFO_Valid
     );
     
     Deframing_Burst : entity work.Burst_Deframer
@@ -135,20 +136,38 @@ begin
        -- Data_control_in  => Data_Control_Meta_Out,
         
         Flowcontrol => RX_Flowcontrol,
-        CRC24_Error => CRC24_Error,
+        CRC24_Error => CRC24_Error_burst,
         
         Data_valid_in   => Data_valid_Meta_Out,
         Data_valid_out  => Data_valid_Burst_Out
     );
     RX_FIFO_Write <= Data_valid_Burst_Out;
-    RX_FIFO_Data <= Data_Burst_Out;
+    RX_FIFO_Data <=  CRC32_Error_fifo & CRC24_Error_fifo & Data_Burst_Out;
+    
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if CRC24_Error_burst = '1' then
+                CRC24_Error_fifo <= '1';
+            elsif RX_FIFO_Write = '1' then
+                CRC24_Error_fifo <= '0';
+            end if;
+            
+            if CRC32_Error_meta = '1' then
+                CRC32_Error_fifo <= '1';
+            elsif RX_FIFO_Write = '1' then
+                CRC32_Error_fifo <= '0';
+            end if;
+            
+        end if;
+    end process;
            
     Deframing_Meta : entity work.Meta_Deframer
     port map (
         clk         => clk,
         reset       => reset,
         
-        CRC32_Error => CRC32_Error,
+        CRC32_Error => CRC32_Error_meta,
         
         Data_in          => Data_Descrambler_Out,
         Data_out         => Data_Meta_Out,
@@ -219,18 +238,15 @@ begin
 --            link_up_p1 := Data_Valid_Descrambler_Out;
 --        end if;
 --    end process;
-    
-    output : process (fifo_read_clk, reset) is
-    begin
-        if (reset = '1') then
-            RX_Data_Out <= (others => '0');
-        elsif (rising_edge(fifo_read_clk)) then
-            RX_SOP <= FIFO_Data_Out(68);
-            RX_EOP <= FIFO_Data_Out(67);
-            RX_EOP_Valid <= FIFO_Data_Out(66 downto 64);
-            RX_Data_Out <= FIFO_Data_Out(63 downto 0);
-        end if;
-    end process output;
+
+
+    CRC32_Error <= FIFO_Data_Out(70);    
+    CRC24_Error <= FIFO_Data_Out(69);    
+    RX_SOP <= FIFO_Data_Out(68);
+    RX_EOP <= FIFO_Data_Out(67);
+    RX_EOP_Valid <= FIFO_Data_Out(66 downto 64);
+    RX_Data_Out <= FIFO_Data_Out(63 downto 0);
+        
     
 --    state_register : process (clk) is 
 --    begin

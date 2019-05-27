@@ -193,7 +193,7 @@ END COMPONENT;
     signal RX_FlowControl	: std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
     signal RX_Channel    	: std_logic_vector(7 downto 0);      -- Select transmit channel (yet unutilized)
     
-    signal RX_Valid_Out     : std_logic;
+    signal RX_FIFO_Valid     : std_logic;
     
     signal TX_FIFO_Full      : std_logic;
     signal TX_FIFO_progfull  : std_logic;
@@ -285,7 +285,7 @@ signal err3: std_logic;
 signal mty3: std_logic_vector(3 downto 0);
 
 
-constant LOOPBACK: boolean := true;
+constant LOOPBACK: boolean := false;
 
 
 
@@ -376,7 +376,7 @@ begin
         
         TX_FIFO_progfull => TX_FIFO_progfull,
         
-        RX_Valid_Out => RX_Valid_Out,
+        RX_FIFO_Valid => RX_FIFO_Valid,
         TX_FIFO_Full => TX_FIFO_Full,
         RX_FIFO_Full => RX_FIFO_Full,
         
@@ -428,13 +428,7 @@ begin
     C1990_RXN_IN <= IL150G_TXN_OUT;  
     C1990_RXP_IN <= IL150G_TXP_OUT;  
     end generate;
-        
-    
-    
-    
---    leo:  Loopback 
- --  C1990RX_IL150GTX_N <= C1990TX_IL150GRX_N;
- --   C1990RX_IL150GTX_P <= C1990TX_IL150GRX_P;
+
     
     RX_FIFO_Read <= not RX_FIFO_Empty;
     

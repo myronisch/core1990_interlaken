@@ -1,5 +1,6 @@
 library ieee; 
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 library work;
 
 entity interlaken_interface is
@@ -21,7 +22,7 @@ entity interlaken_interface is
         
         ----Data signals---------------------------------
 		TX_Data 	: in std_logic_vector(63 downto 0);          -- Data transmitted
-        RX_Data     : out std_logic_vector (63 downto 0);        -- Data received
+        RX_Data     : out std_logic_vector (63 downto 0);   -- Data received
 		
 		----Transceiver related transmission-------------
 		TX_Out_P  : out std_logic;
@@ -43,17 +44,17 @@ entity interlaken_interface is
 		RX_FlowControl	: out std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
 		RX_Channel    	: out std_logic_vector(7 downto 0);      -- Select transmit channel (yet unutilized)
 		
-		RX_Valid_Out    : out std_logic;
+		RX_FIFO_Valid    : out std_logic;
 		
 		----Transmitter status signals---------------------
 		TX_FIFO_Full    : out std_logic;
         TX_FIFO_Write   : in std_logic;
         TX_FIFO_progfull: out std_logic;
         
-        RX_in: out std_logic_vector(63 downto 0); --Debug
-        TX_out: out std_logic_vector(63 downto 0); --Debug
-        Data_Descrambler : out std_logic_vector(66 downto 0);
-        Data_Decoder : out std_logic_vector(66 downto 0);
+--        RX_in: out std_logic_vector(63 downto 0); --Debug
+--        TX_out: out std_logic_vector(63 downto 0); --Debug
+--        Data_Descrambler : out std_logic_vector(66 downto 0);
+--        Data_Decoder : out std_logic_vector(66 downto 0);
 		
 		----Receiver status signals------------------------
 		RX_FIFO_Full      : out std_logic;
@@ -62,7 +63,10 @@ entity interlaken_interface is
 		Decoder_lock      : out std_logic;
 		Descrambler_lock  : out std_logic;
 		CRC24_Error       : out std_logic;
-		CRC32_Error       : out std_logic
+		CRC32_Error       : out std_logic;
+		
+		loopback_in       : in std_logic_vector(2 downto 0)
+
 		
 	);
 end entity interlaken_interface;
@@ -75,65 +79,97 @@ architecture interface of interlaken_interface is
 
     
     -------------------------- Include Transceiver -----------------------------
-    component Transceiver_10g_64b67b
-     Port ( 
-       SOFT_RESET_TX_IN : in STD_LOGIC;
-       SOFT_RESET_RX_IN : in STD_LOGIC;
-       DONT_RESET_ON_DATA_ERROR_IN : in STD_LOGIC;
-       Q0_CLK1_GTREFCLK_PAD_N_IN : in STD_LOGIC;
-       Q0_CLK1_GTREFCLK_PAD_P_IN : in STD_LOGIC;
-       GT0_TX_FSM_RESET_DONE_OUT : out STD_LOGIC;
-       GT0_RX_FSM_RESET_DONE_OUT : out STD_LOGIC;
-       GT0_DATA_VALID_IN : in STD_LOGIC;
-       GT0_TX_MMCM_LOCK_OUT : out STD_LOGIC;
-       GT0_RX_MMCM_LOCK_OUT : out STD_LOGIC;
-       GT0_TXUSRCLK_OUT : out STD_LOGIC;
-       GT0_TXUSRCLK2_OUT : out STD_LOGIC;
-       GT0_RXUSRCLK_OUT : out STD_LOGIC;
-       GT0_RXUSRCLK2_OUT : out STD_LOGIC;
-       gt0_drpaddr_in : in STD_LOGIC_VECTOR ( 8 downto 0 );
-       gt0_drpdi_in : in STD_LOGIC_VECTOR ( 15 downto 0 );
-       gt0_drpdo_out : out STD_LOGIC_VECTOR ( 15 downto 0 );
-       gt0_drpen_in : in STD_LOGIC;
-       gt0_drprdy_out : out STD_LOGIC;
-       gt0_drpwe_in : in STD_LOGIC;
-       gt0_dmonitorout_out : out STD_LOGIC_VECTOR ( 7 downto 0 );
-       gt0_eyescanreset_in : in STD_LOGIC;
-       gt0_rxuserrdy_in : in STD_LOGIC;
-       gt0_eyescandataerror_out : out STD_LOGIC;
-       gt0_eyescantrigger_in : in STD_LOGIC;
-       gt0_rxdata_out : out STD_LOGIC_VECTOR ( 63 downto 0 );
-       gt0_gtxrxp_in : in STD_LOGIC;
-       gt0_gtxrxn_in : in STD_LOGIC;
-       gt0_rxdfelpmreset_in : in STD_LOGIC;
-       gt0_rxmonitorout_out : out STD_LOGIC_VECTOR ( 6 downto 0 );
-       gt0_rxmonitorsel_in : in STD_LOGIC_VECTOR ( 1 downto 0 );
-       gt0_rxoutclkfabric_out : out STD_LOGIC;
-       gt0_rxdatavalid_out : out STD_LOGIC;
-       gt0_rxheader_out : out STD_LOGIC_VECTOR ( 2 downto 0 );
-       gt0_rxheadervalid_out : out STD_LOGIC;
-       gt0_rxgearboxslip_in : in STD_LOGIC;
-       gt0_gtrxreset_in : in STD_LOGIC;
-       gt0_rxpmareset_in : in STD_LOGIC;
-       gt0_rxresetdone_out : out STD_LOGIC;
-       gt0_gttxreset_in : in STD_LOGIC;
-       gt0_txuserrdy_in : in STD_LOGIC;
-       gt0_txdata_in : in STD_LOGIC_VECTOR ( 63 downto 0 );
-       gt0_gtxtxn_out : out STD_LOGIC;
-       gt0_gtxtxp_out : out STD_LOGIC;
-       gt0_txoutclkfabric_out : out STD_LOGIC;
-       gt0_txoutclkpcs_out : out STD_LOGIC;
-       gt0_txgearboxready_out : out STD_LOGIC;
-       gt0_txheader_in : in STD_LOGIC_VECTOR ( 2 downto 0 );
-       gt0_txstartseq_in : in STD_LOGIC;
-       gt0_txresetdone_out : out STD_LOGIC;
-       GT0_QPLLLOCK_OUT : out STD_LOGIC;
-       GT0_QPLLREFCLKLOST_OUT : out STD_LOGIC;
-       GT0_QPLLOUTCLK_OUT : out STD_LOGIC;
-       GT0_QPLLOUTREFCLK_OUT : out STD_LOGIC;
-       sysclk_in : in STD_LOGIC
-     );
+component Transceiver_10g_64b67b
+    port
+    (
+        SOFT_RESET_TX_IN                        : in   std_logic;
+        SOFT_RESET_RX_IN                        : in   std_logic;
+        DONT_RESET_ON_DATA_ERROR_IN             : in   std_logic;
+        Q1_CLK0_GTREFCLK_PAD_N_IN               : in   std_logic;
+        Q1_CLK0_GTREFCLK_PAD_P_IN               : in   std_logic;
+    
+        GT0_TX_FSM_RESET_DONE_OUT               : out  std_logic;
+        GT0_RX_FSM_RESET_DONE_OUT               : out  std_logic;
+        GT0_DATA_VALID_IN                       : in   std_logic;
+        GT0_TX_MMCM_LOCK_OUT                    : out  std_logic;
+        GT0_RX_MMCM_LOCK_OUT                    : out  std_logic;
+     
+        GT0_TXUSRCLK_OUT                        : out  std_logic;
+        GT0_TXUSRCLK2_OUT                       : out  std_logic;
+        GT0_RXUSRCLK_OUT                        : out  std_logic;
+        GT0_RXUSRCLK2_OUT                       : out  std_logic;
+    
+        --_________________________________________________________________________
+        --GT0  (X0Y4)
+        --____________________________CHANNEL PORTS________________________________
+        ---------------------------- Channel - DRP Ports  --------------------------
+        gt0_drpaddr_in                          : in   std_logic_vector(8 downto 0);
+        gt0_drpdi_in                            : in   std_logic_vector(15 downto 0);
+        gt0_drpdo_out                           : out  std_logic_vector(15 downto 0);
+        gt0_drpen_in                            : in   std_logic;
+        gt0_drprdy_out                          : out  std_logic;
+        gt0_drpwe_in                            : in   std_logic;
+        ------------------------------- Loopback Ports -----------------------------
+        gt0_loopback_in                         : in   std_logic_vector(2 downto 0);
+        --------------------- RX Initialization and Reset Ports --------------------
+        gt0_eyescanreset_in                     : in   std_logic;
+        gt0_rxuserrdy_in                        : in   std_logic;
+        -------------------------- RX Margin Analysis Ports ------------------------
+        gt0_eyescandataerror_out                : out  std_logic;
+        gt0_eyescantrigger_in                   : in   std_logic;
+        ------------------- Receive Ports - Digital Monitor Ports ------------------
+        gt0_dmonitorout_out                     : out  std_logic_vector(14 downto 0);
+        ------------------ Receive Ports - FPGA RX interface Ports -----------------
+        gt0_rxdata_out                          : out  std_logic_vector(63 downto 0);
+        ------------------------ Receive Ports - RX AFE Ports ----------------------
+        gt0_gthrxn_in                           : in   std_logic;
+        --------------------- Receive Ports - RX Equalizer Ports -------------------
+        gt0_rxmonitorout_out                    : out  std_logic_vector(6 downto 0);
+        gt0_rxmonitorsel_in                     : in   std_logic_vector(1 downto 0);
+        --------------- Receive Ports - RX Fabric Output Control Ports -------------
+        gt0_rxoutclkfabric_out                  : out  std_logic;
+        ---------------------- Receive Ports - RX Gearbox Ports --------------------
+        gt0_rxdatavalid_out                     : out  std_logic;
+        gt0_rxheader_out                        : out  std_logic_vector(2 downto 0);
+        gt0_rxheadervalid_out                   : out  std_logic;
+        --------------------- Receive Ports - RX Gearbox Ports  --------------------
+        gt0_rxgearboxslip_in                    : in   std_logic;
+        ------------- Receive Ports - RX Initialization and Reset Ports ------------
+        gt0_gtrxreset_in                        : in   std_logic;
+        ------------------------ Receive Ports -RX AFE Ports -----------------------
+        gt0_gthrxp_in                           : in   std_logic;
+        -------------- Receive Ports -RX Initialization and Reset Ports ------------
+        gt0_rxresetdone_out                     : out  std_logic;
+        --------------------- TX Initialization and Reset Ports --------------------
+        gt0_gttxreset_in                        : in   std_logic;
+        gt0_txuserrdy_in                        : in   std_logic;
+        -------------- Transmit Ports - 64b66b and 64b67b Gearbox Ports ------------
+        gt0_txheader_in                         : in   std_logic_vector(2 downto 0);
+        ------------------ Transmit Ports - TX Data Path interface -----------------
+        gt0_txdata_in                           : in   std_logic_vector(63 downto 0);
+        ---------------- Transmit Ports - TX Driver and OOB signaling --------------
+        gt0_gthtxn_out                          : out  std_logic;
+        gt0_gthtxp_out                          : out  std_logic;
+        ----------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
+        gt0_txoutclkfabric_out                  : out  std_logic;
+        gt0_txoutclkpcs_out                     : out  std_logic;
+        --------------------- Transmit Ports - TX Gearbox Ports --------------------
+        gt0_txsequence_in                       : in   std_logic_vector(6 downto 0);
+        ------------- Transmit Ports - TX Initialization and Reset Ports -----------
+        gt0_txresetdone_out                     : out  std_logic;
+    
+        --____________________________COMMON PORTS________________________________
+        GT0_QPLLLOCK_OUT : out std_logic;
+        GT0_QPLLREFCLKLOST_OUT  : out std_logic;
+         GT0_QPLLOUTCLK_OUT  : out std_logic;
+         GT0_QPLLOUTREFCLK_OUT : out std_logic;
+    
+              sysclk_in                               : in   std_logic
+    
+    );
+    
     end component;
+
     
     signal RX_prog_full : std_logic_vector(15 downto 0);    
     signal FlowControl : std_logic_vector(15 downto 0);
@@ -153,22 +189,16 @@ architecture interface of interlaken_interface is
     signal GT0_TX_FSM_RESET_DONE_OUT : std_logic;
     signal link_up : std_logic;
     signal Descrambler_Locked : std_logic;
-            
+    
+    signal  gt0_txsequence_i                : std_logic_vector(6 downto 0);
+    signal   gt0_txseq_counter_r      :   unsigned(8 downto 0);
+
+    signal gt0_pause_data_valid_r : std_logic;
+    signal gt0_data_valid_out_i   : std_logic;     
+      
 begin
     
-    
-    
---    process (reset, clk) is
---    begin
---        if(reset='1') then
---            TX_Startseq_In <= '0';
---        elsif(rising_edge(clk)) then
---            TX_Startseq_In <= '0';
---            if(TX_Gearboxready_Out = '1') then
---                TX_Startseq_In <= '1';
---            end if;
---        end if;
---    end process;
+
         
     ------------------------------ System Clock --------------------------------
 
@@ -191,8 +221,8 @@ begin
         SOFT_RESET_TX_IN => reset,
         SOFT_RESET_RX_IN => reset,
         DONT_RESET_ON_DATA_ERROR_IN => '0',
-        Q0_CLK1_GTREFCLK_PAD_N_IN => GTREFCLK_IN_N,
-        Q0_CLK1_GTREFCLK_PAD_P_IN => GTREFCLK_IN_P,
+        Q1_CLK0_GTREFCLK_PAD_N_IN => GTREFCLK_IN_N,
+        Q1_CLK0_GTREFCLK_PAD_P_IN => GTREFCLK_IN_P,
         
         GT0_TX_FSM_RESET_DONE_OUT => GT0_TX_FSM_RESET_DONE_OUT,
         GT0_RX_FSM_RESET_DONE_OUT => open,
@@ -205,6 +235,7 @@ begin
         GT0_RXUSRCLK_OUT => open,
         GT0_RXUSRCLK2_OUT => RX_User_Clock,
         
+        gt0_loopback_in  => loopback_in,
         --_________________________________________________________________________
         --GT0  (X0Y2)
         --____________________________CHANNEL PORTS________________________________
@@ -215,23 +246,23 @@ begin
         gt0_drpen_in                    =>      '0',
         gt0_drprdy_out                  =>      open,
         gt0_drpwe_in                    =>      '0',
-        --------------------------- Digital Monitor Ports --------------------------
-        gt0_dmonitorout_out             =>      open,
-        
+
         --------------------- RX Initialization and Reset Ports --------------------
         gt0_eyescanreset_in             =>      '0',
         gt0_rxuserrdy_in                =>      '1',
         -------------------------- RX Margin Analysis Ports ------------------------
         gt0_eyescandataerror_out        =>      open,
         gt0_eyescantrigger_in           =>      '0',
+        --------------------------- Digital Monitor Ports --------------------------
+        gt0_dmonitorout_out             =>      open,
+        
         ------------------ Receive Ports - FPGA RX interface Ports -----------------
         gt0_rxdata_out                  =>      Data_Transceiver_Out,
         --------------------------- Receive Ports - RX AFE -------------------------
-        gt0_gtxrxp_in                   =>      RX_In_P,
+        gt0_gthrxp_in                   =>      RX_In_P,
         ------------------------ Receive Ports - RX AFE Ports ----------------------
-        gt0_gtxrxn_in                   =>      RX_In_N,
+        gt0_gthrxn_in                   =>      RX_In_N,
         --------------------- Receive Ports - RX Equalizer Ports -------------------
-        gt0_rxdfelpmreset_in            =>      '0',
         gt0_rxmonitorout_out            =>      open,
         gt0_rxmonitorsel_in             =>      (others => '0'),
         --------------- Receive Ports - RX Fabric Output Control Ports -------------
@@ -244,25 +275,24 @@ begin
         gt0_rxgearboxslip_in            =>      RX_Gearboxslip_In,
         ------------- Receive Ports - RX Initialization and Reset Ports ------------
         gt0_gtrxreset_in                =>      reset,
-        gt0_rxpmareset_in               =>      '0',
         -------------- Receive Ports -RX Initialization and Reset Ports ------------
         gt0_rxresetdone_out             =>      RX_Resetdone_Out,
         
         --------------------- TX Initialization and Reset Ports --------------------
         gt0_gttxreset_in                =>      reset,
         gt0_txuserrdy_in                =>      '1',
+        -------------- Transmit Ports - 64b66b and 64b67b Gearbox Ports ------------
+        gt0_txheader_in                 =>      TX_Header_In,
         ------------------ Transmit Ports - TX Data Path interface -----------------
         gt0_txdata_in                   =>      Data_Transceiver_In,
         ---------------- Transmit Ports - TX Driver and OOB signaling --------------
-        gt0_gtxtxn_out                  =>      TX_Out_N,
-        gt0_gtxtxp_out                  =>      TX_Out_P,
+        gt0_gthtxn_out                  =>      TX_Out_N,
+        gt0_gthtxp_out                  =>      TX_Out_P,
         ----------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
         gt0_txoutclkfabric_out          =>      open,
         gt0_txoutclkpcs_out             =>      open,
         --------------------- Transmit Ports - TX Gearbox Ports --------------------
-        gt0_txgearboxready_out          =>      TX_Gearboxready_Out,
-        gt0_txheader_in                 =>      TX_Header_In,
-        gt0_txstartseq_in               =>      TX_Startseq_In,
+        gt0_txsequence_in               =>      gt0_txsequence_i, 
         ------------- Transmit Ports - TX Initialization and Reset Ports -----------
         gt0_txresetdone_out             =>      TX_Resetdone_Out,
         --____________________________COMMON PORTS________________________________
@@ -270,8 +300,56 @@ begin
         GT0_QPLLREFCLKLOST_OUT  => open,
         GT0_QPLLOUTCLK_OUT  => open,
         GT0_QPLLOUTREFCLK_OUT => open,
+        
         sysclk_in => clk40
     );
+    
+    --TX Gearbox sequencer
+    
+    gt0_data_valid_out_i <=  '1' when ((gt0_txsequence_i /= "0010101") and (gt0_txsequence_i /= "0101011") and (gt0_txsequence_i /= "1000001")) else
+                                       '0';
+    
+        process(TX_User_Clock)
+        begin
+          if rising_edge (TX_User_Clock) then
+                 gt0_pause_data_valid_r <=  gt0_data_valid_out_i ;
+          end if;
+        end process;
+    
+        TX_Gearboxready_Out  <= '1' when (gt0_pause_data_valid_r='1') else '0';
+    
+        --____________________________ TXSEQUENCE counter to GT __________________________    
+        process(TX_User_Clock)
+        begin
+          if rising_edge (TX_User_Clock) then
+            if((reset='1') or (gt0_txseq_counter_r = 66)) then 
+                 gt0_txseq_counter_r <=  (others => '0') ;
+            else 
+                 gt0_txseq_counter_r <=  gt0_txseq_counter_r + 1 ;
+            end if;
+          end if;
+        end process;
+        gt0_txsequence_i         <= std_logic_vector(gt0_txseq_counter_r(6 downto 0));
+        
+     --RX Gearbox
+        block_sync_sm_0_i  :  entity work.Transceiver_10g_64b67b_BLOCK_SYNC_SM 
+     generic map
+     (
+         SH_CNT_MAX          => 64,    
+         SH_INVALID_CNT_MAX  => 16    
+     )
+     port map
+     (
+         -- User Interface
+         BLOCKSYNC_OUT             =>    open,
+         RXGEARBOXSLIP_OUT         =>    RX_Gearboxslip_In,
+         RXHEADER_IN               =>    RX_Header_Out,
+         RXHEADERVALID_IN          =>    RX_Headervalid_Out,
+ 
+         -- System Interface
+         USER_CLK                  =>    RX_User_Clock,
+         SYSTEM_RESET              =>    reset
+     );
     
     ---------------------------- Transmitting side -----------------------------
     Interlaken_TX : entity work.Interlaken_Transmitter
@@ -308,7 +386,7 @@ begin
         TX_valid_out    => GT0_DATA_VALID_IN
     );
     
-    TX_out <= Data_Transceiver_In;
+  --  TX_out <= Data_Transceiver_In;
     
     ---------------------------- Receiving side --------------------------------
     Interlaken_RX : entity work.Interlaken_Receiver
@@ -323,7 +401,7 @@ begin
         RX_Data_In(63 downto 0) => Data_Transceiver_Out,--Data_Transferred,
         RX_Data_In(66 downto 64)=> RX_Header_Out,--Data_Transferred,
         RX_Data_Out             => RX_Data,
-        RX_Valid_Out            => RX_Valid_Out,
+        RX_FIFO_Valid           => RX_FIFO_Valid,
         
         RX_SOP          => RX_SOP,
         RX_EOP_valid    => RX_EOP_Valid,
@@ -338,17 +416,17 @@ begin
         CRC24_Error     => CRC24_Error,
         CRC32_Error     => CRC32_Error,
         
-        Data_Descrambler => Data_Descrambler, 
-        Data_Decoder => Data_Decoder,
+        Data_Descrambler => open, 
+        Data_Decoder => open,
         
         RX_FIFO_Full       => RX_FIFO_Full,
         RX_FIFO_Empty      => RX_FIFO_Empty,
         RX_FIFO_Read       => RX_FIFO_Read,
            
         RX_Link_Up      => Link_Up,
-        Bitslip         => RX_Gearboxslip_In
+        Bitslip         => open--RX_Gearboxslip_In
     );
     Descrambler_Lock <= Descrambler_locked;
-    RX_in <= Data_Transceiver_Out;
+   -- RX_in <= Data_Transceiver_Out;
     
 end architecture interface;

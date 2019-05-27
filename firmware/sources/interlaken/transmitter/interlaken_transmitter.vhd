@@ -44,7 +44,7 @@ architecture Transmitter of Interlaken_Transmitter is
     signal FIFO_Read_Count, FIFO_Write_Count : std_logic_vector(4 downto 0);
     signal FIFO_prog_empty : std_logic;
     
-    signal Data_Input : std_logic_vector (68 downto 0);
+    --signal Data_Input : std_logic_vector (68 downto 0);
     signal Data_FIFO_In : std_logic_vector (68 downto 0);
     
     signal Data_Burst_In : std_logic_vector(68 downto 0);
@@ -194,7 +194,7 @@ begin
         Gearboxready    => Gearbox_Pause
 	);
 	
-	Gearbox_Pause <= TX_GearboxReady or GearboxSignal;
+	Gearbox_Pause <= TX_GearboxReady ;--or GearboxSignal;
 	
 	Gearbox : process(clk, reset, TX_Gearboxready, Gearbox_Count, TX_Startseq)
 	begin    

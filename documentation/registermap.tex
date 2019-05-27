@@ -276,6 +276,23 @@ any & T & Fire a test MSIx interrupt \#5 \\
  & & & ACKNOWLEDGE & 1 & R & Indicates the termination of a normal bus cycle \\
  & & & ERROR & 0 & R & Address not mapped by the crossbar \\
 \hline
+\multicolumn{7}{|c|}{Interlaken} \\
+\hline
+0x5000 & 0 & \multicolumn{2}{l|}{INTERLAKEN\_PACKET\_LENGTH} &
+15:0 & W & Packet length for fromhost packet (to Interlaken) \\
+\hline
+0x5010 & 0 & \multicolumn{5}{l|}{INTERLAKEN\_CONTROL\_STATUS} \\
+\cline{3-7}
+ & & & TRANSCEIVER\_RESET & any & T & Any write to this register triggers a transceiver reset \\
+ & & & DECODER\_LOCK & 1 & R & Decoder lock indication \\
+ & & & DESCRAMBLER\_LOCK & 0 & R & Descrambler lock indication \\
+\hline
+0x5020 & 0 & \multicolumn{5}{l|}{TRANSCEIVER} \\
+\cline{3-7}
+ & & & LOOPBACK & 8 & W & Interlaken \\
+ & & & TX\_FAULT & 7:4 & R & SFP transceiver TX fault indication \\
+ & & & RX\_LOS & 3:0 & R & Loss of signal indication \\
+\hline
 \caption{FELIX register map BAR2}\label{tab:dma_register_map_bar2} \\
 \end{longtabu}
 %\end{landscape}

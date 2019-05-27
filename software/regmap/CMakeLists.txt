@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 2.8.12)
 
 set(PACKAGE regmap)
 set(PACKAGE_VERSION 3.4.1)

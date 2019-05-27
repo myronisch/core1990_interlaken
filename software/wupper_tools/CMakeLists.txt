@@ -41,3 +41,13 @@ target_link_libraries (wupper-dma-stat Wupper)
 
 add_executable(wupper-wishbone src/wupper-wishbone.cpp)
 target_link_libraries (wupper-wishbone Wupper)
+
+add_executable(wupper-i2c src/wupper-i2c.cpp)
+target_link_libraries (wupper-i2c Wupper)
+
+add_executable(wupper-init src/wupper-init.cpp)
+target_link_libraries (wupper-init Wupper)
+
+add_executable(wupper-interlaken-transfer src/wupper-interlaken-transfer.cpp)
+target_link_libraries (wupper-interlaken-transfer Wupper)
+
