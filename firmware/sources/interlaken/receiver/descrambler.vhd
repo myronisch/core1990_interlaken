@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.ALL; 
+use work.interlaken_package.all;
 
 entity Descrambler is 
 	generic (
@@ -47,15 +48,8 @@ architecture behavior of Descrambler is
 	signal Poly : std_logic_vector (57 downto 0);
 	signal Shiftreg : std_logic_vector (63 downto 0);	
 	signal Data_HDR_P1, Data_HDR : std_logic_vector(2 downto 0);
-        -- Constants
-    constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization framing layer control word
-    constant SCRAM_STATE_INIT_VALUE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000"; -- Starting value of scrambler 
-    constant META_TYPE_SYNCHRONIZATION_P: std_logic_vector(4 downto 0) := "11110";
-    constant META_TYPE_SCRAM_STATE_P: std_logic_vector(4 downto 0) := "01010";
-    
-    constant META_TYPE_SYNCHRONIZATION_N: std_logic_vector(4 downto 0) := "00001";
-    constant META_TYPE_SCRAM_STATE_N: std_logic_vector(4 downto 0) := "10101";
-    
+   
+
 begin
 	shiftreg(63) <= Poly(57) xor Poly(38);
     shiftreg(62) <= Poly(56) xor Poly(37);

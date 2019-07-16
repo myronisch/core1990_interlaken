@@ -1,13 +1,15 @@
 library ieee; 
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.interlaken_package.all;
 library work;
 
 entity interlaken_interface is
     generic(
-         BurstMax   : positive;      -- Configurable value of BurstMax
-         BurstShort : positive;      -- Configurable value of BurstShort
-         PacketLength : positive    -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
+         BurstMax     : positive;      -- Configurable value of BurstMax
+         BurstShort   : positive;      -- Configurable value of BurstShort
+         PacketLength : positive;     -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
+         Lanes        : positive     -- Number of Lanes (Transmission channels)
     );
 	port (
 	    ----40 MHz input, from clock generator------------
@@ -34,9 +36,9 @@ entity interlaken_interface is
 		TX_SOP          : in std_logic;
 		TX_EOP          : in std_logic;
 		TX_EOP_Valid    : in std_logic_vector(2 downto 0);
-		TX_FlowControl  : in std_logic_vector(15 downto 0);
-        TX_Channel      : in std_logic_vector(7 downto 0);
-		
+		TX_FlowControl  : in slv_16_array(0 to Lanes-1);
+        TX_Channel      : in slv_8_array(0 to Lanes-1); 
+        
 		----Receiver output signals-----------------------
 		RX_SOP        	: out std_logic;                         -- Start of Packet
 		RX_EOP        	: out std_logic;                         -- End of Packet
@@ -73,9 +75,7 @@ end entity interlaken_interface;
 
 architecture interface of interlaken_interface is
     
-    signal TX_User_Clock, RX_User_Clock : std_logic;
-    signal Data_Transferred : std_logic_vector(66 downto 0);    --Data in transfer
-    
+
 
     
     -------------------------- Include Transceiver -----------------------------
@@ -170,8 +170,12 @@ component Transceiver_10g_64b67b
     
     end component;
 
+    signal TX_User_Clock, RX_User_Clock : std_logic;
+    signal Data_Transferred : std_logic_vector(66 downto 0);    --Data in transfer
+    signal TX_Data_In_s : slv_64_array(0 to Lanes-1);
     
-    signal RX_prog_full : std_logic_vector(15 downto 0);    
+    signal RX_prog_full : slv_16_array(0 to Lanes-1);    
+    signal prog_full : std_logic_vector(15 downto 0);  
     signal FlowControl : std_logic_vector(15 downto 0);
     signal RX_Datavalid_Out : std_logic;
     signal RX_Header_Out : std_logic_vector(2 downto 0);
@@ -184,8 +188,8 @@ component Transceiver_10g_64b67b
     signal TX_Startseq_In : std_logic;
     signal TX_Resetdone_Out : std_logic;
     
-    signal Data_Transceiver_In, Data_Transceiver_Out : std_logic_vector(63 downto 0);
-    signal GT0_DATA_VALID_IN : std_logic;
+    signal Data_Transceiver_In, Data_Transceiver_Out : std_logic_vector(((64*Lanes)-1) downto 0);
+    signal GT0_DATA_VALID_IN :  slv_1_array(0 to Lanes-1);
     signal GT0_TX_FSM_RESET_DONE_OUT : std_logic;
     signal link_up : std_logic;
     signal Descrambler_Locked : std_logic;
@@ -195,7 +199,10 @@ component Transceiver_10g_64b67b
 
     signal gt0_pause_data_valid_r : std_logic;
     signal gt0_data_valid_out_i   : std_logic;     
-      
+    
+    --signal TX_EOP_Valid_s         : slv_3_array(0 to Lanes-1);
+   -- signal TX_SOP_s, TX_EOP_s     : std_logic;
+    signal FIFO_Read_Burst_s        : slv_1_array(0 to Lanes-1);
 begin
     
 
@@ -226,7 +233,7 @@ begin
         
         GT0_TX_FSM_RESET_DONE_OUT => GT0_TX_FSM_RESET_DONE_OUT,
         GT0_RX_FSM_RESET_DONE_OUT => open,
-        GT0_DATA_VALID_IN => GT0_DATA_VALID_IN,
+        GT0_DATA_VALID_IN => GT0_DATA_VALID_IN(0)(0), -- ToDo, Map to 4 valid signals instead of just lane 0
         GT0_TX_MMCM_LOCK_OUT => open,
         GT0_RX_MMCM_LOCK_OUT => open,
         
@@ -352,11 +359,15 @@ begin
      );
     
     ---------------------------- Transmitting side -----------------------------
-    Interlaken_TX : entity work.Interlaken_Transmitter
+--    TX_SOP_s <= TX_SOP&"000";
+--    TX_EOP_s <= "000"&TX_EOP;
+    
+    Interlaken_TX : entity work.Interlaken_Transmitter_multiChannel
     generic map(
-        BurstMax   => BurstMax,      -- Configurable value of BurstMax
-        BurstShort => BurstShort,    -- Configurable value of BurstShort
-        PacketLength => PacketLength -- Configurable value of PacketLength
+        BurstMax     => BurstMax,      -- Configurable value of BurstMax
+        BurstShort   => BurstShort,    -- Configurable value of BurstShort
+        PacketLength => PacketLength, -- Configurable value of PacketLength
+        Lanes        => Lanes
     )
     port map (
         write_clk => clk150,
@@ -364,29 +375,32 @@ begin
         reset => reset,
         
         TX_Data_In  => TX_Data,
-        TX_Data_Out(63 downto 0) => Data_Transceiver_In,
+        TX_Data_Out(((Lanes*67)-1) downto ((Lanes*67)-(Lanes*67))) => Data_Transceiver_In, 
         TX_Data_Out(66 downto 64) => TX_Header_In,
         
         TX_SOP          => TX_SOP,
         TX_EOP_Valid    => TX_EOP_Valid,
         TX_EOP          => TX_EOP,
-        TX_Channel      => TX_Channel,
+        --TX_Channel      => TX_Channel,
         TX_Gearboxready => TX_Gearboxready_Out,
         TX_Startseq     => TX_Startseq_In,
         
-        FIFO_Write_Data => TX_FIFO_Write,
-        FIFO_prog_full  => TX_FIFO_progfull,
-        
-        TX_FlowControl  => FlowControl,
+        TX_FIFO_Write_Data => TX_FIFO_Write,
+        TX_FIFO_prog_full  => TX_FIFO_progfull,
+        TX_FIFO_Full       => TX_FIFO_Full,
+
+        TX_FlowControl  => TX_FlowControl,
         RX_prog_full    => RX_prog_full,
         
-        Link_up         => Descrambler_locked,
-        FIFO_Full       => TX_FIFO_Full,
-        
+        Link_up         => Link_up,
+        FIFO_Read_Burst => FIFO_Read_Burst_s,
         TX_valid_out    => GT0_DATA_VALID_IN
+        
     );
     
-  --  TX_out <= Data_Transceiver_In;
+
+
+
     
     ---------------------------- Receiving side --------------------------------
     Interlaken_RX : entity work.Interlaken_Receiver
@@ -407,7 +421,7 @@ begin
         RX_EOP_valid    => RX_EOP_Valid,
         RX_EOP          => RX_EOP,
         RX_FlowControl  => FlowControl,
-        RX_prog_full    => RX_prog_full,
+        RX_prog_full    => prog_full,
         RX_Channel      => RX_Channel,
         RX_Datavalid    => RX_Datavalid_Out,
         

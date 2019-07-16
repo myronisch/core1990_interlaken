@@ -61,12 +61,14 @@ use UNISIM.VCOMPONENTS.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_1164.all;
 use work.pcie_package.all;
+use work.interlaken_package.all;
 
 entity application is
   generic(
     NUMBER_OF_INTERRUPTS : integer := 8;
     CARD_TYPE            : integer := 709;
-    BurstMax             : integer := 256);
+    BurstMax             : integer := 256
+    );
   port (
     SYSCLK_P             : in     std_logic;--200 MHz clock at H19/G18
     SYSCLK_N             : in     std_logic;
@@ -305,9 +307,10 @@ begin
   
   il0: entity work.interlaken_interface 
       generic map(
-           BurstMax     => BurstMax,      -- Configurable value of BurstMax
-           BurstShort   => 64,       -- Configurable value of BurstShort
-           PacketLength => 2024)     -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
+           BurstMax     => BurstMax,  -- Configurable value of BurstMax
+           BurstShort   => 64,        -- Configurable value of BurstShort
+           PacketLength => 2024,       -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
+           Lanes        => 4)         -- Number of Lanes (Transmission channels)
       port map(
           ----40 MHz input, from clock generator------------
           clk40  => clk40,                                      --: in std_logic;

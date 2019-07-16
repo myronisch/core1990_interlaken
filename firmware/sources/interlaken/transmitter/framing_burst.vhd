@@ -1,5 +1,6 @@
 library ieee; 
 use ieee.std_logic_1164.all;
+use work.interlaken_package.all;
 
 entity Burst_Framer is 
 	generic (
@@ -14,6 +15,8 @@ entity Burst_Framer is
 		TX_SOP        : in std_logic;                         -- Start of Packet
 		TX_ValidBytes : in std_logic_vector(2 downto 0);      -- Valid bytes packet contains
 		TX_EOP        : in std_logic;                         -- End of Packet
+        Channel_send_idle : in std_logic;
+        
 		TX_Channel    : in std_logic_vector(7 downto 0);      -- Select transmit channel (yet unutilized)
 		
 		Data_in          : in std_logic_vector(63 downto 0);  -- Input data
@@ -38,7 +41,7 @@ entity Burst_Framer is
 end Burst_Framer;
 
 architecture framing of Burst_Framer is 
-	type state_type is (IDLE, DATA, WORD, FILL, EOP_SET, EOP_FULL, EOP_EMPTY);
+	type state_type is (IDLE, DATA, WORD, FILL, EOP_SET, EOP_FULL, IDLE_SET, IDLE_FULL, IDLE_EMPTY, EOP_EMPTY);
 	signal pres_state, next_state : state_type;
 	
 	signal Data_Temp             : std_logic_vector(66 downto 0) := (others => '0');
@@ -157,7 +160,7 @@ begin
                 Data_valid_check := Valid_P2;  
                 
                 --if(HDR_P2 = "010"and(Data_P2(62 downto 60) = "110" or Data_P2(61 downto 60) = "01")) then --Control word BurstMax or EOP only word 
-                if(HDR_P2 = "010"and(Data_P2(61 downto 60) = "01")) then --Control word BurstMax or EOP only word 
+                if(HDR_P2 = "010" and ((Data_P2(61 downto 60) = "01") or (Data_P2(62 downto 60) = "100"))) then --Control word BurstMax or EOP only word 
                     Data_out(23 downto 0) <= CRC24_Out_v; -- Include CRC in last packet of burst   
                 end if;
                 
@@ -221,23 +224,27 @@ begin
 		end if;
 	end process state_register;
 	
-	state_decoder : process (pres_state, TX_SOP, TX_Enable, TX_EOP, Byte_Counter, FIFO_meta, Gearboxready) is
+	state_decoder : process (pres_state, TX_SOP, Channel_send_idle, TX_Enable, TX_EOP, Byte_Counter, FIFO_meta, Gearboxready) is
 	begin
 	    if(Gearboxready = '0' or FIFO_meta = '0') then
 	       next_state <= pres_state;
 	    else
             case pres_state is
             when IDLE =>
-                if (TX_Enable = '1' and TX_SOP = '1' and TX_EOP = '0') then
+                if (TX_Enable = '1' and TX_EOP = '0' and Channel_send_idle = '0') then
                     next_state <= DATA;
-                elsif (TX_Enable = '1' and TX_SOP = '1' and TX_EOP = '1') then
+                elsif (TX_Enable = '1' and TX_EOP = '1') then
                     next_state <= EOP_SET;
+                elsif (TX_Enable = '1' and  Channel_send_idle = '1') then
+                        next_state <= IDLE_SET;                    
                 else 
                     next_state <= IDLE;
                 end if;
             when DATA =>
                 if(TX_EOP = '1' ) then
-                    next_state <= EOP_SET;    
+                    next_state <= EOP_SET;  
+                elsif (Channel_send_idle = '1') then
+                    next_state <= IDLE_SET;  
                 elsif (Byte_Counter >= (BurstMax-8)) then
                     next_state <= WORD;
                 else
@@ -251,6 +258,12 @@ begin
                 else
                     next_state <= EOP_EMPTY;
                 end if;	            
+            when IDLE_SET =>
+                if (Byte_Counter >= BurstShort) then
+                    next_state <= IDLE_FULL;
+                else
+                    next_state <= IDLE_EMPTY;
+                end if;                
             when EOP_EMPTY =>
                 if (Byte_Counter >= BurstShort) then
                    next_state <= IDLE;
@@ -293,19 +306,23 @@ begin
                     Data_valid_temp <= Data_in_valid;                    
                     
                     if (TX_SOP = '1' and TX_Enable = '1') then -- Indicates the start of data flow
-                        CRC24_TX <= "010"&X"E000_0001_0000_0000"; -- Start packet E000_0001_0000_0000
+                        CRC24_TX <= "010"&X"E000_0001_0000_0000"; -- Start packet 
                         --CRC24_TX(55 downto 40) <= RX_prog_full;
                         Data_Valid <= '1';
                         Data_valid_temp <= '1'; --Start of a new packet is always valid
                    -- elsif (TX_flowcontrol(0) = '0') then  -- TODO Flowcontrol is not used? why as condition? 
                     --    CRC24_TX <= "010"&X"C000_0001_0000_0000"; --  C000_0001_0000_0000
                      --   CRC24_TX(55 downto 40) <= RX_prog_full;
-                        
+                    elsif (TX_Enable = '1') then
+                        CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Idle packet, data follows
+                        Data_Valid <= '1';
+                        Data_valid_temp <= '1'; --Start of a new packet is always valid
+ 
                     else
-                        CRC24_TX <= "001"&X"0000_0000_0000_0000"; -- data word placeholder
+                        CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
                     end if;
                     
-                    if(TX_EOP = '1' and TX_SOP = '1') then
+                    if((TX_EOP = '1' or Channel_send_idle = '1') and TX_Enable = '1') then
                         FIFO_readreq <= '0';
                         Data_Valid <= '1';    
                     end if;
@@ -332,7 +349,7 @@ begin
                     
                     if (Byte_Counter >= (BurstMax-8)) then
                         FIFO_readreq <= '0';
-                    elsif(TX_EOP = '1' ) then
+                    elsif(TX_EOP = '1'  or Channel_send_idle = '1') then
                         FIFO_readreq <= '0';
                     end if; 
                     
@@ -392,6 +409,26 @@ begin
                         CRC24_RST <= '1';
                         CRC24_P1 <= '0';
                     end if; 
+                when IDLE_SET =>     -- Transmit last bytes from buffer and add this to byte count
+                        Byte_Counter <= Byte_Counter + 8;
+                        
+                        CRC24_TX <= Data_temp;
+                        Data_temp <= "001"&Data_in; -- Still read out data and save because FIFO takes a cycle to respond
+                        
+                        Data_valid <= Data_valid_temp;
+                        Data_valid_temp <= Data_in_valid;
+                        
+                        HealthLane <= '1';     -- set status of lane to healthy
+                        HealthInterface <= '1'; -- set status of interface to healthy
+                        
+                        Data_Control <= '0';
+                        CRC24_EN <= '1';
+                        CRC24_RST <= '0';
+                        if (CRC24_P1 = '1') then
+                            CRC24_RST <= '1';
+                            CRC24_P1 <= '0';
+                        end if; 
+                    
                 
                 when EOP_EMPTY =>	-- Count bytes, send frame to CRC-24 and output idle word containing CRC and EOP
                     if (Byte_Counter >= BurstShort) then
@@ -402,6 +439,16 @@ begin
                     CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet 1001
                     --CRC24_TX(55 downto 40) <= RX_prog_full;
                     CRC24_TX(59 downto 57) <= TX_ValidBytes_s;  -- '1' & TX_ValidBytes_s; 
+                    Data_Valid <= '1';
+                    Data_Control <= '1'; 
+                when IDLE_EMPTY =>	-- Count bytes, send frame to CRC-24 and output idle word containing CRC and EOP
+                    if (Byte_Counter >= BurstShort) then
+                         FIFO_readreq <= '1';
+                    end if; 
+                    Byte_Counter <= Byte_Counter + 8; --
+                    
+                    CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Burst end packet 1001
+                    --CRC24_TX(55 downto 40) <= RX_prog_full;
                     Data_Valid <= '1';
                     Data_Control <= '1'; 
                     
@@ -421,6 +468,12 @@ begin
                     FIFO_readreq <= '1';
                     CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
                     CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;
+                    --CRC24_TX(55 downto 40) <= RX_prog_full;
+                    Data_Valid <= '1';
+                    Data_Control <= '1';
+               when IDLE_FULL => 	-- Send frame to CRC-24 and output burst word containing CRC and EOP
+                    FIFO_readreq <= '1';
+                    CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
                     --CRC24_TX(55 downto 40) <= RX_prog_full;
                     Data_Valid <= '1';
                     Data_Control <= '1';

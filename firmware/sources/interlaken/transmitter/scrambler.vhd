@@ -1,5 +1,6 @@
 library ieee; 
 use ieee.std_logic_1164.all;
+use work.interlaken_package.all;
 
 entity Scrambler is 
 	port ( 
@@ -23,11 +24,7 @@ end Scrambler;
 architecture Scrambling of Scrambler is 
 	signal Poly : std_logic_vector (57 downto 0);
 	signal Shiftreg : std_logic_vector (63 downto 0);	
-	    -- Constants
-    constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization framing layer control word
-    constant SCRAM_STATE_INIT_VALUE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000"; -- Starting value of scrambler 
-    constant META_TYPE_SYNCHRONIZATION: std_logic_vector(4 downto 0) := "11110";
-    constant META_TYPE_SCRAM_STATE: std_logic_vector(4 downto 0) := "01010";
+	
 
 begin
 	shiftreg(63) <= Poly(57) xor Poly(38);

@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.interlaken_package.all;
 
 entity Burst_Deframer is
     port(

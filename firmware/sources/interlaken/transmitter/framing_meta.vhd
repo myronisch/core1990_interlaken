@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
---use work.interlaken_package.all;
+use work.interlaken_package.all;
+
 entity Meta_Framer is
 	generic(
 		PacketLength : positive -- 2048 * 8 = 16KB - 128Kb each packet. Including the metaframing itself
@@ -53,10 +54,6 @@ architecture framing of Meta_Framer is
     signal Gearboxready_P1 : std_logic;
     signal CRC32_Rst_P1 : std_logic;
     
-        -- Constants
-    constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization, framing layer control word
-    constant SCRAM_STATE_INIT_VALUE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000"; -- Starting value of scrambler 
-    constant SKIP_WORD : std_logic_vector(63 downto 0) := X"1e1e_1e1e_1e1e_1e1e"; -- skip word, framing layer control word
 
 
 begin

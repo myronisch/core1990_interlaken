@@ -57,6 +57,7 @@ use UNISIM.VCOMPONENTS.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_1164.all;
 use work.pcie_package.all;
+use work.interlaken_package.all;
 
 entity wupper_interlaken_top is
   generic(

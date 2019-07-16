@@ -1,5 +1,6 @@
 library ieee; 
 use ieee.std_logic_1164.all;
+use work.interlaken_package.all;
 library work;
 
 entity Interlaken_Receiver is

@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.interlaken_package.all;
 
 entity Meta_Deframer is
     port(
@@ -39,17 +40,8 @@ architecture Deframing of Meta_Deframer is
     signal CRC32_Rst : std_logic;                       -- CRC-32 reset
     signal CrcCalc   : std_logic;                       -- Calculate the CRC-32
     signal CRC32_Check1, CRC32_Check2, CRC32_Check3 : std_logic := '0'; -- Pipeline for CRC check 
-    signal CRC32_Good : std_logic;                      -- CRC value is checked and valid
-    
-   
-    -- Constants
-    constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization framing layer control word
-    constant DIAGNOSTIC : std_logic_vector(63 downto 34) := "011001"&X"000000";
-    constant SCRAM_STATE_INIT_VALUE : std_logic_vector(63 downto 0) := X"2800_0000_0000_0000"; -- Starting value of scrambler
-    constant META_TYPE_SYNCHRONIZATION: std_logic_vector(4 downto 0) := "11110";
-    constant META_TYPE_SCRAM_STATE: std_logic_vector(4 downto 0) := "01010";
-    constant META_TYPE_SKIP_WORD: std_logic_vector(4 downto 0) := "01010";
-    constant META_TYPE_DIAGNOSTIC: std_logic_vector(4 downto 0) := "11001";
+    signal CRC32_Good : std_logic;                      -- CRC value is checked and valid-- Constants
+
 
 
     
