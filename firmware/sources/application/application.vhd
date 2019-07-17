@@ -9,26 +9,18 @@
 --! @class application
 --! 
 --!
---! @author      Andrea Borga    (andrea.borga@nikhef.nl)<br>
---!              Frans Schreuder (frans.schreuder@nikhef.nl)<br>
---!              Oussama el Kharraz Alami<br>
+--! @author      Frans Schreuder (frans.schreuder@nikhef.nl)<br>
+--!              Leonie Verwoert (leonie.verw@gmail.com)<br>
 --!
 --!
---! @date        05/10/2015    created
+--! @date        01/05/2019    created
 --!
---! @version     1.0
+--! @version     1.2
 --!
 --! @brief 
---! This example application fills the downfifo (PCIe -> PC) with pseudo random data by using
---! a LFSR and multiplies the data from upfifo (PC -> PCIe) back to the downfifo. The size
---! of the randomdata is 256 bits. The DMA core will take care of the data and writes it into PC memory
---! according to the DMA descriptors.
---! 
+--! This application functions as the connection between Wupper and the Interlaken protocol. 
+--! It is used to implement the Interlaken protocol on the FELIX hardware.
 --! @detail
---! We are discarding any DMA data sent by the PC, otherwise a second fifo could be connected to these ports: <br>
---! fifo_din <br>
---! fifo_we <br>
---! fifo_full <br>
 --!
 --!-----------------------------------------------------------------------------
 --! @TODO
@@ -50,7 +42,6 @@
 --! You should have received a copy of the GNU Lesser General Public
 --! License along with this library.
 --! 
--- 
 --! @brief ieee 
 
 
@@ -67,7 +58,8 @@ entity application is
   generic(
     NUMBER_OF_INTERRUPTS : integer := 8;
     CARD_TYPE            : integer := 709;
-    BurstMax             : integer := 256
+    BurstMax             : integer := 256;
+    Lanes                : positive := 4
     );
   port (
     SYSCLK_P             : in     std_logic;--200 MHz clock at H19/G18
@@ -111,29 +103,11 @@ architecture rtl of application is
     signal reset                    : std_logic;
     signal s_flush_fifo             : std_logic;
     signal loopback_valid           : std_logic;
-    
-    --! These signals belong to the LFSR
-    signal lfsr_enable, lfsr_valid  :std_logic;
-    signal lfsr_data                :std_logic_vector(255 downto 0);
-    
-    --! This signal start the write process
-    signal start_write              :std_logic;
-    
-    --! Enable application enable 
-    signal enable_app_write         : std_logic;
-    signal start_lfsr               : std_logic;
-    signal start_loopback           : std_logic;  
-    signal APP_MUX                  : std_logic;
-    signal LFSR_LOAD_SEED           : std_logic;
-    signal APP_ENABLE               : std_logic_vector(0 downto 0);
-    signal LFSR_SEED                : std_logic_vector(255 downto 0);
-    
-  
     signal fromHostFifo_empty_s  :  std_logic; 
     
     ---- Interlaken instance signals
-    signal  RX_FlowControl_s     : std_logic_vector(15 downto 0); 
-    signal  RX_Channel_s         : std_logic_vector(7 downto 0) := "00000001";  
+    signal  RX_FlowControl_s     : std_logic_vector(15 downto 0);
+    signal  RX_Channel_s         : std_logic_vector(7 downto 0);
     
     signal  TX_FIFO_progfull_s   : std_logic;
 
@@ -164,17 +138,17 @@ architecture rtl of application is
     signal  WU_TO_TX             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";
     signal  ToWupperCounter      : std_logic_vector(15 downto 0) := X"0000";  -- counts the passed (64 bit) data bursts
     signal  FromWuppercounter    : std_logic_vector(15 downto 0) := X"0000";  -- counts thw data packets read from the wupper fifo
-    signal  CRC24_Error_s        : std_logic := '0';
+    signal  CRC24_Error_s        : std_logic_vector(Lanes-1 downto 0);--std_logic := '0';
     signal  CRC24_occured        : std_logic := '0';
-    signal  CRC32_Error_s        : std_logic := '0';
+    signal  CRC32_Error_s        : std_logic_vector(Lanes-1 downto 0);--std_logic := '0';
     signal  CRC32_occured        : std_logic := '0';
     signal  send_sync_word       : std_logic;
     signal  send_sync_word_p1    : std_logic;
     signal  send_sync_word_p2    : std_logic;
     signal  RX_EOP_s_p1          : std_logic;
     
-    signal  Decoder_lock_s       : std_logic; --interlaken_monitor_type;
-    signal  Descrambler_lock_s   : std_logic;
+    signal  Decoder_lock_s       : std_logic_vector(Lanes-1 downto 0);--std_logic; --interlaken_monitor_type;
+    signal  Descrambler_lock_s   : std_logic_vector(Lanes-1 downto 0);--std_logic;
     signal  PacketLength         : std_logic_vector(15 downto 0) := X"0010";
     
     signal  toHostFifo_din_s     : std_logic_vector(63 downto 0) ;
@@ -310,7 +284,7 @@ begin
            BurstMax     => BurstMax,  -- Configurable value of BurstMax
            BurstShort   => 64,        -- Configurable value of BurstShort
            PacketLength => 2024,       -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
-           Lanes        => 4)         -- Number of Lanes (Transmission channels)
+           Lanes        => Lanes)         -- Number of Lanes (Transmission channels) Default: 4
       port map(
           ----40 MHz input, from clock generator------------
           clk40  => clk40,                                      --: in std_logic;
@@ -337,7 +311,7 @@ begin
           TX_EOP            => TX_EOP_s,                        --: in std_logic;
           TX_EOP_Valid      => TX_EOP_Valid_s,                  --: in std_logic_vector(2 downto 0);
           TX_FlowControl    => RX_FlowControl_s,                --: in std_logic_vector(15 downto 0);
-          TX_Channel        => RX_Channel_s,                    --: in std_logic_vector(7 downto 0);
+        --  TX_Channel        => RX_Channel_s,                    --: in std_logic_vector(7 downto 0);
       
      
           ----Receiver output signals-------------    
@@ -345,7 +319,7 @@ begin
           RX_EOP            => RX_EOP_s,                        --: out std_logic;                         
           RX_EOP_Valid      => RX_EOP_Valid_s,                  --: out std_logic_vector(2 downto 0);      
           RX_FlowControl    => RX_FlowControl_s,                --: out std_logic_vector(15 downto 0);     
-          RX_Channel        => RX_Channel_s,                    --: out std_logic_vector(7 downto 0);      
+          --RX_Channel        => RX_Channel_s,                    --: out std_logic_vector(7 downto 0);      
           RX_FIFO_Valid      => RX_FIFO_Valid,                  --: out std_logic;
           RX_FIFO_Read      => RX_FIFO_Read_s,                  --: in std_logic;
 
@@ -367,8 +341,8 @@ begin
       );
       -- Register variables
       PacketLength <= register_map_control.INTERLAKEN_PACKET_LENGTH;
-      interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DECODER_LOCK(1)  <= Decoder_lock_s ;
-      interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0) <= Descrambler_lock_s;
+      interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DECODER_LOCK(1)  <= Decoder_lock_s(0) ;
+      interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0) <= Descrambler_lock_s(0);
       --
       RX_FIFO_Read_s <= not RX_FIFO_Empty_s and not send_sync_word and not toHostFifo_prog_full; -- Read data when not empty and no sync_word is beiging sent
       toHostFifo_wr_en <= toHostFifo_wr_en_s; -- Write data in wupper fifo, or write sync word in fifo
@@ -399,11 +373,11 @@ begin
                     RX_FIFO_Valid_p1 <= RX_FIFO_Valid;
                     toHostFifo_wr_en_s <= '0';
                     -- Check CRC error signals
-                    if CRC24_Error_s = '1' then
+                    if CRC24_Error_s(0) = '1' then
                         CRC24_occured <= '1';
                     end if;
                     
-                    if CRC32_Error_s = '1' then
+                    if CRC32_Error_s(0) = '1' then
                         CRC32_occured <= '1';
                     end if;
                     
@@ -448,7 +422,7 @@ begin
     fromHostFifo_rd_en <= fromHostFifo_rd_en_s;
     TX_FIFO_Write_s <= fromHostFifo_rd_en_s_p1; 
     
-    fromHostFifo_rd_en_s <= not fromHostFifo_empty_s and (not TX_FIFO_progfull_s)  and Descrambler_lock_s; 
+    fromHostFifo_rd_en_s <= not fromHostFifo_empty_s and (not TX_FIFO_progfull_s)  and Descrambler_lock_s(0); 
     Wu_TO_TX <= fromHostFifo_dout;
                    
       process(clk150)

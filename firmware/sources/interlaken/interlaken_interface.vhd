@@ -36,15 +36,15 @@ entity interlaken_interface is
 		TX_SOP          : in std_logic;
 		TX_EOP          : in std_logic;
 		TX_EOP_Valid    : in std_logic_vector(2 downto 0);
-		TX_FlowControl  : in slv_16_array(0 to Lanes-1);
-        TX_Channel      : in slv_8_array(0 to Lanes-1); 
+		TX_FlowControl  : in std_logic_vector(15 downto 0);
+       -- TX_Channel      : in slv_8_array(0 to Lanes-1); 
         
 		----Receiver output signals-----------------------
-		RX_SOP        	: out std_logic;                         -- Start of Packet
+		RX_SOP        	: out std_logic;                        -- Start of Packet
 		RX_EOP        	: out std_logic;                         -- End of Packet
 		RX_EOP_Valid 	: out std_logic_vector(2 downto 0);      -- Valid bytes packet contains
 		RX_FlowControl	: out std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
-		RX_Channel    	: out std_logic_vector(7 downto 0);      -- Select transmit channel (yet unutilized)
+		--RX_Channel    	: out std_logic_vector(7 downto 0);      -- Select transmit channel (yet unutilized)
 		
 		RX_FIFO_Valid    : out std_logic;
 		
@@ -62,10 +62,10 @@ entity interlaken_interface is
 		RX_FIFO_Full      : out std_logic;
 		RX_FIFO_Empty     : out std_logic;
 		RX_FIFO_Read      : in std_logic;
-		Decoder_lock      : out std_logic;
-		Descrambler_lock  : out std_logic;
-		CRC24_Error       : out std_logic;
-		CRC32_Error       : out std_logic;
+		Decoder_lock      : out std_logic_vector(Lanes-1 downto 0);
+		Descrambler_lock  : out std_logic_vector(Lanes-1 downto 0);
+		CRC24_Error       : out std_logic_vector(Lanes-1 downto 0);
+		CRC32_Error       : out std_logic_vector(Lanes-1 downto 0);
 		
 		loopback_in       : in std_logic_vector(2 downto 0)
 
@@ -176,7 +176,7 @@ component Transceiver_10g_64b67b
     
     signal RX_prog_full : slv_16_array(0 to Lanes-1);    
     signal prog_full : std_logic_vector(15 downto 0);  
-    signal FlowControl : std_logic_vector(15 downto 0);
+    signal FlowControl : std_logic_vector(15 downto 0); 
     signal RX_Datavalid_Out : std_logic;
     signal RX_Header_Out : std_logic_vector(2 downto 0);
     signal RX_Headervalid_Out : std_logic;
@@ -191,8 +191,8 @@ component Transceiver_10g_64b67b
     signal Data_Transceiver_In, Data_Transceiver_Out : std_logic_vector(((64*Lanes)-1) downto 0);
     signal GT0_DATA_VALID_IN :  slv_1_array(0 to Lanes-1);
     signal GT0_TX_FSM_RESET_DONE_OUT : std_logic;
-    signal link_up : std_logic;
-    signal Descrambler_Locked : std_logic;
+    signal link_up : std_logic_vector(Lanes-1 downto 0);
+    signal Descrambler_Locked : std_logic_vector(Lanes-1 downto 0);
     
     signal  gt0_txsequence_i                : std_logic_vector(6 downto 0);
     signal   gt0_txseq_counter_r      :   unsigned(8 downto 0);
@@ -359,8 +359,7 @@ begin
      );
     
     ---------------------------- Transmitting side -----------------------------
---    TX_SOP_s <= TX_SOP&"000";
---    TX_EOP_s <= "000"&TX_EOP;
+
     
     Interlaken_TX : entity work.Interlaken_Transmitter_multiChannel
     generic map(
@@ -381,7 +380,6 @@ begin
         TX_SOP          => TX_SOP,
         TX_EOP_Valid    => TX_EOP_Valid,
         TX_EOP          => TX_EOP,
-        --TX_Channel      => TX_Channel,
         TX_Gearboxready => TX_Gearboxready_Out,
         TX_Startseq     => TX_Startseq_In,
         
@@ -403,9 +401,10 @@ begin
 
     
     ---------------------------- Receiving side --------------------------------
-    Interlaken_RX : entity work.Interlaken_Receiver
+    Interlaken_RX : entity work.Interlaken_Receiver_multiChannel
     generic map (
-        PacketLength => PacketLength
+        PacketLength => PacketLength,
+        Lanes        => Lanes
     )
     port map (
         fifo_read_clk   => clk150,
@@ -422,7 +421,6 @@ begin
         RX_EOP          => RX_EOP,
         RX_FlowControl  => FlowControl,
         RX_prog_full    => prog_full,
-        RX_Channel      => RX_Channel,
         RX_Datavalid    => RX_Datavalid_Out,
         
         Descrambler_Lock=> Descrambler_Locked,

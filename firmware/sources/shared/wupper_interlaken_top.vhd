@@ -70,7 +70,8 @@ entity wupper_interlaken_top is
     COMMIT_DATETIME       : std_logic_vector(39 downto 0) := x"0000FE71CE";
     GIT_TAG               : std_logic_vector(127 downto 0) := x"00000000000000000000000000000000";
     GIT_COMMIT_NUMBER     : integer := 0;
-    BurstMax              : integer := 256);
+    BurstMax              : integer := 256;
+    Lanes                 : Positive := 4);
   port (
     SYSCLK_P       : in     std_logic;--200 MHz clock at H19/G18
     SYSCLK_N       : in     std_logic;
@@ -267,12 +268,14 @@ begin
       I => Buf_G_out    -- Buffer input
   );
   end block;
-  --! The example application only instantiates one fifo (PC=>PCIe). 
-  --! it fills it with some constants and a counter value.
+
+  -- Application to implement Interlaken
   u0: entity work.application
     generic map(
       NUMBER_OF_INTERRUPTS => NUMBER_OF_INTERRUPTS,
-      BurstMax             => BurstMax)
+      BurstMax             => BurstMax,
+      Lanes                => Lanes
+      )
     port map(
       SYSCLK_P             => SYSCLK_P,
       SYSCLK_N             => SYSCLK_N,

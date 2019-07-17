@@ -2,6 +2,7 @@ library ieee;
 use ieee.numeric_std.all;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
+library work;
 use work.interlaken_package.all;
 library XPM;
 use xpm.vcomponents.all;
@@ -24,11 +25,11 @@ entity Interlaken_Transmitter_multiChannel is
 		TX_SOP        	: in std_logic;     -- Start of Packet
 		TX_EOP_Valid 	: in std_logic_vector(f_log2(Lanes)+2 downto 0);      -- Valid bytes packet contains
 		TX_EOP        	: in std_logic;      -- End of Packet
-		--TX_Channel    	: in slv_8_array(0 to Lanes-1);                   -- Select transmit channel (yet unutilized)
+
 		TX_Gearboxready : in std_logic;
 		TX_Startseq     : in std_logic;
 		
-		TX_FlowControl	: in slv_16_array(0 to Lanes-1);                  -- Flow control data (yet unutilized)
+		TX_FlowControl	: in std_logic_vector(15 downto 0); --slv_16_array(0 to Lanes-1);                  -- Flow control data (yet unutilized)
 		RX_prog_full    : in slv_16_array(0 to Lanes-1);
 		
 		TX_FIFO_Write_Data : in std_logic;
@@ -36,7 +37,7 @@ entity Interlaken_Transmitter_multiChannel is
 		TX_FIFO_Full       : out std_logic;
 		TX_FIFO_Empty      : out std_logic;
 
-		Link_up         : in std_logic;
+		Link_up         : in std_logic_vector(Lanes-1 downto 0);                                 -- Checks if Decoder and descrambler are in lock (currently only 1 channel)
 		FIFO_Valid      : out std_logic;
 		FIFO_Read_Burst : out slv_1_array(0 to Lanes-1);
 		TX_valid_out    : out slv_1_array(0 to Lanes-1)
@@ -48,6 +49,7 @@ end entity Interlaken_Transmitter_multiChannel;
 architecture Transmitter of Interlaken_Transmitter_multiChannel is
 
     signal TX_FIFO_Read_Data : std_logic;
+    signal TX_FIFO_Read_Data_Lane : std_logic_vector(Lanes-1 downto 0);
     signal TX_FIFO_Read_Count, TX_FIFO_Write_Count : std_logic_vector(4 downto 0);
     signal TX_FIFO_prog_empty : std_logic;
     signal Data_FIFO_In : std_logic_vector(TX_Data_In'length+TX_EOP_Valid'length+1 downto 0);
@@ -158,7 +160,7 @@ xpm_fifo_async_inst : xpm_fifo_async
   );
 
 
-
+TX_FIFO_Read_Data <= TX_FIFO_Read_Data_Lane(0); -- or TX_FIFO_Read_Data_Lane(1) or TX_FIFO_Read_Data_Lane(2) or TX_FIFO_Read_Data_Lane(3);
 
 ----- Instantiation of different transmission Lanes. -----   
     g_lanes: for i in 0 to Lanes-1 generate      -- Generate TX Lanes (Transmission Channels)
@@ -169,7 +171,7 @@ xpm_fifo_async_inst : xpm_fifo_async
     begin
     
     
-    TX_FIFO_Read_Data <= FIFO_Read_Burst_s(0)(0) and FIFO_Read_Burst_s(1)(0) and FIFO_Read_Burst_s(2)(0) and FIFO_Read_Burst_s(3)(0) and Link_up;
+    TX_FIFO_Read_Data_Lane(i) <= FIFO_Read_Burst_s(i)(0) and Link_up(i);
     Data_FIFO_In <= TX_SOP & TX_EOP & TX_EOP_Valid & TX_Data_In;
     FIFO_Read_Burst <= FIFO_Read_Burst_s;
     
@@ -184,6 +186,7 @@ xpm_fifo_async_inst : xpm_fifo_async
         BurstMax        => BurstMax,          -- Configurable value of BurstMax
         BurstShort      => BurstShort,        -- Configurable value of BurstShort
         PacketLength    => PacketLength,      -- Configurable value of PacketLength
+        Lanes           => Lanes,              -- Number of Transmission Lanes
         LaneNumber      => i                  -- Current Lane (TX channel)
     )
     port map  (
@@ -202,7 +205,7 @@ xpm_fifo_async_inst : xpm_fifo_async
         TX_Gearboxready  => TX_Gearboxready,  
         TX_Startseq      => TX_Startseq,      
 
-        TX_FlowControl   => TX_Flowcontrol(i)(15 downto 0) ,          -- Flow Control is yet unutilized
+        TX_FlowControl   => TX_Flowcontrol ,          -- Flow Control is yet unutilized
         RX_prog_full     => RX_prog_full(i)(15 downto 0),     
 
         FIFO_Write_Data  => TX_FIFO_Write_Data,    
@@ -245,7 +248,7 @@ begin
     else
       Channel_SOP(i) <= '0';
     end if;
-    --
+    -----
     --if fifo_EOP_Valid > i*8-1 or fifo_EOP_Valid = ZEROS then
     --  TX_EOP_Valid_Lanes(i) <= "000";
     --  Channel_send_idle(i) <= '0';

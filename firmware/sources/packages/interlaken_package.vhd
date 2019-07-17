@@ -1,15 +1,15 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Nikhef
+-- Engineer: Leonie Verwoert
 -- 
 -- Create Date: 07/02/2019 01:50:05 PM
--- Design Name: 
+-- Design Name: Wupper-Interlaken 
 -- Module Name: interlaken_package - Behavioral
--- Project Name: 
+-- Project Name: Wupper-Interlaken  
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: 
--- 
+--  Package for the commonly used constants and types in the Wupper-Interlaken project.
 -- Dependencies: 
 -- 
 -- Revision:

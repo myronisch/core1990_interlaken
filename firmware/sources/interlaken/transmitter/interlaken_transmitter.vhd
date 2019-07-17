@@ -10,6 +10,7 @@ entity Interlaken_Transmitter is
          BurstMax      : positive;      -- Configurable value of BurstMax
          BurstShort    : positive;      -- Configurable value of BurstShort
          PacketLength  : positive;      -- Configurable value of PacketLength
+         Lanes         : positive;      -- Number of Lanes
          LaneNumber    : positive       -- Current Lane
     );
 	port (
@@ -19,7 +20,7 @@ entity Interlaken_Transmitter is
 		
 		Data_Burst_in 	: in std_logic_vector(63 downto 0);
 		TX_Lane_Data_Out : out std_logic_vector (66 downto 0);       -- Data ready to transmit
-		TX_Data_Out     : out std_logic_vector(275 downto 0);
+		TX_Data_Out     : out std_logic_vector(((Lanes*69)-1) downto 0);
 		
 		TX_SOP        	: in std_logic;                         -- Start of Packet
 		TX_EOP_Valid 	: in std_logic_vector(2 downto 0);      -- Valid bytes packet contains
@@ -36,14 +37,14 @@ entity Interlaken_Transmitter is
 		FIFO_Write_Data : in std_logic;
 		FIFO_prog_full  : out std_logic;
 		FIFO_Full       : out std_logic;
-		Link_up         : in std_logic;
+		Link_up         : in std_logic_vector(Lanes-1 downto 0);
 		TX_valid_out    : out std_logic;
 		
 		FIFO_Valid       : in std_logic; --
 		FIFO_Read_Burst  : out std_logic;
 		FIFO_Empty       : in std_logic;	  
-        FIFO_Write_Count : in std_logic_vector(4 downto 0);
-        FIFO_Read_Count  : in std_logic_vector(4 downto 0)
+        FIFO_Write_Count : in std_logic_vector(9 downto 0);    -- Depending on TX FIFO's write count data width (default 10)
+        FIFO_Read_Count  : in std_logic_vector(9 downto 0)
 		
 	);
 end entity Interlaken_Transmitter;

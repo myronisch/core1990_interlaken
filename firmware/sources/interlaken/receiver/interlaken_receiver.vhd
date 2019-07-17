@@ -5,8 +5,8 @@ library work;
 
 entity Interlaken_Receiver is
     generic (
-        --channelnumber : integer;
-        PacketLength : positive
+        PacketLength  : positive;
+        LaneNumber    : positive       -- Current Lane
     );
 	port (
 	    fifo_read_clk	: in std_logic;
@@ -47,11 +47,11 @@ end entity Interlaken_Receiver;
 
 architecture Receiver of Interlaken_Receiver is
     type state_type is (IDLE, DATA);
-	signal pres_state, next_state: state_type;
+	--signal pres_state, next_state: state_type;
 	
-    signal FIFO_Read_Count, FIFO_Write_Count : std_logic_vector(5 downto 0);
-    signal FIFO_prog_full, FIFO_prog_empty  : std_logic;
-    signal FIFO_Data_Out : std_logic_vector(70 downto 0);
+ --   signal FIFO_Read_Count, FIFO_Write_Count : std_logic_vector(5 downto 0);
+  --  signal FIFO_prog_full, FIFO_prog_empty  : std_logic;
+   -- signal FIFO_Data_Out : std_logic_vector(70 downto 0);
     
     COMPONENT RX_FIFO
 		PORT (
@@ -102,25 +102,25 @@ architecture Receiver of Interlaken_Receiver is
     
 begin
     
-    RX_prog_full(0) <= not FIFO_prog_full;
-    RX_prog_full(15 downto 1) <= (others => '0');
+--    RX_prog_full(0) <= not FIFO_prog_full;
+--    RX_prog_full(15 downto 1) <= (others => '0');    
     --RX_FlowControl       <= FlowControl; --RX_FlowControl(channelnumber) <= FIFO_prog_full;
 
-    FIFO_Receiver : RX_FIFO
-    port map (
-        rst             => Reset,
-        wr_clk          => clk,
-        rd_clk          => fifo_read_clk,
-        din             => RX_FIFO_Data,
-        wr_en           => RX_FIFO_Write,
-        rd_en           => RX_FIFO_Read,
-        dout            => FIFO_Data_Out,
-        full            => RX_FIFO_Full,
-        empty           => RX_FIFO_Empty,
-        prog_full       => FIFO_prog_full,
-        prog_empty      => FIFO_prog_empty,
-        valid           => RX_FIFO_Valid
-    );
+--    FIFO_Receiver : RX_FIFO
+--    port map (
+--        rst             => Reset,
+--        wr_clk          => clk,
+--        rd_clk          => fifo_read_clk,
+--        din             => RX_FIFO_Data,
+--        wr_en           => RX_FIFO_Write,
+--        rd_en           => RX_FIFO_Read,
+--        dout            => FIFO_Data_Out,
+--        full            => RX_FIFO_Full,
+--        empty           => RX_FIFO_Empty,
+--        prog_full       => FIFO_prog_full,
+--        prog_empty      => FIFO_prog_empty,
+--        valid           => RX_FIFO_Valid
+--    );
     
     Deframing_Burst : entity work.Burst_Deframer
     port map (
@@ -133,8 +133,6 @@ begin
         SOP              => Data_Burst_Out(68),--: out std_logic;
         EOP              => Data_Burst_Out(67),--: out std_logic;
         EOP_valid        => Data_Burst_Out(66 downto 64),--: out std_logic_vector(2 downto 0);
-        
-       -- Data_control_in  => Data_Control_Meta_Out,
         
         Flowcontrol => RX_Flowcontrol,
         CRC24_Error => CRC24_Error_burst,
@@ -172,8 +170,7 @@ begin
         
         Data_in          => Data_Descrambler_Out,
         Data_out         => Data_Meta_Out,
-       -- Data_control_in  => Data_Control_Descrambler_Out,
-        --Data_control_out => Data_control_Meta_out,
+
         Data_valid_in    => Data_valid_Descrambler_out,
         Data_valid_out   => Data_valid_Meta_out
     );
@@ -191,8 +188,7 @@ begin
         
         Data_in          => Data_Decoder_Out,
         Data_out         => Data_Descrambler_Out,
-        --Data_control_In  => Data_Control_Decoder_Out,
-        --Data_control_Out => Data_control_Descrambler_Out,
+        
         Data_valid_in    => Data_valid_decoder_out,
         Data_valid_out   => Data_valid_Descrambler_out,
         Lock             => Descrambler_In_lock,
@@ -231,77 +227,15 @@ begin
         Bitslip     => Bitslip
     );
     
---    linkup_proc: process(clk)
---        variable link_up_p1: std_logic;
---    begin
---        if rising_edge(clk) then
---            RX_Link_Up <= Data_Valid_Descrambler_Out or link_up_p1;
---            link_up_p1 := Data_Valid_Descrambler_Out;
---        end if;
---    end process;
 
 
-    CRC32_Error <= FIFO_Data_Out(70);    
-    CRC24_Error <= FIFO_Data_Out(69);    
-    RX_SOP <= FIFO_Data_Out(68);
-    RX_EOP <= FIFO_Data_Out(67);
-    RX_EOP_Valid <= FIFO_Data_Out(66 downto 64);
-    RX_Data_Out <= FIFO_Data_Out(63 downto 0);
+--    CRC32_Error <= FIFO_Data_Out(70);    
+--    CRC24_Error <= FIFO_Data_Out(69);    
+--    RX_SOP <= FIFO_Data_Out(68);
+--    RX_EOP <= FIFO_Data_Out(67);
+--    RX_EOP_Valid <= FIFO_Data_Out(66 downto 64);
+--    RX_Data_Out <= FIFO_Data_Out(63 downto 0);
         
     
---    state_register : process (clk) is 
---    begin
---       if (rising_edge(clk)) then
---           pres_state <= next_state;
---       end if;
---    end process state_register;
-    
---    state_decoder : process (pres_state, Data_Burst_Out) is
---    begin
---       case pres_state is
---       when IDLE =>
---           if  (Data_Burst_Out(65) = '1') then
---               next_state <= DATA;
---           else
---               next_state <= IDLE;
---           end if;
-           
---       when DATA =>
---           if(Data_Burst_Out(64) = '1') then
---               next_state <= IDLE;
---           else
---               next_state <= DATA;
---           end if;
---       when others =>
---           next_state <= IDLE;
---       end case;
---    end process state_decoder;
-    
---    fifo_out : process(fifo_empty) is
---    begin
---        RX_fifo_read <= '0';
---        if(fifo_empty = '0') then
---            RX_fifo_read <= '1';
---        end if;
---    end process;
-    
---    output_state : process (pres_state, clk) is
---    begin
---        if rising_edge(clk) then
---            case pres_state is
---            when IDLE =>
---                RX_FIFO_Write <= '0';
---                RX_FIFO_Data <= (others => '0');
---                if  (Data_Burst_Out(65) = '1') then
---                    RX_FIFO_Write <= Data_valid_Burst_Out;
---                    RX_FIFO_Data <= Data_Burst_Out;                
---                end if;
-               
---            when DATA =>
---                RX_FIFO_Write <= Data_valid_Burst_Out;
---                RX_FIFO_Data <= Data_Burst_Out;                
---            end case;
---        end if;
---    end process output_state;
 
 end architecture Receiver;
