@@ -17,17 +17,18 @@ entity Interlaken_Receiver_multiChannel is
 		clk   		     : in std_logic;
 		reset 		     : in std_logic;
 		
-		RX_Data_In 	     : in std_logic_vector((67*Lanes)-1 downto 0); 
-		RX_Data_Out      : out std_logic_vector((64*Lanes)-1 downto 0);       -- Data ready to transmit
+		RX_Data_In 	     : in slv_67_array(0 to Lanes-1);  
+		RX_Data_Out      : out slv_64_array(0 to Lanes-1);         -- Data ready to transmit
 		
 		RX_SOP        	 : out std_logic; --std_logic_vector(Lanes-1 downto 0);            -- Start of Packet
-		RX_EOP_Valid 	 : out std_logic_vector(2 downto 0); --std_logic_vector(f_log2(Lanes)+2 downto 0);         -- Valid bytes packet contains
+		RX_EOP_Valid_Total 	 : out std_logic_vector(f_log2(Lanes)+2 downto 0);  --std_logic_vector(f_log2(Lanes)+2 downto 0);         -- Valid bytes packet contains
+		
 		RX_EOP        	 : out std_logic; --std_logic_vector(Lanes-1 downto 0);                       -- End of Packet
 		
 		RX_FlowControl	 : out std_logic_vector(15 downto 0);   -- Flow control data (yet unutilized)
 		RX_prog_full     : out std_logic_vector(15 downto 0);   -- Indication FIFO of this channel is full
 		
-		RX_Datavalid     : in std_logic; -- From GTH Transceiver
+		RX_Datavalid     : in std_logic_vector(Lanes-1 downto 0); -- From GTH Transceiver
 		
 		CRC24_Error       : out std_logic_vector(Lanes-1 downto 0);
 		CRC32_Error       : out std_logic_vector(Lanes-1 downto 0);
@@ -54,7 +55,7 @@ architecture Receiver of Interlaken_Receiver_multiChannel is
     signal FIFO_prog_full, FIFO_prog_empty  : std_logic;
     signal FIFO_Data_Out : std_logic_vector(70 downto 0);
     
-    signal RX_FIFO_Data_In : std_logic_vector(RX_Data_Out'length+RX_EOP_Valid'length+1 downto 0);
+    signal RX_FIFO_Data_In : std_logic_vector(RX_Data_Out'length+RX_EOP_Valid_Total'length+1 downto 0);
     signal RX_prog_full_s : std_logic_vector(15 downto 0);
 
     signal wr_data_count, rd_data_count : std_logic_vector(9 downto 0);
@@ -79,11 +80,11 @@ architecture Receiver of Interlaken_Receiver_multiChannel is
 
     -- Lane specific signals --
     signal CRC32_Error_Lane, CRC24_Error_Lane, RX_SOP_Lane, RX_EOP_Lane : std_logic_vector(Lanes-1 downto 0);
-    signal RX_EOP_Valid_Lane : std_logic_vector(f_log2(Lanes)+2 downto 0); 
+    signal RX_EOP_Valid_Lanes : slv_3_array(0 to Lanes-1);
     -- Universal signals (of the total system) --
     signal CRC32_Error_s, CRC24_Error_s, RX_SOP_s, RX_EOP_s: std_logic_vector(Lanes-1 downto 0);
-    signal RX_EOP_Valid_s: std_logic_vector(f_log2(Lanes)+2 downto 0); 
-    
+    signal RX_EOP_Valid_out : std_logic_vector(f_log2(Lanes)+2 downto 0);
+
 begin
     
 --    RX_prog_full(0) <= not FIFO_prog_full;
@@ -118,13 +119,13 @@ xpm_fifo_async_inst : xpm_fifo_async
     ECC_MODE            => "no_ecc",   -- error correction encoding
     RELATED_CLOCKS      => 0,          -- Specifies if wr and rd clocks have the same source (despite different frequencies)
     FIFO_WRITE_DEPTH    => 1024,   --69,
-    WRITE_DATA_WIDTH    => RX_Data_In'length + RX_EOP_Valid'length + 2,   --32,
+    WRITE_DATA_WIDTH    => RX_Data_In'length + RX_EOP_Valid_Total'length + 2,   --32,
     WR_DATA_COUNT_WIDTH => 10,   --4
     PROG_FULL_THRESH    => 28*Lanes,   --28,
     FULL_RESET_VALUE    => 1,          -- controls enablement of ecc on all ports of memory primitive
     READ_MODE           => "std",
     FIFO_READ_LATENCY   => 1,          -- Number of output register stages in the read data path
-    READ_DATA_WIDTH     => RX_Data_In'length + RX_EOP_Valid'length + 2,   --32,
+    READ_DATA_WIDTH     => RX_Data_In'length + RX_EOP_Valid_Total'length + 2,   --32,
     RD_DATA_COUNT_WIDTH => 10,   --12,
     PROG_EMPTY_THRESH   => 4,    --4,
     DOUT_RESET_VALUE    => (others => '0'),
@@ -171,32 +172,31 @@ xpm_fifo_async_inst : xpm_fifo_async
 --    RX_SOP_Lane(i) <= FIFO_Data_Out(68*(i+1));
 --    RX_EOP_Lane(i) <= FIFO_Data_Out(67*(i+1));
 --    RX_Data_Out <= FIFO_Data_Out(((64*(i+1))-1) downto (64*i));
-    
---    RX_EOP_Valid_Lane((((i+1)*3)-1) downto i*3) <= FIFO_Data_Out(((67*(i+1))-1)  downto (64*(i+1)));
 
     
     lane_rx: entity work.interlaken_receiver
       generic map ( 
           PacketLength      => PacketLength,
-          LaneNumber        => i                  -- Current Lane (RX channel)
+          LaneNumber        => i    ,              -- Current Lane (RX channel)
+          Lanes             => Lanes
       )                     
       port map(                
           fifo_read_clk     =>  fifo_read_clk,
           clk               =>  clk,
           reset             =>  reset,
                             
-          RX_Data_In        => RX_Data_In(((i*67)-1) downto (i*67)-(i*67)),
-          RX_Data_Out       => RX_Data_Out(((i*64)-1) downto (i*64)-(i*64)), 
+          RX_Data_In        => RX_Data_In(i)(66 downto 0),
+          RX_Data_Out       => RX_Data_Out(i)(63 downto 0), 
                             
           RX_FIFO_Valid     => RX_FIFO_Valid,
                             
           RX_SOP            => RX_SOP_Lane(i),       
-          RX_EOP_Valid      => RX_EOP_Valid_Lane((((i+1)*3)-1) downto i*3),
+          RX_EOP_Valid      => RX_EOP_Valid_Lanes(i),
           RX_EOP            => RX_EOP_Lane(i),
           RX_FlowControl    => RX_FlowControl,
           RX_prog_full      => RX_prog_full_s,
           RX_Channel        => RX_Channel,
-          RX_Datavalid      => RX_Datavalid, -- ToDo: array or one signal?
+          RX_Datavalid      => RX_Datavalid(i), 
                            
           CRC24_Error       => CRC24_Error(i),
           CRC32_Error       => CRC32_Error(i),
@@ -216,10 +216,28 @@ xpm_fifo_async_inst : xpm_fifo_async
       );
     end generate;
 
---process(RX_EOP_Lane, RX_SOP_Lane, RX_EOP_Valid_Lane)
---begin 
---    for i in 0 to Lanes-1 loop
-
---end process;
+process(RX_EOP_Lane, RX_SOP_Lane, RX_EOP_Valid_Lanes)
+  variable EOP_Valid_out : std_logic_vector(f_log2(Lanes)+2 downto 0);
+  variable validNumBytes : integer := 0;
+begin 
+ for i in 0 to Lanes-1 loop
+   validNumBytes := validNumBytes + to_integer(unsigned(RX_EOP_Valid_Lanes(i)));
+ end loop;
+ 
+ if ((validNumBytes+1) / (Lanes*8)) = 1 then
+     EOP_Valid_out := "00000";   
+ elsif validNumBytes > 0 and validNumBytes < 8 then 
+     EOP_Valid_out := std_logic_vector(to_unsigned(validNumBytes, 3)); 
+ elsif validNumBytes > 8 and validNumBytes < 16 then 
+     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-8), 3));
+ elsif validNumBytes > 16 and validNumBytes < 24 then 
+     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-16), 3));
+ elsif validNumBytes > 24 and validNumBytes < 32 then 
+     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-24), 3));        
+ else
+     EOP_Valid_out := (others => '0');
+ end if;
+ RX_EOP_Valid_out <= EOP_Valid_out;
+end process;
     
 end architecture Receiver;

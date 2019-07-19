@@ -24,7 +24,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -39,8 +39,11 @@ package interlaken_package is
     type slv_69_array is array(natural range <>) of std_logic_vector(68 downto 0);
     type slv_16_array is array(natural range <>) of std_logic_vector(15 downto 0);
     type slv_8_array is array(natural range <>) of std_logic_vector(7 downto 0);
+    type slv_7_array is array(natural range <>) of std_logic_vector(6 downto 0);
     type slv_3_array is array(natural range <>) of std_logic_vector(2 downto 0);
     type slv_1_array is array(natural range <>) of std_logic_vector(0 downto 0);
+
+    type uns_9_array is array(natural range <>) of unsigned(8 downto 0);
     
     -- Constants --
     constant SYNCHRONIZATION : std_logic_vector(63 downto 0) := X"78f6_78f6_78f6_78f6";  -- synchronization, framing layer control word

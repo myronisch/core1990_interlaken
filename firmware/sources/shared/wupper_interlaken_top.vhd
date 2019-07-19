@@ -95,10 +95,22 @@ entity wupper_interlaken_top is
     sys_clk_p      : in     std_logic; --! 100MHz PCIe reference clock
     sys_reset_n    : in     std_logic;
     si5324_reset_n : out    std_logic; --! Active-low system reset from PCIe interface
-    TX_Out_P       : out    std_logic;
-    TX_Out_N       : out    std_logic;
-    RX_In_P        : in     std_logic;
-    RX_In_N        : in     std_logic;
+    TX0_Out_P       : out    std_logic;
+    TX0_Out_N       : out    std_logic;
+    RX0_In_P        : in     std_logic;
+    RX0_In_N        : in     std_logic;
+    TX1_Out_P            : out    std_logic;
+    TX1_Out_N            : out    std_logic;
+    RX1_In_P             : in     std_logic;
+    RX1_In_N             : in     std_logic;
+    TX2_Out_P            : out    std_logic;
+    TX2_Out_N            : out    std_logic;
+    RX2_In_P             : in     std_logic;
+    RX2_In_N             : in     std_logic;
+    TX3_Out_P            : out    std_logic;
+    TX3_Out_N            : out    std_logic;
+    RX3_In_P             : in     std_logic;
+    RX3_In_N             : in     std_logic; 
     SFP_TX_DISABLE : out    std_logic_vector(3 downto 0);
     SFP_RX_LOS     : in     std_logic_vector(3 downto 0)
     );
@@ -299,10 +311,22 @@ begin
       toHostFifo_rst       => toHostFifo_rst,
       toHostFifo_wr_clk    => toHostFifo_wr_clk,
       toHostFifo_wr_en     => toHostFifo_wr_en,
-      TX_Out_P             => TX_Out_P,
-      TX_Out_N             => TX_Out_N,
-      RX_In_P              => RX_In_P,
-      RX_In_N              => RX_In_N,
+      TX0_Out_P             => TX0_Out_P,
+      TX0_Out_N             => TX0_Out_N,
+      RX0_In_P              => RX0_In_P,
+      RX0_In_N              => RX0_In_N,
+      TX1_Out_P             => TX1_Out_P,
+      TX1_Out_N             => TX1_Out_N,
+      RX1_In_P              => RX1_In_P,
+      RX1_In_N              => RX1_In_N,
+      TX2_Out_P             => TX2_Out_P,
+      TX2_Out_N             => TX2_Out_N,
+      RX2_In_P              => RX2_In_P,
+      RX2_In_N              => RX2_In_N,
+      TX3_Out_P             => TX3_Out_P,
+      TX3_Out_N             => TX3_Out_N,
+      RX3_In_P              => RX3_In_P,
+      RX3_In_N              => RX3_In_N,
       SFP_RX_LOS           => SFP_RX_LOS
       );
       

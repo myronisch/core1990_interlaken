@@ -84,10 +84,22 @@ entity application is
     toHostFifo_rst       : out    std_logic;
     toHostFifo_wr_clk    : out    std_logic;
     toHostFifo_wr_en     : out    std_logic;
-    TX_Out_P             : out    std_logic;
-    TX_Out_N             : out    std_logic;
-    RX_In_P              : in     std_logic;
-    RX_In_N              : in     std_logic;
+    TX0_Out_P            : out    std_logic;
+    TX0_Out_N            : out    std_logic;
+    RX0_In_P             : in     std_logic;
+    RX0_In_N             : in     std_logic;
+    TX1_Out_P            : out    std_logic;
+    TX1_Out_N            : out    std_logic;
+    RX1_In_P             : in     std_logic;
+    RX1_In_N             : in     std_logic;
+    TX2_Out_P            : out    std_logic;
+    TX2_Out_N            : out    std_logic;
+    RX2_In_P             : in     std_logic;
+    RX2_In_N             : in     std_logic;
+    TX3_Out_P            : out    std_logic;
+    TX3_Out_N            : out    std_logic;
+    RX3_In_P             : in     std_logic;
+    RX3_In_N             : in     std_logic;
     SFP_RX_LOS           : in     std_logic_vector(3 downto 0)
 
  
@@ -116,7 +128,7 @@ architecture rtl of application is
     signal  TX_SOP_s             : std_logic;
     signal  TX_SOP_s_p1          : std_logic;
     signal  TX_EOP_s             : std_logic;
-    signal  TX_EOP_Valid_s       : std_logic_vector(2 downto 0); 
+    signal  TX_EOP_Valid_s       : std_logic_vector(f_log2(Lanes)+2 downto 0); --std_logic_vector(2 downto 0); 
     signal  fromHostFifo_rd_en_s_p1 : std_logic;
     signal  fromHostFifo_rd_en_s : std_logic;
     signal  toHostFifo_wr_en_s   : std_logic;
@@ -127,15 +139,15 @@ architecture rtl of application is
     signal  RX_FIFO_FULL_s       : std_logic;
     signal  RX_SOP_s             : std_logic;
     signal  RX_EOP_s             : std_logic;
-    signal  RX_EOP_Valid_s       : std_logic_vector(2 downto 0);
+    signal  RX_EOP_Valid_s       : std_logic_vector(f_log2(Lanes)+2 downto 0);
     signal  RX_FIFO_Valid        : std_logic;  
     signal  RX_FIFO_Valid_p1     : std_logic;
     signal  RX_FIFO_Read_s_p1    : std_logic;
 
     signal  ToWupperState        : std_logic;  
     signal  FromWupperState      : std_logic;  
-    signal  RX_TO_WU             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";
-    signal  WU_TO_TX             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";
+    signal  RX_TO_WU             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";   -- IL channel 0
+    signal  WU_TO_TX             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";   -- IL channel 0
     signal  ToWupperCounter      : std_logic_vector(15 downto 0) := X"0000";  -- counts the passed (64 bit) data bursts
     signal  FromWuppercounter    : std_logic_vector(15 downto 0) := X"0000";  -- counts thw data packets read from the wupper fifo
     signal  CRC24_Error_s        : std_logic_vector(Lanes-1 downto 0);--std_logic := '0';
@@ -159,6 +171,9 @@ architecture rtl of application is
     signal  reset_hard_soft      : std_logic; --hard and soft reset coming from wupper, input to clk_40MHz reset. locked output is used to reset the application.
     signal  loopback_in          : std_logic_vector(2 downto 0);
     
+    -- Output signal to use with Channel Bonding -- 
+    signal  Interlaken_Channels_Output   : slv_64_array(0 to Lanes-1);   -- Channel 0 is currently mapped to  RX_TO_WU.
+    signal  Interlaken_Channels_Input    : slv_64_array(0 to Lanes-1);   -- Channel 0 is currently mapped to  WU_TO_TX.
        -------------------------- Generate System Clock ---------------------------
      component clk_40MHz
      port (
@@ -173,73 +188,73 @@ architecture rtl of application is
          reset             : in     std_logic );
      end component;
 --   
-    component ila_0
+--    component ila_0
 
-    port (
-    	clk : IN STD_LOGIC;
+--    port (
+--    	clk : IN STD_LOGIC;
   
-        probe0 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
-        probe1 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
-        probe2 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
-        probe3 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
-        probe4 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
-        probe5 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe6 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe9 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe10 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe11 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe12 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe13 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe14 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe15 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe16 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe17 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe18 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe19 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe20 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe21 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe22 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
-        probe23 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
-        probe24 : IN STD_LOGIC_VECTOR(0 DOWNTO 0)
-    );
-    end component  ;
+--        probe0 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
+--        probe1 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
+--        probe2 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
+--        probe3 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
+--        probe4 : IN STD_LOGIC_VECTOR(63 DOWNTO 0); 
+--        probe5 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe6 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe7 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe8 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe9 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe10 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe11 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe12 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe13 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe14 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe15 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe16 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe17 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe18 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe19 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe20 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe21 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe22 : IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+--        probe23 : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+--        probe24 : IN STD_LOGIC_VECTOR(0 DOWNTO 0)
+--    );
+--    end component  ;
 
 
 begin
 
-    Logic_Analyzer : ila_0
-    PORT MAP (
-    	clk => clk150,
+--    Logic_Analyzer : ila_0
+--    PORT MAP (
+--    	clk => clk150,
     	
-        probe0(63 downto 0) => RX_TO_WU, 
-        probe1(63 downto 0) => WU_TO_TX, 
-        probe2(63 downto 0) => toHostFifo_din_s, 
-        probe3(63 downto 0) => fromHostFifo_dout, 
-        probe4(63 downto 0) => (others => '0'), 
-        probe5(0) => send_sync_word, 
-        probe6(0) => send_sync_word_p1, 
-        probe7(0) => RX_EOP_s, 
-        probe8(0) => RX_SOP_s, 
-        probe9(0) => RX_FIFO_Empty_s, 
-        probe10(0) => RX_FIFO_Read_s, 
-        probe11(0) => RX_FIFO_Valid, 
-        probe12(0) => fromHostFifo_empty_s, 
-        probe13(0) => fromHostFifo_rd_en_s, 
-        probe14(0) => toHostFifo_wr_en_s, 
-        probe15(0) => RX_FIFO_Valid_p1, 
-        probe16(0) => '0', 
-        probe17(0) => TX_FIFO_Full_s, 
-        probe18(0) => TX_FIFO_Write_s, 
-        probe19(0) => '0', 
-        probe20(0) => '0', 
-        probe21(0) => '0', 
-        probe22(0) => '0', 
-        probe23(0) => '0',
-        probe24(0) => '0'
+--        probe0(63 downto 0) => RX_TO_WU, 
+--        probe1(63 downto 0) => WU_TO_TX, 
+--        probe2(63 downto 0) => toHostFifo_din_s, 
+--        probe3(63 downto 0) => fromHostFifo_dout, 
+--        probe4(63 downto 0) => (others => '0'), 
+--        probe5(0) => send_sync_word, 
+--        probe6(0) => send_sync_word_p1, 
+--        probe7(0) => RX_EOP_s, 
+--        probe8(0) => RX_SOP_s, 
+--        probe9(0) => RX_FIFO_Empty_s, 
+--        probe10(0) => RX_FIFO_Read_s, 
+--        probe11(0) => RX_FIFO_Valid, 
+--        probe12(0) => fromHostFifo_empty_s, 
+--        probe13(0) => fromHostFifo_rd_en_s, 
+--        probe14(0) => toHostFifo_wr_en_s, 
+--        probe15(0) => RX_FIFO_Valid_p1, 
+--        probe16(0) => '0', 
+--        probe17(0) => TX_FIFO_Full_s, 
+--        probe18(0) => TX_FIFO_Write_s, 
+--        probe19(0) => '0', 
+--        probe20(0) => '0', 
+--        probe21(0) => '0', 
+--        probe22(0) => '0', 
+--        probe23(0) => '0',
+--        probe24(0) => '0'
 
-    );
+--    );
 
 
 
@@ -297,19 +312,41 @@ begin
           
           
           ----Data signals---------------------------------
-          TX_Data     => WU_TO_TX, --fromHostFifo_dout,         --: in std_logic_vector(63 downto 0);          
-          RX_Data     => RX_TO_WU, -- toHostFifo_din,           --: out std_logic_vector (63 downto 0);        
+          TX_Data(0)     => WU_TO_TX, --fromHostFifo_dout,                  
+          TX_Data(1)     => Interlaken_Channels_Output(1),   -- Extra TX channels can be mapped here instead of this signal 
+          TX_Data(2)     => Interlaken_Channels_Output(2),   -- 
+          TX_Data(3)     => Interlaken_Channels_Output(3),   --
+          RX_Data(0)     => RX_TO_WU, -- toHostFifo_din,              
+          RX_Data(1)     => Interlaken_Channels_Input(1),    -- Extra RX channels can be mapped here instead of this signal 
+          RX_Data(2)     => Interlaken_Channels_Input(2),    --
+          RX_Data(3)     => Interlaken_Channels_Input(3),    --
           
           ----Transceiver related transmission-------------
-          TX_Out_P  => TX_Out_P,                                --: out std_logic;
-          TX_Out_N  => TX_Out_N,                                --: out std_logic;
-          RX_In_P   => RX_In_P,                                 --: in std_logic;
-          RX_In_N   => RX_In_N,                                 --: in std_logic;
+          -- Channel 0 -- 
+          TX0_Out_P  => TX0_Out_P,                               
+          TX0_Out_N  => TX0_Out_N,                               
+          RX0_In_P   => RX0_In_P,                                
+          RX0_In_N   => RX0_In_N,      
+          -- Channel 1 --                          
+          TX1_Out_P  => TX1_Out_P ,
+          TX1_Out_N  => TX1_Out_N ,
+          RX1_In_P   => RX1_In_P  ,
+          RX1_In_N   => RX1_In_N  ,
+          -- Channel 2 -- 
+          TX2_Out_P  => TX2_Out_P ,
+          TX2_Out_N  => TX2_Out_N ,
+          RX2_In_P   => RX2_In_P  ,
+          RX2_In_N   => RX2_In_N  ,
+          -- Channel 3 -- 
+          TX3_Out_P  => TX3_Out_P ,
+          TX3_Out_N  => TX3_Out_N ,
+          RX3_In_P   => RX3_In_P  ,
+          RX3_In_N   => RX3_In_N  ,
           
           ----Transmitter input/ready signals--------------
           TX_SOP            => TX_SOP_s,                        --: in std_logic;
           TX_EOP            => TX_EOP_s,                        --: in std_logic;
-          TX_EOP_Valid      => TX_EOP_Valid_s,                  --: in std_logic_vector(2 downto 0);
+          TX_EOP_Valid_Total      => TX_EOP_Valid_s,                  --: in std_logic_vector(2 downto 0);
           TX_FlowControl    => RX_FlowControl_s,                --: in std_logic_vector(15 downto 0);
         --  TX_Channel        => RX_Channel_s,                    --: in std_logic_vector(7 downto 0);
       
@@ -317,7 +354,7 @@ begin
           ----Receiver output signals-------------    
           RX_SOP            => RX_SOP_s,                        --: out std_logic;                         
           RX_EOP            => RX_EOP_s,                        --: out std_logic;                         
-          RX_EOP_Valid      => RX_EOP_Valid_s,                  --: out std_logic_vector(2 downto 0);      
+          RX_EOP_Valid_Total      => RX_EOP_Valid_s,                  --: out std_logic_vector(2 downto 0);      
           RX_FlowControl    => RX_FlowControl_s,                --: out std_logic_vector(15 downto 0);     
           --RX_Channel        => RX_Channel_s,                    --: out std_logic_vector(7 downto 0);      
           RX_FIFO_Valid      => RX_FIFO_Valid,                  --: out std_logic;
@@ -385,7 +422,7 @@ begin
                     if ToWupperState = '1' then  -- Send data to fifo
                         if send_sync_word = '1' then                      -- EOP signal received, next clock cycle: send sync word
                             
-                            SYNC_INFO_WORD(36 downto 34) := RX_EOP_Valid_s; -- Nuumber of bytes that are valid from the previous 8-byte data word
+                            SYNC_INFO_WORD(37 downto 33) := RX_EOP_Valid_s; -- Nuumber of bytes that are valid from the previous 8-byte data word
                             ToWupperstate <= '0';
                         end if;
 
@@ -432,12 +469,12 @@ begin
                 FromWupperCounter <= (others => '0');
                 TX_EOP_s <= '0';
                 TX_SOP_s <= '0';
-                TX_EOP_Valid_s <= (others => '0');
+                --TX_EOP_Valid_s <= (others => '0');
             else
                fromHostFifo_rd_en_s_p1 <= fromHostFifo_rd_en_s;
                if fromHostFifo_rd_en_s = '1' then  -- Wait with sending data to the Interlaken TX, untill the RX IL is initialised
                       FromWupperCounter <= FromWupperCounter + 1;
-                      TX_EOP_Valid_s <= "000";
+                      --TX_EOP_Valid_s <= "00000";
                       if FromWupperCounter = X"0000" then     -- Transmit a SOP (Start Of Packet)
                           TX_SOP_s <= '1';
                           TX_EOP_S <= '0';
@@ -445,7 +482,7 @@ begin
                           TX_SOP_s <= '0';
                       elsif FromWupperCounter = PacketLength-1 then  -- When the set packet length is reached
                           TX_EOP_s <= '1';                  -- Transmit the EOP (End Of Packet)
-                          TX_EOP_Valid_s <= "111";          -- Signal that the previous Data is valid
+                          --TX_EOP_Valid_s <= "11111";          -- Signal that the previous Data is valid
                           FromWupperCounter <= (others => '0');
                       end if;   
                                      

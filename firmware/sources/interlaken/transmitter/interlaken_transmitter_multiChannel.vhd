@@ -12,22 +12,22 @@ entity Interlaken_Transmitter_multiChannel is
          BurstMax     : positive;      -- Configurable value of BurstMax
          BurstShort   : positive;      -- Configurable value of BurstShort
          PacketLength : positive;      -- Configurable value of PacketLength
-         Lanes        : positive       -- Configurable value of Transmission channels/Lanes
+         Lanes        : positive    -- Configurable value of Transmission channels/Lanes
     );
 	port (
 	    write_clk         : in std_logic;
 		clk               : in std_logic;
 		reset             : in std_logic;
 		
-		TX_Data_In 	    : in std_logic_vector((64*Lanes)-1 downto 0);
-		TX_Data_Out     : out std_logic_vector((67*Lanes)-1 downto 0);                -- Data ready to transmit
+		TX_Data_In 	    : in slv_64_array(0 to Lanes-1);
+		TX_Data_Out     : out  slv_67_array(0 to Lanes-1);                -- Data ready to transmit
 		
 		TX_SOP        	: in std_logic;     -- Start of Packet
-		TX_EOP_Valid 	: in std_logic_vector(f_log2(Lanes)+2 downto 0);      -- Valid bytes packet contains
+		TX_EOP_Valid_Total 	: in std_logic_vector(f_log2(Lanes)+2 downto 0);      -- Valid bytes packet contains
 		TX_EOP        	: in std_logic;      -- End of Packet
 
-		TX_Gearboxready : in std_logic;
-		TX_Startseq     : in std_logic;
+		TX_Gearboxready : in std_logic_vector(Lanes-1 downto 0);
+		TX_Startseq     : in std_logic_vector(Lanes-1 downto 0);
 		
 		TX_FlowControl	: in std_logic_vector(15 downto 0); --slv_16_array(0 to Lanes-1);                  -- Flow control data (yet unutilized)
 		RX_prog_full    : in slv_16_array(0 to Lanes-1);
@@ -52,12 +52,12 @@ architecture Transmitter of Interlaken_Transmitter_multiChannel is
     signal TX_FIFO_Read_Data_Lane : std_logic_vector(Lanes-1 downto 0);
     signal TX_FIFO_Read_Count, TX_FIFO_Write_Count : std_logic_vector(4 downto 0);
     signal TX_FIFO_prog_empty : std_logic;
-    signal Data_FIFO_In : std_logic_vector(TX_Data_In'length+TX_EOP_Valid'length+1 downto 0);
-    signal Data_FIFO_Out : std_logic_vector(TX_Data_In'length+TX_EOP_Valid'length+1 downto 0);
-    signal Data_Burst_In : slv_69_array(0 to Lanes-1);
+    signal Data_FIFO_In : std_logic_vector(TX_Data_In(0)'length+TX_EOP_Valid_Total'length+1 downto 0);
+    signal Data_FIFO_Out : std_logic_vector(TX_Data_In(0)'length+TX_EOP_Valid_Total'length+1 downto 0);
+    signal Data_Burst_In_s : slv_69_array(0 to Lanes-1);
     
     signal TX_Lane_Data_Out : slv_67_array(0 to Lanes-1);
-    signal Tx_Data_Out_s : slv_64_array(0 to Lanes-1);
+  --  signal Tx_Data_Out_s : slv_64_array(0 to Lanes-1);
     signal TX_FIFO_Empty_s : std_logic;
    
     signal FIFO_Read_Burst_s : slv_1_array(0 to Lanes-1);
@@ -68,6 +68,7 @@ architecture Transmitter of Interlaken_Transmitter_multiChannel is
     
     signal TX_EOP_Valid_Lanes : slv_3_array(0 to Lanes-1);
     signal Channel_EOP, Channel_SOP, Channel_send_idle  : std_logic_vector((Lanes-1) downto 0);
+    --signal Data_Burst_in_0, Data_Burst_in_1, Data_Burst_in_2, Data_Burst_in_3 : std_logic_vector(69 downto 0);
     
 --    COMPONENT TX_FIFO
 --        PORT (
@@ -90,6 +91,14 @@ architecture Transmitter of Interlaken_Transmitter_multiChannel is
 
 begin
 
+
+
+	
+--	TX_Data_Out(275 downto 207) <= TX_Lane_Data_out(3)(66 downto 0);
+--	TX_Data_Out(206 downto 138)
+--	TX_Data_Out(137 downto 69)
+--	TX_Data_Out(68 downto 0)
+        
 --    TX_Enable <= '1';
     
 --    FIFO_Transmitter : TX_FIFO
@@ -119,16 +128,16 @@ xpm_fifo_async_inst : xpm_fifo_async
     ECC_MODE            => "no_ecc",   -- error correction encoding
     RELATED_CLOCKS      => 0,          -- Specifies if wr and rd clocks have the same source (despite different frequencies)
     FIFO_WRITE_DEPTH    => 1024,   --69,
-    WRITE_DATA_WIDTH    => TX_Data_In'length+TX_EOP_Valid'length+2,   --32,
-    WR_DATA_COUNT_WIDTH => 10,   --4
+    WRITE_DATA_WIDTH    => TX_Data_In(0)'length+TX_EOP_Valid_Total'length+2,   --32,
+    WR_DATA_COUNT_WIDTH => 5,   --4
     PROG_FULL_THRESH    => 28*Lanes,   --28,
     FULL_RESET_VALUE    => 1,          -- controls enablement of ecc on all ports of memory primitive
     READ_MODE           => "std",
     FIFO_READ_LATENCY   => 1,          -- Number of output register stages in the read data path
-    READ_DATA_WIDTH     => TX_Data_In'length+TX_EOP_Valid'length+2,   --32,
-    RD_DATA_COUNT_WIDTH => 10,   --12,
+    READ_DATA_WIDTH     => TX_Data_In(0)'length+TX_EOP_Valid_Total'length+2,   --32,
+    RD_DATA_COUNT_WIDTH => 5,   --12,
     PROG_EMPTY_THRESH   => 4,    --4,
-    DOUT_RESET_VALUE    => (others => '0'),
+    DOUT_RESET_VALUE    => "0",
     CDC_SYNC_STAGES     => 2,
     WAKEUP_TIME         => 0           -- Disable sleep
   )
@@ -172,15 +181,13 @@ TX_FIFO_Read_Data <= TX_FIFO_Read_Data_Lane(0); -- or TX_FIFO_Read_Data_Lane(1) 
     
     
     TX_FIFO_Read_Data_Lane(i) <= FIFO_Read_Burst_s(i)(0) and Link_up(i);
-    Data_FIFO_In <= TX_SOP & TX_EOP & TX_EOP_Valid & TX_Data_In;
-    FIFO_Read_Burst <= FIFO_Read_Burst_s;
-    
+    Data_FIFO_In <= TX_SOP & TX_EOP & TX_EOP_Valid_Total & TX_Data_In(i)(63 downto 0);
     TX_FIFO_Empty <= TX_FIFO_Empty_s;
     TX_FIFO_dout_valid <=   (not TX_FIFO_Empty_s) and TX_FIFO_Read_Data;
     
-    Data_Burst_in(i)(63 downto 0) <= Data_FIFO_Out(((64*(i+1))-1) downto (64*i));
-    
+    --Data_Burst_in(i) <= ;
 
+    
     lane_tx: entity work.interlaken_transmitter
     generic map (          
         BurstMax        => BurstMax,          -- Configurable value of BurstMax
@@ -194,16 +201,16 @@ TX_FIFO_Read_Data <= TX_FIFO_Read_Data_Lane(0); -- or TX_FIFO_Read_Data_Lane(1) 
         clk              => clk,          
         reset            => Reset,         
 
-        Data_Burst_In    => Data_Burst_in(i)(63 downto 0),         
-        TX_Lane_Data_Out => TX_Lane_Data_Out(i)(67 downto 0),     
-        TX_Data_Out      => Tx_Data_Out(((i*64)-1) downto (i*64)-(i*64)),     
+        Data_Burst_In    => Data_Burst_in_s(i)(63 downto 0),         
+        TX_Lane_Data_Out => TX_Data_Out(i)(66 downto 0),     
+       -- TX_Data_Out(((67*Lanes)-1) downto ((67*i)))      => Tx_Data_Out(i)(66 downto 0),     
         TX_SOP           => Channel_SOP(i),         
         TX_EOP           => Channel_EOP(i), 
         Channel_send_idle => Channel_send_idle(i),         
         TX_EOP_Valid     => TX_EOP_Valid_Lanes(i)(2 downto 0),-- Data_Burst_in(i)(66 downto 64),       
         TX_Channel       => std_logic_vector(to_unsigned(i, 8)), -- Transfer channel number i to binairy number         
-        TX_Gearboxready  => TX_Gearboxready,  
-        TX_Startseq      => TX_Startseq,      
+        TX_Gearboxready  => TX_Gearboxready(i),  
+        TX_Startseq      => TX_Startseq(i),      
 
         TX_FlowControl   => TX_Flowcontrol ,          -- Flow Control is yet unutilized
         RX_prog_full     => RX_prog_full(i)(15 downto 0),     

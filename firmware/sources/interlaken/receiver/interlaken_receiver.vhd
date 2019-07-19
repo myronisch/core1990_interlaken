@@ -6,7 +6,8 @@ library work;
 entity Interlaken_Receiver is
     generic (
         PacketLength  : positive;
-        LaneNumber    : positive       -- Current Lane
+        LaneNumber    : integer;       -- Current Lane
+        Lanes         : positive      -- Number of Lanes
     );
 	port (
 	    fifo_read_clk	: in std_logic;

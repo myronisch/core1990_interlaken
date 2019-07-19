@@ -71,7 +71,8 @@ entity Transceiver_10g_64b67b_BLOCK_SYNC_SM is
 generic
 (
     SH_CNT_MAX         :  integer  := 64;
-    SH_INVALID_CNT_MAX :  integer  := 16 
+    SH_INVALID_CNT_MAX :  integer  := 16; 
+    Lanes              :  integer 
 );
 port
 (
