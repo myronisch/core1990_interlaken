@@ -55,7 +55,7 @@ architecture Receiver of Interlaken_Receiver_multiChannel is
     signal FIFO_prog_full, FIFO_prog_empty  : std_logic;
     signal FIFO_Data_Out : std_logic_vector(70 downto 0);
     
-    signal RX_FIFO_Data_In : std_logic_vector(RX_Data_Out'length+RX_EOP_Valid_Total'length+1 downto 0);
+    signal RX_FIFO_Data_In : std_logic_vector(RX_Data_Out(0)'length+RX_EOP_Valid_Total'length+ 1 downto 0);
     signal RX_prog_full_s : std_logic_vector(15 downto 0);
 
     signal wr_data_count, rd_data_count : std_logic_vector(9 downto 0);
@@ -119,16 +119,16 @@ xpm_fifo_async_inst : xpm_fifo_async
     ECC_MODE            => "no_ecc",   -- error correction encoding
     RELATED_CLOCKS      => 0,          -- Specifies if wr and rd clocks have the same source (despite different frequencies)
     FIFO_WRITE_DEPTH    => 1024,   --69,
-    WRITE_DATA_WIDTH    => RX_Data_In'length + RX_EOP_Valid_Total'length + 2,   --32,
+    WRITE_DATA_WIDTH    => RX_FIFO_Data_In'length, 
     WR_DATA_COUNT_WIDTH => 10,   --4
     PROG_FULL_THRESH    => 28*Lanes,   --28,
     FULL_RESET_VALUE    => 1,          -- controls enablement of ecc on all ports of memory primitive
     READ_MODE           => "std",
     FIFO_READ_LATENCY   => 1,          -- Number of output register stages in the read data path
-    READ_DATA_WIDTH     => RX_Data_In'length + RX_EOP_Valid_Total'length + 2,   --32,
+    READ_DATA_WIDTH     => RX_FIFO_Data_In'length,   
     RD_DATA_COUNT_WIDTH => 10,   --12,
     PROG_EMPTY_THRESH   => 4,    --4,
-    DOUT_RESET_VALUE    => (others => '0'),
+    DOUT_RESET_VALUE    => "0",
     CDC_SYNC_STAGES     => 2,
     WAKEUP_TIME         => 0           -- Disable sleep
   )

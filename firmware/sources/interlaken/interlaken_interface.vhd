@@ -825,8 +825,20 @@ begin
     
     
 -- Map data from TX to the transceiver --
-Data_Transceiver_In <= slv_64_array(TX_Data_Out_s(63 downto 0));
-TX_Header_In <= slv_3_array(TX_Data_Out_s(3 downto 0));
+-- Lane 0
+Data_Transceiver_In(0) <= TX_Data_Out_s(0)(63 downto 0);
+TX_Header_In(0) <= TX_Data_Out_s(0)(2 downto 0);
+-- Lane 1
+Data_Transceiver_In(1) <= TX_Data_Out_s(1)(63 downto 0);
+TX_Header_In(1) <= TX_Data_Out_s(1)(2 downto 0);
+-- Lane 2
+Data_Transceiver_In(2) <= TX_Data_Out_s(2)(63 downto 0);
+TX_Header_In(2) <= TX_Data_Out_s(2)(2 downto 0);
+-- Lane 3
+Data_Transceiver_In(3) <= TX_Data_Out_s(3)(63 downto 0);
+TX_Header_In(3) <= TX_Data_Out_s(3)(2 downto 0);
+
+
 
 -- Map data from transceiver to RX --
 RX_Data_In_s(0)(63 downto 0) <= Data_Transceiver_Out(0); -- ToDo:  Make this modular instead of static.
