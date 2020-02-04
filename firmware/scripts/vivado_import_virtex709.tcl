@@ -103,6 +103,7 @@ set_property STEPS.ROUTE_DESIGN.ARGS.DIRECTIVE MoreGlobalIterations [get_runs im
 # ----------------------------------------------------------
 # Core1990Interlaken top file
 # ----------------------------------------------------------
+read_vhdl -library work $proj_dir/sources/packages/interlaken_package.vhd
 read_vhdl -library work $proj_dir/sources/interlaken/interlaken_interface.vhd
 
 add_files -fileset sim_1 -norecurse $proj_dir/simulation/interlaken_interface_tb.vhd
@@ -127,6 +128,8 @@ read_vhdl -library work $proj_dir/sources/interlaken/transmitter/framing_meta.vh
 read_vhdl -library work $proj_dir/sources/interlaken/transmitter/scrambler.vhd
 read_vhdl -library work $proj_dir/sources/interlaken/transmitter/encoder.vhd
 read_vhdl -library work $proj_dir/sources/interlaken/transmitter/interlaken_transmitter.vhd
+read_vhdl -library work $proj_dir/sources/interlaken/transmitter/interlaken_transmitter_multiChannel.vhd 
+
 
 # ----------------------------------------------------------
 # Interlaken Receiver
@@ -137,6 +140,7 @@ read_vhdl -library work $proj_dir/sources/interlaken/receiver/deframing_meta.vhd
 read_vhdl -library work $proj_dir/sources/interlaken/receiver/descrambler.vhd
 read_vhdl -library work $proj_dir/sources/interlaken/receiver/decoder.vhd
 read_vhdl -library work $proj_dir/sources/interlaken/receiver/interlaken_receiver.vhd
+read_vhdl -library work $proj_dir/sources/interlaken/receiver/interlaken_receiver_multiChannel.vhd
 
 # ----------------------------------------------------------
 # IP cores (Interlaken)
@@ -144,8 +148,8 @@ read_vhdl -library work $proj_dir/sources/interlaken/receiver/interlaken_receive
 
 import_ip $proj_dir/sources/ip_cores/vc709/clk_40MHz.xci
 import_ip $proj_dir/sources/ip_cores/vc709/Transceiver_10g_64b67b.xci
-import_ip $proj_dir/sources/ip_cores/vc709/RX_FIFO.xci
-import_ip $proj_dir/sources/ip_cores/vc709/TX_FIFO.xci
+#import_ip $proj_dir/sources/ip_cores/vc709/RX_FIFO.xci
+#import_ip $proj_dir/sources/ip_cores/vc709/TX_FIFO.xci
 # Generate all the output products
 generate_target all [get_files *clk_40MHz.xci]
 # Create a DCP for the IP

@@ -227,13 +227,13 @@ begin
  if ((validNumBytes+1) / (Lanes*8)) = 1 then
      EOP_Valid_out := "00000";   
  elsif validNumBytes > 0 and validNumBytes < 8 then 
-     EOP_Valid_out := std_logic_vector(to_unsigned(validNumBytes, 3)); 
+     EOP_Valid_out := std_logic_vector(to_unsigned(validNumBytes, 5)); 
  elsif validNumBytes > 8 and validNumBytes < 16 then 
-     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-8), 3));
+     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-8), 5));
  elsif validNumBytes > 16 and validNumBytes < 24 then 
-     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-16), 3));
+     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-16), 5));
  elsif validNumBytes > 24 and validNumBytes < 32 then 
-     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-24), 3));        
+     EOP_Valid_out := std_logic_vector(to_unsigned((validNumBytes-24), 5));        
  else
      EOP_Valid_out := (others => '0');
  end if;

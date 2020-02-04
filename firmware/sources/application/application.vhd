@@ -84,22 +84,10 @@ entity application is
     toHostFifo_rst       : out    std_logic;
     toHostFifo_wr_clk    : out    std_logic;
     toHostFifo_wr_en     : out    std_logic;
-    TX0_Out_P            : out    std_logic;
-    TX0_Out_N            : out    std_logic;
-    RX0_In_P             : in     std_logic;
-    RX0_In_N             : in     std_logic;
-    TX1_Out_P            : out    std_logic;
-    TX1_Out_N            : out    std_logic;
-    RX1_In_P             : in     std_logic;
-    RX1_In_N             : in     std_logic;
-    TX2_Out_P            : out    std_logic;
-    TX2_Out_N            : out    std_logic;
-    RX2_In_P             : in     std_logic;
-    RX2_In_N             : in     std_logic;
-    TX3_Out_P            : out    std_logic;
-    TX3_Out_N            : out    std_logic;
-    RX3_In_P             : in     std_logic;
-    RX3_In_N             : in     std_logic;
+    TX_Out_P             : out    std_logic_vector(Lanes-1 downto 0);
+    TX_Out_N             : out    std_logic_vector(Lanes-1 downto 0);
+    RX_In_P              : in     std_logic_vector(Lanes-1 downto 0);
+    RX_In_N              : in     std_logic_vector(Lanes-1 downto 0);
     SFP_RX_LOS           : in     std_logic_vector(3 downto 0)
 
  
@@ -322,26 +310,10 @@ begin
           RX_Data(3)     => Interlaken_Channels_Input(3),    --
           
           ----Transceiver related transmission-------------
-          -- Channel 0 -- 
-          TX0_Out_P  => TX0_Out_P,                               
-          TX0_Out_N  => TX0_Out_N,                               
-          RX0_In_P   => RX0_In_P,                                
-          RX0_In_N   => RX0_In_N,      
-          -- Channel 1 --                          
-          TX1_Out_P  => TX1_Out_P ,
-          TX1_Out_N  => TX1_Out_N ,
-          RX1_In_P   => RX1_In_P  ,
-          RX1_In_N   => RX1_In_N  ,
-          -- Channel 2 -- 
-          TX2_Out_P  => TX2_Out_P ,
-          TX2_Out_N  => TX2_Out_N ,
-          RX2_In_P   => RX2_In_P  ,
-          RX2_In_N   => RX2_In_N  ,
-          -- Channel 3 -- 
-          TX3_Out_P  => TX3_Out_P ,
-          TX3_Out_N  => TX3_Out_N ,
-          RX3_In_P   => RX3_In_P  ,
-          RX3_In_N   => RX3_In_N  ,
+          TX_Out_P  => TX_Out_P,                                --: out std_logic_vector(Lanes-1 downto 0);
+          TX_Out_N  => TX_Out_N,                                --: out std_logic_vector(Lanes-1 downto 0);
+          RX_In_P   => RX_In_P,                                 --: in std_logic_vector(Lanes-1 downto 0);
+          RX_In_N   => RX_In_N,                                 --: in std_logic_vector(Lanes-1 downto 0);
           
           ----Transmitter input/ready signals--------------
           TX_SOP            => TX_SOP_s,                        --: in std_logic;

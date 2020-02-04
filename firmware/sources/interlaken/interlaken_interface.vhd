@@ -27,22 +27,10 @@ entity interlaken_interface is
         RX_Data     : out slv_64_array(0 to Lanes-1);     -- Data received
 		
 		----Transceiver related transmission-------------
-		TX0_Out_P  : out std_logic;
-		TX0_Out_N  : out std_logic;
-		RX0_In_P   : in std_logic;
-        RX0_In_N   : in std_logic;
-        TX1_Out_P  : out std_logic;
-        TX1_Out_N  : out std_logic;
-        RX1_In_P   : in std_logic;
-        RX1_In_N   : in std_logic;
-        TX2_Out_P  : out std_logic;
-        TX2_Out_N  : out std_logic;
-        RX2_In_P   : in std_logic;
-        RX2_In_N   : in std_logic;
-        TX3_Out_P  : out std_logic;
-        TX3_Out_N  : out std_logic;
-        RX3_In_P   : in std_logic;
-        RX3_In_N   : in std_logic;
+		TX_Out_P  : out std_logic_vector(Lanes-1 downto 0);
+		TX_Out_N  : out std_logic_vector(Lanes-1 downto 0);
+		RX_In_P   : in std_logic_vector(Lanes-1 downto 0);
+        	RX_In_N   : in std_logic_vector(Lanes-1 downto 0);
 		
 		----Transmitter input/ready signals--------------
 		TX_SOP          : in std_logic;
@@ -519,9 +507,9 @@ begin
         ------------------ Receive Ports - FPGA RX interface Ports -----------------
         gt0_rxdata_out                  =>      Data_Transceiver_Out(0),
         --------------------------- Receive Ports - RX AFE -------------------------
-        gt0_gthrxp_in                   =>      RX0_In_P,
+        gt0_gthrxp_in                   =>      RX_In_P(0),
         ------------------------ Receive Ports - RX AFE Ports ----------------------
-        gt0_gthrxn_in                   =>      RX0_In_N,
+        gt0_gthrxn_in                   =>      RX_In_N(0),
         --------------------- Receive Ports - RX Equalizer Ports -------------------
         gt0_rxmonitorout_out            =>      open,
         gt0_rxmonitorsel_in             =>      (others => '0'),
@@ -546,8 +534,8 @@ begin
         ------------------ Transmit Ports - TX Data Path interface -----------------
         gt0_txdata_in                   =>      Data_Transceiver_In(0),
         ---------------- Transmit Ports - TX Driver and OOB signaling --------------
-        gt0_gthtxn_out                  =>      TX0_Out_N,
-        gt0_gthtxp_out                  =>      TX0_Out_P,
+        gt0_gthtxn_out                  =>      TX_Out_N(0),
+        gt0_gthtxp_out                  =>      TX_Out_P(0),
         ----------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
         gt0_txoutclkfabric_out          =>      open,
         gt0_txoutclkpcs_out             =>      open,
@@ -578,8 +566,8 @@ begin
        --------------- Receive Ports - FPGA RX interface Ports -----------------
         gt1_rxdata_out                  =>      Data_Transceiver_Out(1),
        --------------------- Receive Ports - RX AFE Ports ----------------------
-        gt1_gthrxn_in                   =>      RX1_In_N,
-        gt1_gthrxp_in                   =>      RX0_In_P,
+        gt1_gthrxn_in                   =>      RX_In_N(1),
+        gt1_gthrxp_in                   =>      RX_In_P(1),
        ------------------ Receive Ports - RX Equalizer Ports -------------------
         gt1_rxmonitorout_out            =>      open,
         gt1_rxmonitorsel_in             =>      (others => '0'),
@@ -603,8 +591,8 @@ begin
        --------------- Transmit Ports - TX Data Path interface -----------------
         gt1_txdata_in                   =>      Data_Transceiver_In(1),
        ------------- Transmit Ports - TX Driver and OOB signaling --------------
-        gt1_gthtxn_out                  =>      TX1_Out_N,
-        gt1_gthtxp_out                  =>      TX1_Out_P,
+        gt1_gthtxn_out                  =>      TX_Out_N(1),
+        gt1_gthtxp_out                  =>      TX_Out_P(1),
        -------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
         gt1_txoutclkfabric_out          =>      open,
         gt1_txoutclkpcs_out             =>      open,
@@ -635,8 +623,8 @@ begin
        --------------- Receive Ports - FPGA RX interface Ports -----------------
         gt2_rxdata_out                  =>      Data_Transceiver_Out(2),
        --------------------- Receive Ports - RX AFE Ports ----------------------
-        gt2_gthrxn_in                   =>      RX2_In_N,
-        gt2_gthrxp_in                   =>      RX2_In_P,
+        gt2_gthrxn_in                   =>      RX_In_N(2),
+        gt2_gthrxp_in                   =>      RX_In_P(2),
        ------------------ Receive Ports - RX Equalizer Ports -------------------
         gt2_rxmonitorout_out            =>      open,
         gt2_rxmonitorsel_in             =>      (others => '0'),
@@ -660,8 +648,8 @@ begin
        --------------- Transmit Ports - TX Data Path interface -----------------
         gt2_txdata_in                   =>      Data_Transceiver_In(2),
        ------------- Transmit Ports - TX Driver and OOB signaling --------------
-        gt2_gthtxn_out                  =>      TX2_Out_N,
-        gt2_gthtxp_out                  =>      TX2_Out_P,
+        gt2_gthtxn_out                  =>      TX_Out_N(2),
+        gt2_gthtxp_out                  =>      TX_Out_P(2),
        -------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
         gt2_txoutclkfabric_out          =>      open,
         gt2_txoutclkpcs_out             =>      open,
@@ -692,8 +680,8 @@ begin
        --------------- Receive Ports - FPGA RX interface Ports -----------------
         gt3_rxdata_out                  =>      Data_Transceiver_Out(3),
        --------------------- Receive Ports - RX AFE Ports ----------------------
-        gt3_gthrxn_in                   =>      RX3_In_N,
-        gt3_gthrxp_in                   =>      RX3_In_P,
+        gt3_gthrxn_in                   =>      RX_In_N(3),
+        gt3_gthrxp_in                   =>      RX_In_P(3),
        ------------------ Receive Ports - RX Equalizer Ports -------------------
         gt3_rxmonitorout_out            =>      open,
         gt3_rxmonitorsel_in             =>      (others => '0'),
@@ -717,8 +705,8 @@ begin
        --------------- Transmit Ports - TX Data Path interface -----------------
         gt3_txdata_in                   =>      Data_Transceiver_In(3),
        ------------- Transmit Ports - TX Driver and OOB signaling --------------
-        gt3_gthtxn_out                  =>      TX3_Out_N,
-        gt3_gthtxp_out                  =>      TX3_Out_P,
+        gt3_gthtxn_out                  =>      TX_Out_N(3),
+        gt3_gthtxp_out                  =>      TX_Out_P(3),
        -------- Transmit Ports - TX Fabric Clock Output Control Ports ----------
         gt3_txoutclkfabric_out          =>      open,
         gt3_txoutclkpcs_out             =>      open,
