@@ -111,35 +111,35 @@ END COMPONENT;
                 
 begin
 
-    wupper2wb_data_in(64 downto 64) <= control_in.wishbone_control.write_not_read;
-    wupper2wb_data_in(63 downto 32) <= control_in.wishbone_control.address;
-    wupper2wb_data_in(31 downto 0)  <= control_in.wishbone_write.data;
+    wupper2wb_data_in(64 downto 64) <= control_in.WISHBONE_CONTROL.WRITE_NOT_READ;
+    wupper2wb_data_in(63 downto 32) <= control_in.WISHBONE_CONTROL.ADDRESS;
+    wupper2wb_data_in(31 downto 0)  <= control_in.WISHBONE_WRITE.DATA;
     
 
 wupper_to_wb : wupper_to_wishbone_fifo
   PORT MAP (
-    rst     => RST_I,
+    rst     => rst_i,
     wr_clk  => wupper_clk_i,
     rd_clk  => wishbone_clk_i,
     din     => wupper2wb_data_in,
     wr_en   => wupper2wb_wr_en,
     rd_en   => wupper2wb_rd_en,
     dout    => wupper2wb_fifo_out,
-    full    => monitor_out.wishbone_write.full(32),
+    full    => monitor_out.WISHBONE_WRITE.FULL(32),
     empty   => wupper2wb_empty
   ); 
   
 wb_to_wupper : wishbone_to_wupper_fifo
   PORT MAP (
-    rst     => RST_I,
+    rst     => rst_i,
     wr_clk  => wishbone_clk_i,
     rd_clk  => wupper_clk_i,
     din     => master_i.dat,
     wr_en   => wb2wupper_wr_en,
     rd_en   => wb2wupper_rd_en,
-    dout    => monitor_out.wishbone_read.data,
+    dout    => monitor_out.WISHBONE_READ.DATA,
     full    => wb2wupper_full,
-    empty   => monitor_out.wishbone_read.empty(32)
+    empty   => monitor_out.WISHBONE_READ.EMPTY(32)
     );
     
     
@@ -166,28 +166,28 @@ begin
     end if;
 end process;
     
-    rd_wr_delay: process (wishbone_clk_i, control_in.wishbone_write, control_in.wishbone_read) is
+    rd_wr_delay: process (wishbone_clk_i) is
     begin
         if rising_edge(wishbone_clk_i) then
-            wupper2wb_wr_en1   <=  to_sl(control_in.wishbone_write.write_enable);       
-            wb2wupper_rd_en1   <=  to_sl(control_in.wishbone_read.read_enable);        
+            wupper2wb_wr_en1   <=  to_sl(control_in.WISHBONE_WRITE.WRITE_ENABLE);       
+            wb2wupper_rd_en1   <=  to_sl(control_in.WISHBONE_READ.READ_ENABLE);        
         end if;       
         
     end process rd_wr_delay;
     
-    wupper2wb_wr_en <=  to_sl(control_in.wishbone_write.write_enable) and not wupper2wb_wr_en1;
-    wb2wupper_rd_en <=  to_sl(control_in.wishbone_read.read_enable)  and not wb2wupper_rd_en1; 
+    wupper2wb_wr_en <=  to_sl(control_in.WISHBONE_WRITE.WRITE_ENABLE) and not wupper2wb_wr_en1;
+    wb2wupper_rd_en <=  to_sl(control_in.WISHBONE_READ.READ_ENABLE)  and not wb2wupper_rd_en1; 
                 
-    state_register: process (wishbone_clk_i, RST_I) is
+    state_register: process (wishbone_clk_i, rst_i) is
     begin
-        if RST_I = '1' then
+        if rst_i = '1' then
             prs <= wb_idle;
         elsif rising_edge(wishbone_clk_i) then
             prs <= nxt;
         end if;
     end process state_register;   
     
-    next_state_decoder: process (prs, wupper2wb_empty, master_i, wupper2wb_fifo_out)
+    next_state_decoder: process (prs, wupper2wb_empty, master_i, wupper2wb_fifo_out, wb2wupper_full)
     begin
         wb2wupper_wr_en <= '0';
         case prs is
@@ -211,7 +211,7 @@ end process;
         end case;
     end process next_state_decoder;
     
-    output_decoder: process(prs, wupper2wb_empty) is
+    output_decoder: process(prs, wupper2wb_empty, wupper2wb_fifo_out(31 downto 0), wupper2wb_fifo_out(63 downto 32), wupper2wb_fifo_out(64)) is
     begin
         wupper2wb_rd_en <= '0';
         master_o.cyc <= '0';

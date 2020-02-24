@@ -26,7 +26,7 @@ Registers:
   type: R
   step: 0x010
   default: 0
-  endpoints: 0
+  endpoints: 0,1
   entries:
     - ref: Bar0
       offset: 0x0000
@@ -92,12 +92,13 @@ Bar0:
         - range: 7..0
           type: W
           desc: Enable descriptors 7:0. One bit per descriptor. Cleared when Descriptor is handled.
-    - name: DMA_FIFO_FLUSH
-      type: T
-      bitfield:
-        - range: any
-          desc: Flush (reset). Any write clears the DMA Main output FIFO
+    #- name: DMA_FIFO_FLUSH
+    #  type: T
+    #  bitfield:
+    #    - range: any
+    #      desc: Flush (reset). Any write clears the DMA Main output FIFO
     - name: DMA_RESET
+      offset: 0x420
       type: T
       bitfield:
         - range: any
@@ -130,7 +131,37 @@ Bar0:
         - range: 11..0
           name: THRESHOLD_NEGATE
           desc: Negate value of the ToHost programmalbe full flag
+    
+    - name: BUSY_THRESHOLD_ASSERT
+      type: W
+      desc: Tohost or Fromhost busy will be asserted in circular DMA mode when the server PC buffer gets full (space below ASSERT threshold)..
+      default: 0x6400000
+      bitfield:
+        - range: 63..0
+        
+    - name: BUSY_THRESHOLD_NEGATE
+      type: W
+      desc: Tohost or Fromhost busy will be negated in circular DMA mode when the server PC buffer gets less full (space above NEGATE threshold).
+      default: 0x6E00000
+      bitfield:
+        - range: 63..0
 
+    - name: BUSY_STATUS
+      type: R
+      bitfield:
+        - range: 1
+          name: FROMHOST_BUSY
+          desc: A fromhost descriptor passed BUSY_THRESHOLD_ASSERT, busy flag set
+        - range: 0
+          name: TOHOST_BUSY
+          desc: A tohost descriptor passed BUSY_THRESHOLD_ASSERT, busy flag set
+
+    - name: PC_PTR_GAP
+      type: W
+      desc: This is the minimum value that the pc_pointer in a descriptor has to decrease in order to flip the evencycle_pc bit
+      default: 0x1000000
+      bitfield:
+        - range: 63..0
 
 DMA_DESC:
   number: 8
@@ -147,13 +178,13 @@ DMA_DESC:
     - name: DMA_DESC_{index}a
       bitfield:
         - range: 127..64
-          name: RD_POINTER
-          desc: PC Read Pointer
+          name: SW_POINTER
+          desc: Pointer controlled by the software, indicating read or write status for circular DMA
         - range: 12
           name: WRAP_AROUND
           desc: Wrap around
         - range: 11
-          name: READ_WRITE
+          name: FROMHOST
           desc: "1: fromHost/ 0: toHost"
         - range: 10..0
           name: NUM_WORDS
@@ -174,8 +205,8 @@ DMA_DESC_STATUS:
           name: DESC_DONE
           desc: Descriptor Done
         - range: 63..0
-          name: CURRENT_ADDRESS
-          desc: Current Address
+          name: FW_POINTER
+          desc: Pointer controlled by the firmwarre, indicating where the DMA is busy reading or writing
 
 
 #Bar1 contains the registers dedicated to the Wupper interrupg controller.
@@ -195,7 +226,7 @@ Bar1:
             Selectively enable Interrupts
 
 INT_VEC:
-  number: 8
+  number: 16
   type: W
   entries:
     - name: INT_VEC_{index}
@@ -220,16 +251,16 @@ Bar2:
     - ref: ApplicationSpecific
       offset: 0x1000
     - ref: HouseKeepingControlsAndMonitors
-      offset: 0x2000
+      offset: 0x9000
     - ref: Wishbone
-      offset: 0x4000
+      offset: 0xC000
     - ref: Interlaken
-      offset: 0x5000
+      offset: 0xD000
 
 GenericBoardInformation:
   group: GEN
   desc: Generic Board Information
-  endpoints: 0
+  endpoints: 0,1
   entries:
     - name: REG_MAP_VERSION
       bitfield:
@@ -243,11 +274,36 @@ GenericBoardInformation:
           value: BUILD_DATETIME
           desc: Board ID Date / Time in BCD format YYMMDDhhmm
 
-    - name: BOARD_ID_SVN
+    #- name: BOARD_ID_SVN
+    #  bitfield:
+    #    - range: 15..0
+    #      value: std_logic_vector(to_unsigned(SVN_VERSION,16))
+    #      desc: OBSOLETE Board ID SVN Revision
+
+    - name: GIT_COMMIT_TIME
+      offset: 0x30
       bitfield:
-        - range: 15..0
-          value: std_logic_vector(to_unsigned(SVN_VERSION,16))
-          desc: Board ID SVN Revision
+        - range: 39..0
+          value: COMMIT_DATETIME
+          desc: Board ID GIT Commit time of current revision, Date / Time in BCD format YYMMDDhhmm
+          
+    - name: GIT_TAG
+      bitfield:
+        - range: 63..0
+          value: GIT_TAG(63 downto 0)
+          desc: String containing the current GIT TAG
+
+    - name: GIT_COMMIT_NUMBER
+      bitfield:
+        - range: 31..0
+          value: std_logic_vector(to_unsigned(GIT_COMMIT_NUMBER,32))
+          desc: Number of GIT commits after current GIT_TAG
+          
+    - name: GIT_HASH
+      bitfield:
+        - range: 31..0
+          value: GIT_HASH(159 downto 128)
+          desc: Short GIT hash (32 bit)
 
     - name: STATUS_LEDS
       type: W
@@ -273,9 +329,18 @@ GenericBoardInformation:
           value: std_logic_vector(to_unsigned(CARD_TYPE,64))
           desc: |
             Card Type:
-              * 709 (0x2c5) VC709
-              * 710 (0x2c6) HTG710
-              * 711 (0x2c7) BNL711
+              - 709 (0x2c5): FLX709, VC709
+              - 710 (0x2c6): FLX710, HTG710
+              - 711 (0x2c7): FLX711, BNL711
+              - 712 (0x2c8): FLX712, BNL712
+              - 128 (0x080): FLX128, VCU128
+
+    - name: PCIE_ENDPOINT
+      type: R
+      desc: Indicator of the PCIe endpoint on BNL71x cards with two endpoints. 0 or 1
+      bitfield:
+        - range: 0
+          value: std_logic_vector(to_unsigned(PCIE_ENDPOINT, 1))
     
     
 ApplicationSpecific:
@@ -419,19 +484,20 @@ HouseKeepingControlsAndMonitors:
       bitfield:
         - range: 63..0
           desc: Unique identifier of the FPGA
-    - name: INT_TEST_4
-      offset: 0x0800
-      type: T
+
+    - name: INT_TEST
+      type: W
       value: 1
       bitfield:
-        - range: any
-          desc: Fire a test MSIx interrupt \#4
-    - name: INT_TEST_5
-      type: T
-      value: 1
-      bitfield:
-        - range: any
-          desc: Fire a test MSIx interrupt \#5
+        - name: TRIGGER
+          type: T
+          range: any
+          desc: Fire a test MSIx interrupt set in IRQ
+        - name: IRQ
+          type: W
+          range: 3..0
+          desc: Set this field to a value equal to the MSIX interrupt to be fired. The write triggers the interrupt immediately.
+
           
 Wishbone:
   desc: Wishbone

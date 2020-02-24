@@ -49,18 +49,14 @@
 
 
 
-library ieee, UNISIM, work;
+library ieee, UNISIM;
 use ieee.numeric_std.all;
 use UNISIM.VCOMPONENTS.all;
-use ieee.std_logic_unsigned.all;
+use ieee.std_logic_unsigned.all;-- @suppress "Deprecated package"
 use ieee.std_logic_1164.all;
-use work.pcie_package.all;
 
 entity pcie_init is
   port (
-    bar0                     : out    std_logic_vector(31 downto 0);
-    bar1                     : out    std_logic_vector(31 downto 0);
-    bar2                     : out    std_logic_vector(31 downto 0);
     cfg_fc_cpld              : in     std_logic_vector(11 downto 0);
     cfg_fc_cplh              : in     std_logic_vector(7 downto 0);
     cfg_fc_npd               : in     std_logic_vector(11 downto 0);
@@ -98,9 +94,6 @@ architecture rtl of pcie_init is
     --attribute dont_touch of s_cfg_fc_pd : signal is "true";
     --attribute dont_touch of s_cfg_fc_ph : signal is "true";
 
-    signal bar0_s: std_logic_vector(31 downto 0);
-    signal bar1_s: std_logic_vector(31 downto 0);
-    signal bar2_s: std_logic_vector(31 downto 0);
     signal write_cfg_done_1: std_logic;
     signal bar_index : std_logic_vector(2 downto 0);
     
@@ -131,13 +124,7 @@ begin
     cfg_write_skp_nolfsr : process(clk)
     begin
       if(rising_edge(clk)) then
-        bar0 <= bar0_s;
-        bar1 <= bar1_s;
-        bar2 <= bar2_s;
-        bar0_s <= bar0_s;
-        bar1_s <= bar1_s;
-        bar2_s <= bar2_s;
-        
+                
         uncor_err_stat <= uncor_err_stat;
         cor_err_stat   <= cor_err_stat;
         adv_err_cap    <= adv_err_cap;
@@ -150,53 +137,53 @@ begin
           cfg_mgmt_read        <= '0';
           write_cfg_done_1     <= '0';
           bar_index            <= "000"; 
-        elsif(write_cfg_done_1 = '1') then
-          case(bar_index) is
-            when "000" =>
-              --Addresses in cfg_mgmt_addr are the same as addresses in PCIe configuration space, however divided by 4
-              cfg_mgmt_addr <= "000"&x"0004"; --read BAR0
-              if(cfg_mgmt_read_write_done = '1') then
-                bar0_s <= cfg_mgmt_read_data;
-                bar_index <= "001";
-              end if;
-            when "001" =>
-              cfg_mgmt_addr <= "000"&x"0005"; --read BAR1
-              if(cfg_mgmt_read_write_done = '1') then
-                bar1_s <= cfg_mgmt_read_data;
-                bar_index <= "010";
-              end if;
-            when "010" =>
-              cfg_mgmt_addr <= "000"&x"0006"; --read BAR2
-              if(cfg_mgmt_read_write_done = '1') then
-                bar2_s <= cfg_mgmt_read_data;
-                bar_index <= "011";
-              end if;
-            when "011" =>
-              cfg_mgmt_addr <= "000"&x"0041"; --read Uncorrectable error status register
-              if(cfg_mgmt_read_write_done = '1') then
-                uncor_err_stat <= cfg_mgmt_read_data;
-                bar_index <= "100";
-              end if;
-            when "100" =>
-              cfg_mgmt_addr <= "000"&x"0044"; --read Correctable error status register
-              if(cfg_mgmt_read_write_done = '1') then
-                cor_err_stat <= cfg_mgmt_read_data;
-                bar_index <= "101";
-              end if;
-            when "101" =>
-              cfg_mgmt_addr <= "000"&x"0046"; --read Advanced error cap and control register
-              if(cfg_mgmt_read_write_done = '1') then
-                adv_err_cap <= cfg_mgmt_read_data;
-                bar_index <= "000";
-              end if;
+--        elsif(write_cfg_done_1 = '1') then
+--          case(bar_index) is
+--            when "000" =>
+--              --Addresses in cfg_mgmt_addr are the same as addresses in PCIe configuration space, however divided by 4
+--              cfg_mgmt_addr <= "000"&x"0004"; --read BAR0
+--              if(cfg_mgmt_read_write_done = '1') then
+--                bar0_s <= cfg_mgmt_read_data;
+--                bar_index <= "001";
+--              end if;
+--            when "001" =>
+--              cfg_mgmt_addr <= "000"&x"0005"; --read BAR1
+--              if(cfg_mgmt_read_write_done = '1') then
+--                bar1_s <= cfg_mgmt_read_data;
+--                bar_index <= "010";
+--              end if;
+--            when "010" =>
+--              cfg_mgmt_addr <= "000"&x"0006"; --read BAR2
+--              if(cfg_mgmt_read_write_done = '1') then
+--                bar2_s <= cfg_mgmt_read_data;
+--                bar_index <= "011";
+--              end if;
+--            when "011" =>
+--              cfg_mgmt_addr <= "000"&x"0041"; --read Uncorrectable error status register
+--              if(cfg_mgmt_read_write_done = '1') then
+--                uncor_err_stat <= cfg_mgmt_read_data;
+--                bar_index <= "100";
+--              end if;
+--            when "100" =>
+--              cfg_mgmt_addr <= "000"&x"0044"; --read Correctable error status register
+--              if(cfg_mgmt_read_write_done = '1') then
+--                cor_err_stat <= cfg_mgmt_read_data;
+--                bar_index <= "101";
+--              end if;
+--            when "101" =>
+--              cfg_mgmt_addr <= "000"&x"0046"; --read Advanced error cap and control register
+--              if(cfg_mgmt_read_write_done = '1') then
+--                adv_err_cap <= cfg_mgmt_read_data;
+--                bar_index <= "000";
+--              end if;
             
-            when others =>
-              bar_index <= "000";
-          end case;
-          cfg_mgmt_write_data  <= (others => '0');
-          cfg_mgmt_byte_enable <= x"F";
-          cfg_mgmt_write       <= '0';
-          cfg_mgmt_read        <= '1'; 
+--            when others =>
+--              bar_index <= "000";
+--          end case;
+--          cfg_mgmt_write_data  <= (others => '0');
+--          cfg_mgmt_byte_enable <= x"F";
+--          cfg_mgmt_write       <= '0';
+--          cfg_mgmt_read        <= '1'; 
         elsif((cfg_mgmt_read_write_done = '1') and (write_cfg_done_1 = '0')) then
           cfg_mgmt_addr        <= "100"&x"0082";
           cfg_mgmt_write_data(31 downto 28) <= cfg_mgmt_read_data(31 downto 28);

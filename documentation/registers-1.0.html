@@ -88,10 +88,10 @@ th {
       <td rowspan="4">0x0010</td>
       <td rowspan="4">0,1</td>
       <td rowspan="4">DMA_DESC_0a</td>
-      <td class="name">RD_POINTER</td>
+      <td class="name">SW_POINTER</td>
       <td class="range">127..64</td>
       <td class="type">W</td>
-      <td class="desc">PC Read Pointer</td>
+      <td class="desc">Pointer controlled by the software, indicating read or write status for circular DMA</td>
     </tr>
     <tr>
       <td class="name">WRAP_AROUND</td>
@@ -100,7 +100,7 @@ th {
       <td class="desc">Wrap around</td>
     </tr>
     <tr>
-      <td class="name">READ_WRITE</td>
+      <td class="name">FROMHOST</td>
       <td class="range">11</td>
       <td class="type">W</td>
       <td class="desc">1: fromHost/ 0: toHost</td>
@@ -133,10 +133,10 @@ th {
       <td rowspan="4">0x00F0</td>
       <td rowspan="4">0,1</td>
       <td rowspan="4">DMA_DESC_7a</td>
-      <td class="name">RD_POINTER</td>
+      <td class="name">SW_POINTER</td>
       <td class="range">127..64</td>
       <td class="type">W</td>
-      <td class="desc">PC Read Pointer</td>
+      <td class="desc">Pointer controlled by the software, indicating read or write status for circular DMA</td>
     </tr>
     <tr>
       <td class="name">WRAP_AROUND</td>
@@ -145,7 +145,7 @@ th {
       <td class="desc">Wrap around</td>
     </tr>
     <tr>
-      <td class="name">READ_WRITE</td>
+      <td class="name">FROMHOST</td>
       <td class="range">11</td>
       <td class="type">W</td>
       <td class="desc">1: fromHost/ 0: toHost</td>
@@ -181,10 +181,10 @@ th {
       <td class="desc">Descriptor Done</td>
     </tr>
     <tr>
-      <td class="name">CURRENT_ADDRESS</td>
+      <td class="name">FW_POINTER</td>
       <td class="range">63..0</td>
       <td class="type">R</td>
-      <td class="desc">Current Address</td>
+      <td class="desc">Pointer controlled by the firmwarre, indicating where the DMA is busy reading or writing</td>
     </tr>
     <tr>
       <td colspan="7" class="group">...</td>
@@ -211,10 +211,10 @@ th {
       <td class="desc">Descriptor Done</td>
     </tr>
     <tr>
-      <td class="name">CURRENT_ADDRESS</td>
+      <td class="name">FW_POINTER</td>
       <td class="range">63..0</td>
       <td class="type">R</td>
-      <td class="desc">Current Address</td>
+      <td class="desc">Pointer controlled by the firmwarre, indicating where the DMA is busy reading or writing</td>
     </tr>
     <tr>
       <td rowspan="1">0x0300</td>
@@ -251,15 +251,6 @@ th {
       <td class="range">7..0</td>
       <td class="type">W</td>
       <td class="desc">Enable descriptors 7:0. One bit per descriptor. Cleared when Descriptor is handled.</td>
-    </tr>
-    <tr>
-      <td rowspan="1">0x0410</td>
-      <td rowspan="1">0,1</td>
-      <td rowspan="1">DMA_FIFO_FLUSH</td>
-      <td class="name"></td>
-      <td class="range">any</td>
-      <td class="type">T</td>
-      <td class="desc">Flush (reset). Any write clears the DMA Main output FIFO</td>
     </tr>
     <tr>
       <td rowspan="1">0x0420</td>
@@ -319,6 +310,48 @@ th {
       <td class="desc">Negate value of the ToHost programmalbe full flag</td>
     </tr>
     <tr>
+      <td rowspan="1">0x0470</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">BUSY_THRESHOLD_ASSERT</td>
+      <td class="name"></td>
+      <td class="range">63..0</td>
+      <td class="type">W</td>
+      <td class="desc">Tohost or Fromhost busy will be asserted in circular DMA mode when the server PC buffer gets full (space below ASSERT threshold)..</td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x0480</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">BUSY_THRESHOLD_NEGATE</td>
+      <td class="name"></td>
+      <td class="range">63..0</td>
+      <td class="type">W</td>
+      <td class="desc">Tohost or Fromhost busy will be negated in circular DMA mode when the server PC buffer gets less full (space above NEGATE threshold).</td>
+    </tr>
+    <tr>
+      <td rowspan="2">0x0490</td>
+      <td rowspan="2">0,1</td>
+      <td rowspan="2">BUSY_STATUS</td>
+      <td class="name">FROMHOST_BUSY</td>
+      <td class="range">1</td>
+      <td class="type">R</td>
+      <td class="desc">A fromhost descriptor passed BUSY_THRESHOLD_ASSERT, busy flag set</td>
+    </tr>
+    <tr>
+      <td class="name">TOHOST_BUSY</td>
+      <td class="range">0</td>
+      <td class="type">R</td>
+      <td class="desc">A tohost descriptor passed BUSY_THRESHOLD_ASSERT, busy flag set</td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x04A0</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">PC_PTR_GAP</td>
+      <td class="name"></td>
+      <td class="range">63..0</td>
+      <td class="type">W</td>
+      <td class="desc">This is the minimum value that the pc_pointer in a descriptor has to decrease in order to flip the evencycle_pc bit</td>
+    </tr>
+    <tr>
       <td colspan="7" class="group">Bar1</td>
     </tr>
     <tr>
@@ -349,9 +382,9 @@ th {
       <td colspan="7" class="group">...</td>
     </tr>
     <tr>
-      <td rowspan="3">0x0070</td>
+      <td rowspan="3">0x00F0</td>
       <td rowspan="3">0,1</td>
-      <td rowspan="3">INT_VEC_7</td>
+      <td rowspan="3">INT_VEC_15</td>
       <td class="name">INT_CTRL</td>
       <td class="range">127..96</td>
       <td class="type">W</td>
@@ -386,7 +419,7 @@ th {
     </tr>
     <tr>
       <td rowspan="1">0x0000</td>
-      <td rowspan="1">0</td>
+      <td rowspan="1">0,1</td>
       <td rowspan="1">REG_MAP_VERSION</td>
       <td class="name"></td>
       <td class="range">15..0</td>
@@ -395,7 +428,7 @@ th {
     </tr>
     <tr>
       <td rowspan="1">0x0010</td>
-      <td rowspan="1">0</td>
+      <td rowspan="1">0,1</td>
       <td rowspan="1">BOARD_ID_TIMESTAMP</td>
       <td class="name"></td>
       <td class="range">39..0</td>
@@ -403,17 +436,44 @@ th {
       <td class="desc">Board ID Date / Time in BCD format YYMMDDhhmm</td>
     </tr>
     <tr>
-      <td rowspan="1">0x0020</td>
-      <td rowspan="1">0</td>
-      <td rowspan="1">BOARD_ID_SVN</td>
+      <td rowspan="1">0x0030</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">GIT_COMMIT_TIME</td>
       <td class="name"></td>
-      <td class="range">15..0</td>
+      <td class="range">39..0</td>
       <td class="type">R</td>
-      <td class="desc">Board ID SVN Revision</td>
+      <td class="desc">Board ID GIT Commit time of current revision, Date / Time in BCD format YYMMDDhhmm</td>
     </tr>
     <tr>
-      <td rowspan="1">0x0030</td>
-      <td rowspan="1">0</td>
+      <td rowspan="1">0x0040</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">GIT_TAG</td>
+      <td class="name"></td>
+      <td class="range">63..0</td>
+      <td class="type">R</td>
+      <td class="desc">String containing the current GIT TAG</td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x0050</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">GIT_COMMIT_NUMBER</td>
+      <td class="name"></td>
+      <td class="range">31..0</td>
+      <td class="type">R</td>
+      <td class="desc">Number of GIT commits after current GIT_TAG</td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x0060</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">GIT_HASH</td>
+      <td class="name"></td>
+      <td class="range">31..0</td>
+      <td class="type">R</td>
+      <td class="desc">Short GIT hash (32 bit)</td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x0070</td>
+      <td rowspan="1">0,1</td>
       <td rowspan="1">STATUS_LEDS</td>
       <td class="name"></td>
       <td class="range">7..0</td>
@@ -421,8 +481,8 @@ th {
       <td class="desc">Board GPIO Leds</td>
     </tr>
     <tr>
-      <td rowspan="2">0x0040</td>
-      <td rowspan="2">0</td>
+      <td rowspan="2">0x0080</td>
+      <td rowspan="2">0,1</td>
       <td rowspan="2">GENERIC_CONSTANTS</td>
       <td class="name">INTERRUPTS</td>
       <td class="range">15..8</td>
@@ -436,13 +496,22 @@ th {
       <td class="desc">Number of Descriptors</td>
     </tr>
     <tr>
-      <td rowspan="1">0x0050</td>
-      <td rowspan="1">0</td>
+      <td rowspan="1">0x0090</td>
+      <td rowspan="1">0,1</td>
       <td rowspan="1">CARD_TYPE</td>
       <td class="name"></td>
       <td class="range">63..0</td>
       <td class="type">R</td>
-      <td class="desc">Card Type:<br/>  * 709 (0x2c5) VC709<br/>  * 710 (0x2c6) HTG710<br/>  * 711 (0x2c7) BNL711<br/></td>
+      <td class="desc">Card Type:<br/>  - 709 (0x2c5): FLX709, VC709<br/>  - 710 (0x2c6): FLX710, HTG710<br/>  - 711 (0x2c7): FLX711, BNL711<br/>  - 712 (0x2c8): FLX712, BNL712<br/>  - 128 (0x080): FLX128, VCU128<br/></td>
+    </tr>
+    <tr>
+      <td rowspan="1">0x00A0</td>
+      <td rowspan="1">0,1</td>
+      <td rowspan="1">PCIE_ENDPOINT</td>
+      <td class="name"></td>
+      <td class="range">0</td>
+      <td class="type">R</td>
+      <td class="desc">Indicator of the PCIe endpoint on BNL71x cards with two endpoints. 0 or 1</td>
     </tr>
     <tr>
       <td colspan="7" class="group">Application Specific</td>
@@ -514,7 +583,7 @@ th {
       <td colspan="7" class="group">House Keeping Controls And Monitors</td>
     </tr>
     <tr>
-      <td rowspan="1">0x2300</td>
+      <td rowspan="1">0x9300</td>
       <td rowspan="1">0</td>
       <td rowspan="1">MMCM_MAIN_PLL_LOCK</td>
       <td class="name"></td>
@@ -523,7 +592,7 @@ th {
       <td class="desc">Main MMCM PLL Lock Status</td>
     </tr>
     <tr>
-      <td rowspan="7">0x2310</td>
+      <td rowspan="7">0x9310</td>
       <td rowspan="7">0</td>
       <td rowspan="7">I2C_WR</td>
       <td class="name">I2C_WREN</td>
@@ -568,7 +637,7 @@ th {
       <td class="desc">READ/<o>WRITE</o></td>
     </tr>
     <tr>
-      <td rowspan="3">0x2320</td>
+      <td rowspan="3">0x9320</td>
       <td rowspan="3">0</td>
       <td rowspan="3">I2C_RD</td>
       <td class="name">I2C_RDEN</td>
@@ -589,7 +658,7 @@ th {
       <td class="desc">I2C READ Data</td>
     </tr>
     <tr>
-      <td rowspan="1">0x2330</td>
+      <td rowspan="1">0x9330</td>
       <td rowspan="1">0</td>
       <td rowspan="1">FPGA_CORE_TEMP</td>
       <td class="name"></td>
@@ -598,7 +667,7 @@ th {
       <td class="desc">XADC temperature monitor for the FPGA CORE<br/>for Virtex7<br/>temp (C)= ((FPGA_CORE_TEMP* 503.975)/4096)-273.15<br/>for Kintex Ultrascale<br/>temp (C)= ((FPGA_CORE_TEMP* 502.9098)/4096)-273.8195<br/></td>
     </tr>
     <tr>
-      <td rowspan="1">0x2340</td>
+      <td rowspan="1">0x9340</td>
       <td rowspan="1">0</td>
       <td rowspan="1">FPGA_CORE_VCCINT</td>
       <td class="name"></td>
@@ -607,7 +676,7 @@ th {
       <td class="desc">XADC voltage measurement VCCINT = (FPGA_CORE_VCCINT *3.0)/4096</td>
     </tr>
     <tr>
-      <td rowspan="1">0x2350</td>
+      <td rowspan="1">0x9350</td>
       <td rowspan="1">0</td>
       <td rowspan="1">FPGA_CORE_VCCAUX</td>
       <td class="name"></td>
@@ -616,7 +685,7 @@ th {
       <td class="desc">XADC voltage measurement VCCAUX = (FPGA_CORE_VCCAUX *3.0)/4096</td>
     </tr>
     <tr>
-      <td rowspan="1">0x2360</td>
+      <td rowspan="1">0x9360</td>
       <td rowspan="1">0</td>
       <td rowspan="1">FPGA_CORE_VCCBRAM</td>
       <td class="name"></td>
@@ -625,7 +694,7 @@ th {
       <td class="desc">XADC voltage measurement VCCBRAM = (FPGA_CORE_VCCBRAM *3.0)/4096</td>
     </tr>
     <tr>
-      <td rowspan="1">0x2370</td>
+      <td rowspan="1">0x9370</td>
       <td rowspan="1">0,1</td>
       <td rowspan="1">FPGA_DNA</td>
       <td class="name"></td>
@@ -634,28 +703,25 @@ th {
       <td class="desc">Unique identifier of the FPGA</td>
     </tr>
     <tr>
-      <td rowspan="1">0x2800</td>
-      <td rowspan="1">0</td>
-      <td rowspan="1">INT_TEST_4</td>
-      <td class="name"></td>
+      <td rowspan="2">0x9380</td>
+      <td rowspan="2">0</td>
+      <td rowspan="2">INT_TEST</td>
+      <td class="name">TRIGGER</td>
       <td class="range">any</td>
       <td class="type">T</td>
-      <td class="desc">Fire a test MSIx interrupt #4</td>
+      <td class="desc">Fire a test MSIx interrupt set in IRQ</td>
     </tr>
     <tr>
-      <td rowspan="1">0x2810</td>
-      <td rowspan="1">0</td>
-      <td rowspan="1">INT_TEST_5</td>
-      <td class="name"></td>
-      <td class="range">any</td>
-      <td class="type">T</td>
-      <td class="desc">Fire a test MSIx interrupt #5</td>
+      <td class="name">IRQ</td>
+      <td class="range">3..0</td>
+      <td class="type">W</td>
+      <td class="desc">Set this field to a value equal to the MSIX interrupt to be fired. The write triggers the interrupt immediately.</td>
     </tr>
     <tr>
       <td colspan="7" class="group">Wishbone</td>
     </tr>
     <tr>
-      <td rowspan="2">0x4000</td>
+      <td rowspan="2">0xC000</td>
       <td rowspan="2">0</td>
       <td rowspan="2">WISHBONE_CONTROL</td>
       <td class="name">WRITE_NOT_READ</td>
@@ -670,7 +736,7 @@ th {
       <td class="desc">Slave address for Wishbone bus</td>
     </tr>
     <tr>
-      <td rowspan="3">0x4010</td>
+      <td rowspan="3">0xC010</td>
       <td rowspan="3">0</td>
       <td rowspan="3">WISHBONE_WRITE</td>
       <td class="name">WRITE_ENABLE</td>
@@ -691,7 +757,7 @@ th {
       <td class="desc">Wishbone</td>
     </tr>
     <tr>
-      <td rowspan="3">0x4020</td>
+      <td rowspan="3">0xC020</td>
       <td rowspan="3">0</td>
       <td rowspan="3">WISHBONE_READ</td>
       <td class="name">READ_ENABLE</td>
@@ -712,7 +778,7 @@ th {
       <td class="desc">Wishbone read data</td>
     </tr>
     <tr>
-      <td rowspan="5">0x4030</td>
+      <td rowspan="5">0xC030</td>
       <td rowspan="5">0</td>
       <td rowspan="5">WISHBONE_STATUS</td>
       <td class="name">INT</td>
@@ -748,7 +814,7 @@ th {
       <td colspan="7" class="group">Interlaken</td>
     </tr>
     <tr>
-      <td rowspan="1">0x5000</td>
+      <td rowspan="1">0xD000</td>
       <td rowspan="1">0</td>
       <td rowspan="1">INTERLAKEN_PACKET_LENGTH</td>
       <td class="name"></td>
@@ -757,7 +823,7 @@ th {
       <td class="desc">Packet length for fromhost packet (to Interlaken)</td>
     </tr>
     <tr>
-      <td rowspan="3">0x5010</td>
+      <td rowspan="3">0xD010</td>
       <td rowspan="3">0</td>
       <td rowspan="3">INTERLAKEN_CONTROL_STATUS</td>
       <td class="name">TRANSCEIVER_RESET</td>
@@ -778,7 +844,7 @@ th {
       <td class="desc">Descrambler lock indication</td>
     </tr>
     <tr>
-      <td rowspan="3">0x5020</td>
+      <td rowspan="3">0xD020</td>
       <td rowspan="3">0</td>
       <td rowspan="3">TRANSCEIVER</td>
       <td class="name">LOOPBACK</td>

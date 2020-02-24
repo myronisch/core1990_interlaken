@@ -49,8 +49,14 @@ set_property IOSTANDARD LVCMOS18 [get_ports {SFP_RX_LOS[3]}]
 set_property PACKAGE_PIN AH8 [get_ports GTREFCLK_IN_P]
 
 #Transceiver optic ports
-set_property PACKAGE_PIN AN6 [get_ports RX_In_P]
-set_property PACKAGE_PIN AP4 [get_ports TX_Out_P]
+set_property PACKAGE_PIN AN6 [get_ports {RX_In_P[0]}]
+set_property PACKAGE_PIN AP4 [get_ports {TX_Out_P[0]}]
+set_property PACKAGE_PIN AM8 [get_ports {RX_In_P[1]}]
+set_property PACKAGE_PIN AN2 [get_ports {TX_Out_P[1]}]
+set_property PACKAGE_PIN AL6 [get_ports {RX_In_P[2]}]
+set_property PACKAGE_PIN AM4 [get_ports {TX_Out_P[2]}]
+set_property PACKAGE_PIN AJ6 [get_ports {RX_In_P[3]}]
+set_property PACKAGE_PIN AL2 [get_ports {TX_Out_P[3]}]
 
 ### Pin locations and configuration of the status leds
 #set_property PACKAGE_PIN AM39 [get_ports Valid_out]

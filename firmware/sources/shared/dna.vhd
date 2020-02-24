@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use ieee.std_logic_unsigned.all;
+use ieee.std_logic_unsigned.all; -- @suppress "Deprecated package" (used for sigasi to recognize - operator with std_logic vector)
 Library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
 
@@ -46,7 +46,7 @@ g0: if (CARD_TYPE = 709 or CARD_TYPE = 710) generate
         );
 
 
-    process(clk40, reset)
+    process(clk40)
     begin
         
         if(rising_edge(clk40)) then

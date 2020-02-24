@@ -123,105 +123,119 @@ typedef struct
   volatile u_long                BOARD_ID_TIMESTAMP;            /* 0x0010 - 0x0017 (8) */
   u_char                         unused1[8];                    /* 0x0018 - 0x001F (8) */
 
-  volatile u_long                BOARD_ID_SVN;                  /* 0x0020 - 0x0027 (8) */
-  u_char                         unused2[8];                    /* 0x0028 - 0x002F (8) */
+  u_char                         unused2[0x0010];               /* 0x0020 - 0x002F (16) */
 
-  volatile u_long                STATUS_LEDS;                   /* 0x0030 - 0x0037 (8) */
+  volatile u_long                GIT_COMMIT_TIME;               /* 0x0030 - 0x0037 (8) */
   u_char                         unused3[8];                    /* 0x0038 - 0x003F (8) */
 
-  flxcard_generic_constants_t    GENERIC_CONSTANTS;             /* 0x0040 - 0x0047 (8) */
+  volatile u_long                GIT_TAG;                       /* 0x0040 - 0x0047 (8) */
   u_char                         unused4[8];                    /* 0x0048 - 0x004F (8) */
 
-  volatile u_long                CARD_TYPE;                     /* 0x0050 - 0x0057 (8) */
+  volatile u_long                GIT_COMMIT_NUMBER;             /* 0x0050 - 0x0057 (8) */
   u_char                         unused5[8];                    /* 0x0058 - 0x005F (8) */
 
-  u_char                         unused6[0x0FA0];               /* 0x0060 - 0x0FFF (4000) */
+  volatile u_long                GIT_HASH;                      /* 0x0060 - 0x0067 (8) */
+  u_char                         unused6[8];                    /* 0x0068 - 0x006F (8) */
+
+  volatile u_long                STATUS_LEDS;                   /* 0x0070 - 0x0077 (8) */
+  u_char                         unused7[8];                    /* 0x0078 - 0x007F (8) */
+
+  flxcard_generic_constants_t    GENERIC_CONSTANTS;             /* 0x0080 - 0x0087 (8) */
+  u_char                         unused8[8];                    /* 0x0088 - 0x008F (8) */
+
+  volatile u_long                CARD_TYPE;                     /* 0x0090 - 0x0097 (8) */
+  u_char                         unused9[8];                    /* 0x0098 - 0x009F (8) */
+
+  volatile u_long                PCIE_ENDPOINT;                 /* 0x00A0 - 0x00A7 (8) */
+  u_char                         unused10[8];                   /* 0x00A8 - 0x00AF (8) */
+
+  u_char                         unused11[0x0F50];              /* 0x00B0 - 0x0FFF (3920) */
 
 /* ApplicationSpecific */
   volatile u_long                LFSR_SEED_0;                   /* 0x1000 - 0x1007 (8) */
-  u_char                         unused7[8];                    /* 0x1008 - 0x100F (8) */
+  u_char                         unused12[8];                   /* 0x1008 - 0x100F (8) */
 
   volatile u_long                LFSR_SEED_1;                   /* 0x1010 - 0x1017 (8) */
-  u_char                         unused8[8];                    /* 0x1018 - 0x101F (8) */
+  u_char                         unused13[8];                   /* 0x1018 - 0x101F (8) */
 
   volatile u_long                LFSR_SEED_2;                   /* 0x1020 - 0x1027 (8) */
-  u_char                         unused9[8];                    /* 0x1028 - 0x102F (8) */
+  u_char                         unused14[8];                   /* 0x1028 - 0x102F (8) */
 
   volatile u_long                LFSR_SEED_3;                   /* 0x1030 - 0x1037 (8) */
-  u_char                         unused10[8];                   /* 0x1038 - 0x103F (8) */
+  u_char                         unused15[8];                   /* 0x1038 - 0x103F (8) */
 
   volatile u_long                APP_MUX;                       /* 0x1040 - 0x1047 (8) */
-  u_char                         unused11[8];                   /* 0x1048 - 0x104F (8) */
+  u_char                         unused16[8];                   /* 0x1048 - 0x104F (8) */
 
   volatile u_long                LFSR_LOAD_SEED;                /* 0x1050 - 0x1057 (8) */
-  u_char                         unused12[8];                   /* 0x1058 - 0x105F (8) */
+  u_char                         unused17[8];                   /* 0x1058 - 0x105F (8) */
 
   volatile u_long                APP_ENABLE;                    /* 0x1060 - 0x1067 (8) */
-  u_char                         unused13[8];                   /* 0x1068 - 0x106F (8) */
+  u_char                         unused18[8];                   /* 0x1068 - 0x106F (8) */
 
-  u_char                         unused14[0x0F90];              /* 0x1070 - 0x1FFF (3984) */
+  u_char                         unused19[0x7F90];              /* 0x1070 - 0x8FFF (32656) */
 
 /* HouseKeepingControlsAndMonitors */
-  u_char                         unused15[0x0300];              /* 0x2000 - 0x22FF (768) */
+  u_char                         unused20[0x0300];              /* 0x9000 - 0x92FF (768) */
 
-  volatile u_long                MMCM_MAIN_PLL_LOCK;            /* 0x2300 - 0x2307 (8) */
-  u_char                         unused16[8];                   /* 0x2308 - 0x230F (8) */
+  volatile u_long                MMCM_MAIN_PLL_LOCK;            /* 0x9300 - 0x9307 (8) */
+  u_char                         unused21[8];                   /* 0x9308 - 0x930F (8) */
 
-  flxcard_i2c_wr_t               I2C_WR;                        /* 0x2310 - 0x2317 (8) */
-  u_char                         unused17[8];                   /* 0x2318 - 0x231F (8) */
+  flxcard_i2c_wr_t               I2C_WR;                        /* 0x9310 - 0x9317 (8) */
+  u_char                         unused22[8];                   /* 0x9318 - 0x931F (8) */
 
-  flxcard_i2c_rd_t               I2C_RD;                        /* 0x2320 - 0x2327 (8) */
-  u_char                         unused18[8];                   /* 0x2328 - 0x232F (8) */
+  flxcard_i2c_rd_t               I2C_RD;                        /* 0x9320 - 0x9327 (8) */
+  u_char                         unused23[8];                   /* 0x9328 - 0x932F (8) */
 
-  volatile u_long                FPGA_CORE_TEMP;                /* 0x2330 - 0x2337 (8) */
-  u_char                         unused19[8];                   /* 0x2338 - 0x233F (8) */
+  volatile u_long                FPGA_CORE_TEMP;                /* 0x9330 - 0x9337 (8) */
+  u_char                         unused24[8];                   /* 0x9338 - 0x933F (8) */
 
-  volatile u_long                FPGA_CORE_VCCINT;              /* 0x2340 - 0x2347 (8) */
-  u_char                         unused20[8];                   /* 0x2348 - 0x234F (8) */
+  volatile u_long                FPGA_CORE_VCCINT;              /* 0x9340 - 0x9347 (8) */
+  u_char                         unused25[8];                   /* 0x9348 - 0x934F (8) */
 
-  volatile u_long                FPGA_CORE_VCCAUX;              /* 0x2350 - 0x2357 (8) */
-  u_char                         unused21[8];                   /* 0x2358 - 0x235F (8) */
+  volatile u_long                FPGA_CORE_VCCAUX;              /* 0x9350 - 0x9357 (8) */
+  u_char                         unused26[8];                   /* 0x9358 - 0x935F (8) */
 
-  volatile u_long                FPGA_CORE_VCCBRAM;             /* 0x2360 - 0x2367 (8) */
-  u_char                         unused22[8];                   /* 0x2368 - 0x236F (8) */
+  volatile u_long                FPGA_CORE_VCCBRAM;             /* 0x9360 - 0x9367 (8) */
+  u_char                         unused27[8];                   /* 0x9368 - 0x936F (8) */
 
-  volatile u_long                FPGA_DNA;                      /* 0x2370 - 0x2377 (8) */
-  u_char                         unused23[8];                   /* 0x2378 - 0x237F (8) */
+  volatile u_long                FPGA_DNA;                      /* 0x9370 - 0x9377 (8) */
+  u_char                         unused28[8];                   /* 0x9378 - 0x937F (8) */
 
-  u_char                         unused24[0x0480];              /* 0x2380 - 0x27FF (1152) */
+  u_char                         unused29[0x0480];              /* 0x9380 - 0x97FF (1152) */
 
-  volatile u_long                INT_TEST_4;                    /* 0x2800 - 0x2807 (8) */
-  u_char                         unused25[8];                   /* 0x2808 - 0x280F (8) */
+  volatile u_long                INT_TEST_4;                    /* 0x9800 - 0x9807 (8) */
+  u_char                         unused30[8];                   /* 0x9808 - 0x980F (8) */
 
-  volatile u_long                INT_TEST_5;                    /* 0x2810 - 0x2817 (8) */
-  u_char                         unused26[8];                   /* 0x2818 - 0x281F (8) */
+  volatile u_long                INT_TEST_5;                    /* 0x9810 - 0x9817 (8) */
+  u_char                         unused31[8];                   /* 0x9818 - 0x981F (8) */
 
-  u_char                         unused27[0x17E0];              /* 0x2820 - 0x3FFF (6112) */
+  u_char                         unused32[0x27E0];              /* 0x9820 - 0xBFFF (10208) */
 
 /* Wishbone */
-  flxcard_wishbone_control_t     WISHBONE_CONTROL;              /* 0x4000 - 0x4007 (8) */
-  u_char                         unused28[8];                   /* 0x4008 - 0x400F (8) */
+  flxcard_wishbone_control_t     WISHBONE_CONTROL;              /* 0xC000 - 0xC007 (8) */
+  u_char                         unused33[8];                   /* 0xC008 - 0xC00F (8) */
 
-  flxcard_wishbone_write_t       WISHBONE_WRITE;                /* 0x4010 - 0x4017 (8) */
-  u_char                         unused29[8];                   /* 0x4018 - 0x401F (8) */
+  flxcard_wishbone_write_t       WISHBONE_WRITE;                /* 0xC010 - 0xC017 (8) */
+  u_char                         unused34[8];                   /* 0xC018 - 0xC01F (8) */
 
-  flxcard_wishbone_read_t        WISHBONE_READ;                 /* 0x4020 - 0x4027 (8) */
-  u_char                         unused30[8];                   /* 0x4028 - 0x402F (8) */
+  flxcard_wishbone_read_t        WISHBONE_READ;                 /* 0xC020 - 0xC027 (8) */
+  u_char                         unused35[8];                   /* 0xC028 - 0xC02F (8) */
 
-  flxcard_wishbone_status_t      WISHBONE_STATUS;               /* 0x4030 - 0x4037 (8) */
-  u_char                         unused31[8];                   /* 0x4038 - 0x403F (8) */
+  flxcard_wishbone_status_t      WISHBONE_STATUS;               /* 0xC030 - 0xC037 (8) */
+  u_char                         unused36[8];                   /* 0xC038 - 0xC03F (8) */
 
-  u_char                         unused32[0x0FC0];              /* 0x4040 - 0x4FFF (4032) */
+  u_char                         unused37[0x0FC0];              /* 0xC040 - 0xCFFF (4032) */
 
 /* Interlaken */
-  volatile u_long                INTERLAKEN_PACKET_LENGTH;      /* 0x5000 - 0x5007 (8) */
-  u_char                         unused33[8];                   /* 0x5008 - 0x500F (8) */
+  volatile u_long                INTERLAKEN_PACKET_LENGTH;      /* 0xD000 - 0xD007 (8) */
+  u_char                         unused38[8];                   /* 0xD008 - 0xD00F (8) */
 
-  flxcard_interlaken_control_status_t  INTERLAKEN_CONTROL_STATUS;     /* 0x5010 - 0x5017 (8) */
-  u_char                         unused34[8];                   /* 0x5018 - 0x501F (8) */
+  flxcard_interlaken_control_status_t  INTERLAKEN_CONTROL_STATUS;     /* 0xD010 - 0xD017 (8) */
+  u_char                         unused39[8];                   /* 0xD018 - 0xD01F (8) */
 
-  flxcard_transceiver_t          TRANSCEIVER;                   /* 0x5020 - 0x5027 (8) */
-  u_char                         unused35[8];                   /* 0x5028 - 0x502F (8) */
+  flxcard_transceiver_t          TRANSCEIVER;                   /* 0xD020 - 0xD027 (8) */
+  u_char                         unused40[8];                   /* 0xD028 - 0xD02F (8) */
 
 } flxcard_bar2_regs_t;
 

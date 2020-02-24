@@ -1,242 +1,132 @@
-library ieee; 
+library ieee;
 use ieee.std_logic_1164.all;
 use work.interlaken_package.all;
-library work;
+use work.axi_stream_package.ALL;
 
 entity Interlaken_Receiver is
     generic (
         PacketLength  : positive;
-        LaneNumber    : integer;       -- Current Lane
-        Lanes         : positive      -- Number of Lanes
+        LaneNumber    : integer       -- Current Lane -- @suppress "Unused generic: LaneNumber is not used in work.Interlaken_Receiver(Receiver)"
     );
-	port (
-	    fifo_read_clk	: in std_logic;
-		clk   		    : in std_logic;
-		reset 		    : in std_logic;
-		
+    port (
+        clk   		    : in std_logic;
+        reset 		    : in std_logic;
 		RX_Data_In 	: in std_logic_vector(66 downto 0);
-		RX_Data_Out : out std_logic_vector (63 downto 0);        -- Data ready to transmit
-		
-		RX_FIFO_Valid: out std_logic;
-		
-		--RX_Enable    	: out std_logic;      --not used                   -- Enable the TX
-		RX_SOP        	: out std_logic;                         -- Start of Packet
-		RX_EOP_Valid 	: out std_logic_vector(2 downto 0);      -- Valid bytes packet contains
-		RX_EOP        	: out std_logic;                         -- End of Packet
-		RX_FlowControl	: out std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
-		RX_prog_full    : out std_logic_vector(15 downto 0);     -- Indication FIFO of this channel is full
-		RX_Channel    	: out std_logic_vector(7 downto 0);      -- Select transmit channel (yet unutilized)
-		RX_Datavalid    : in std_logic;
-		
-		CRC24_Error       : out std_logic;
-		CRC32_Error       : out std_logic;
-		Decoder_lock      : out std_logic;
-		Descrambler_lock  : out std_logic;
-		
-		Data_Descrambler : out std_logic_vector(66 downto 0);
-		Data_Decoder     : out std_logic_vector(66 downto 0);
-		
-		RX_FIFO_Full         : out std_logic;
-		RX_FIFO_Empty        : out std_logic;
-		RX_FIFO_Read         : in std_logic;
-		
-		RX_Link_Up      : out std_logic;
-		
-		Bitslip         : out std_logic
+        RX_Datavalid : in std_logic;
+        m_axis      : out axis_64_type;
+        m_axis_tready : in std_logic;
+		Flowcontrol     : out std_logic_vector(15 downto 0);
+        Descrambler_lock : out std_logic;
+        Decoder_Lock : out std_logic;
+        Channel : out  std_logic_vector(7 downto 0);
+        Bitslip         : out std_logic;
+        HealthLane : out std_logic;
+        HealthInterface: out std_logic
 	);
 end entity Interlaken_Receiver;
 
 architecture Receiver of Interlaken_Receiver is
-    type state_type is (IDLE, DATA);
-	--signal pres_state, next_state: state_type;
-	
- --   signal FIFO_Read_Count, FIFO_Write_Count : std_logic_vector(5 downto 0);
-  --  signal FIFO_prog_full, FIFO_prog_empty  : std_logic;
-   -- signal FIFO_Data_Out : std_logic_vector(70 downto 0);
-    
-    COMPONENT RX_FIFO
-		PORT (
-            rst : IN STD_LOGIC;
-            wr_clk : IN STD_LOGIC;
-            rd_clk : IN STD_LOGIC;
-            din : IN STD_LOGIC_VECTOR(70 DOWNTO 0);
-            wr_en : IN STD_LOGIC;
-            rd_en : IN STD_LOGIC;
-            dout : OUT STD_LOGIC_VECTOR(70 DOWNTO 0);
-            full : OUT STD_LOGIC;
-            empty : OUT STD_LOGIC;
-            prog_full : OUT STD_LOGIC;
-            prog_empty : OUT STD_LOGIC;
-            valid : OUT STD_LOGIC
-		);
-    END COMPONENT;
-    
-    signal Data_Burst_Out : std_logic_vector(68 downto 0);
-    
-    signal RX_FIFO_Data : std_logic_vector(70 downto 0);
-    signal RX_FIFO_Write : std_logic;
-    signal Data_valid_Burst_Out : std_logic;
-    signal Flowcontrol : std_logic_vector (15 downto 0);
-    --signal FIFO_empty : std_logic;
     
     signal Data_Meta_Out : std_logic_vector(66 downto 0);
     signal Data_Descrambler_Out : std_logic_vector(66 downto 0);
-    signal Data_Control_Descrambler_Out : std_logic;
-    signal Data_control_Meta_out : std_logic;
     signal Data_valid_Meta_out : std_logic;
-    
     signal Data_Decoder_Out : std_logic_vector(66 downto 0);
-    signal Data_Control_Decoder_Out, Data_valid_decoder_out : std_logic;
+    signal Data_valid_decoder_out : std_logic;
     signal Data_valid_Descrambler_out : std_logic;
-    signal Lane_Number : std_logic_vector(3 downto 0);
-    signal Error_BadSync : std_logic;
-    signal Error_StateMismatch : std_logic;
-    signal Error_NoSync : std_logic;
-    signal Error_Decoder_Sync : std_logic;
-    signal Descrambler_In_lock: std_logic;
-    -- signal FIFO_dout_valid : std_logic;
-    signal CRC24_Error_burst : std_logic ; 
-    signal CRC24_Error_fifo : std_logic := '0';
-    
+    signal Error_BadSync : std_logic;           --todo add to axi stream chunk error -- @suppress "signal Error_BadSync is never read"
+    signal Error_StateMismatch : std_logic;     --todo add to axi stream chunk error -- @suppress "signal Error_StateMismatch is never read"
+    signal Error_NoSync : std_logic;            --todo add to axi stream chunk error -- @suppress "signal Error_NoSync is never read"
+    signal Error_Decoder_Sync : std_logic;      --todo add to axi stream chunk error -- @suppress "signal Error_Decoder_Sync is never read"
     signal CRC32_Error_meta : std_logic;
-    signal CRC32_Error_fifo : std_logic := '0';
     
 begin
     
---    RX_prog_full(0) <= not FIFO_prog_full;
---    RX_prog_full(15 downto 1) <= (others => '0');    
-    --RX_FlowControl       <= FlowControl; --RX_FlowControl(channelnumber) <= FIFO_prog_full;
-
---    FIFO_Receiver : RX_FIFO
---    port map (
---        rst             => Reset,
---        wr_clk          => clk,
---        rd_clk          => fifo_read_clk,
---        din             => RX_FIFO_Data,
---        wr_en           => RX_FIFO_Write,
---        rd_en           => RX_FIFO_Read,
---        dout            => FIFO_Data_Out,
---        full            => RX_FIFO_Full,
---        empty           => RX_FIFO_Empty,
---        prog_full       => FIFO_prog_full,
---        prog_empty      => FIFO_prog_empty,
---        valid           => RX_FIFO_Valid
---    );
-    
     Deframing_Burst : entity work.Burst_Deframer
-    port map (
-        clk         => clk,
-        reset       => reset,
+        port map (
+            Clk => clk,
+            Reset => reset,
+            Data_In => Data_Meta_Out,
+            Data_Valid_In => Data_valid_Meta_out,
+            Channel => Channel,
+            CRC32_Error_meta => CRC32_Error_meta,
+            CRC24_Error => open,
+            Flowcontrol => Flowcontrol,
+            m_axis => m_axis,
+            m_axis_tready => m_axis_tready
         
-        Data_in          => Data_Meta_Out,
-        Data_out         => Data_Burst_Out(63 downto 0),
-        
-        SOP              => Data_Burst_Out(68),--: out std_logic;
-        EOP              => Data_Burst_Out(67),--: out std_logic;
-        EOP_valid        => Data_Burst_Out(66 downto 64),--: out std_logic_vector(2 downto 0);
-        
-        Flowcontrol => RX_Flowcontrol,
-        CRC24_Error => CRC24_Error_burst,
-        
-        Data_valid_in   => Data_valid_Meta_Out,
-        Data_valid_out  => Data_valid_Burst_Out
     );
-    RX_FIFO_Write <= Data_valid_Burst_Out;
-    RX_FIFO_Data <=  CRC32_Error_fifo & CRC24_Error_fifo & Data_Burst_Out;
-    
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            if CRC24_Error_burst = '1' then
-                CRC24_Error_fifo <= '1';
-            elsif RX_FIFO_Write = '1' then
-                CRC24_Error_fifo <= '0';
-            end if;
-            
-            if CRC32_Error_meta = '1' then
-                CRC32_Error_fifo <= '1';
-            elsif RX_FIFO_Write = '1' then
-                CRC32_Error_fifo <= '0';
-            end if;
-            
-        end if;
-    end process;
-           
+
+    --    RX_FIFO_Write <= Data_valid_Burst_Out;
+    --    RX_FIFO_Data <=  CRC32_Error_fifo & CRC24_Error_fifo & Data_Burst_Out;
+    --    
+    --    process(clk)
+    --    begin
+    --        if rising_edge(clk) then
+    --            if CRC24_Error_burst = '1' then
+    --                CRC24_Error_fifo <= '1';
+    --            elsif RX_FIFO_Write = '1' then
+    --                CRC24_Error_fifo <= '0';
+    --            end if;
+    --            
+    --            if CRC32_Error_meta = '1' then
+    --                CRC32_Error_fifo <= '1';
+    --            elsif RX_FIFO_Write = '1' then
+    --                CRC32_Error_fifo <= '0';
+    --            end if;
+    --            
+    --        end if;
+    --    end process;
+
     Deframing_Meta : entity work.Meta_Deframer
-    port map (
-        clk         => clk,
-        reset       => reset,
-        
-        CRC32_Error => CRC32_Error_meta,
-        
-        Data_in          => Data_Descrambler_Out,
-        Data_out         => Data_Meta_Out,
+        port map (
+            Clk => clk,
+            Reset => reset,
+            Data_In => Data_Descrambler_Out,
+            Data_Out => Data_Meta_Out,
+            CRC32_Error => CRC32_Error_meta,
+            Data_Valid_In => Data_valid_Descrambler_out,
+            Data_Valid_Out => Data_valid_Meta_out,
+            HealthLane => HealthLane,
+            HealthInterface => HealthInterface
+        );
 
-        Data_valid_in    => Data_valid_Descrambler_out,
-        Data_valid_out   => Data_valid_Meta_out
-    );
-    
-    Data_Descrambler <= Data_Descrambler_Out;
-    Data_Decoder <= Data_Decoder_Out;
-    
-    Descrambler : entity work.Descrambler 
-    generic map (
-        PacketLength => PacketLength
-    )
-    port map (
-        clk     => clk,
-        reset   => reset,
-        
-        Data_in          => Data_Decoder_Out,
-        Data_out         => Data_Descrambler_Out,
-        
-        Data_valid_in    => Data_valid_decoder_out,
-        Data_valid_out   => Data_valid_Descrambler_out,
-        Lock             => Descrambler_In_lock,
-        
-        Lane_Number => "0001",
-        
-        Error_BadSync       => Error_BadSync,
-        Error_StateMismatch => Error_StateMismatch,
-        Error_NoSync        => Error_NoSync
-    );
-    
-    Descrambler_Lock <= Descrambler_In_lock;
-    
-    sync_proc: process(fifo_read_clk)
-    begin
-        if rising_edge(fifo_read_clk) then
-            RX_Link_Up <= Descrambler_In_lock;
-        end if;
-    end process;
-    
-        
-    Decoder : entity work.Decoder 
-    port map (
-        clk         => clk,
-        reset       => reset,
-        Decoder_En  => '1',
-        
-        Data_in       => RX_Data_In,
-        Data_out      => Data_Decoder_Out,
-        Data_Valid_In => RX_Datavalid,
-        Data_Valid_Out => Data_valid_decoder_out,
-        Data_control  => Data_control_Decoder_Out,
-        
-        Sync_Locked => Decoder_lock,
-        Sync_error  => Error_Decoder_Sync,
-        Bitslip     => Bitslip
-    );
-    
+    --Data_Descrambler <= Data_Descrambler_Out;
 
+    Descrambler : entity work.Descrambler
+        generic map (
+            PacketLength => PacketLength
+        )
+        port map (
+            Clk => clk,
+            Reset => reset,
+            Data_In => Data_Decoder_Out,
+            Data_Out => Data_Descrambler_Out,
+            Lane_Number => "0001",
+            Data_Valid_In => Data_valid_decoder_out,
+            Data_Valid_Out => Data_valid_Descrambler_out,
+            Lock => Descrambler_lock,
+            Error_BadSync => Error_BadSync,
+            Error_StateMismatch => Error_StateMismatch,
+            Error_NoSync => Error_NoSync
+        );
 
---    CRC32_Error <= FIFO_Data_Out(70);    
---    CRC24_Error <= FIFO_Data_Out(69);    
---    RX_SOP <= FIFO_Data_Out(68);
---    RX_EOP <= FIFO_Data_Out(67);
---    RX_EOP_Valid <= FIFO_Data_Out(66 downto 64);
---    RX_Data_Out <= FIFO_Data_Out(63 downto 0);
+    
+    
         
+    Decoder : entity work.Decoder
+        port map (
+            Clk => clk,
+            Reset => reset,
+            Data_In => RX_Data_In,
+            Decoder_En => '1',
+            Data_Valid_In => RX_Datavalid,
+            Data_Valid_Out => Data_valid_decoder_out,
+            Data_Out => Data_Decoder_Out,
+            Decoder_Lock => Decoder_Lock,
+            Sync_Error => Error_Decoder_Sync,
+            Bitslip => Bitslip
+        );
+
     
 
 end architecture Receiver;

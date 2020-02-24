@@ -12,41 +12,30 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
 package I2C is
-	component simple_i2c is
-	port (
-		clk : in std_logic;
-		ena : in std_logic;
-		nReset : in std_logic;
-
-		clk_cnt : in unsigned(7 downto 0);	-- 4x SCL 
-
-		-- input signals
-		start,
-		stop,
-		read,
-		write,
-		ack_in : std_logic;
-		Din : in std_logic_vector(7 downto 0);
-
-		-- output signals
-		cmd_ack : out std_logic;
-		ack_out : out std_logic;
-		Dout : out std_logic_vector(7 downto 0);
-
-		-- i2c signals
-		SCL : inout std_logic;
-		SDA : inout std_logic
-	);
+	component simple_i2c
+		port(
+			clk                              : in    std_logic;
+			ena                              : in    std_logic;
+			nReset                           : in    std_logic;
+			clk_cnt                          : in    unsigned(7 downto 0);
+			start, stop, read, write, ack_in : in    std_logic;
+			Din                              : in    std_logic_vector(7 downto 0);
+			cmd_ack                          : out   std_logic;
+			ack_out                          : out   std_logic;
+			Dout                             : out   std_logic_vector(7 downto 0);
+			SCL                              : inout std_logic;
+			SDA                              : inout std_logic
+		);
 	end component simple_i2c;
 end package I2C;
 
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
 entity simple_i2c is
 	port (
@@ -76,23 +65,19 @@ entity simple_i2c is
 end entity simple_i2c;
 
 architecture structural of simple_i2c is
-	component i2c_core is
-	port (
-		clk : in std_logic;
-		nReset : in std_logic;
-
-		clk_cnt : in unsigned(7 downto 0);
-
-		cmd : in std_logic_vector(2 downto 0);
-		cmd_ack : out std_logic;
-		busy : out std_logic;
-
-		Din : in std_logic;
-		Dout : out std_logic;
-
-		SCL : inout std_logic;
-		SDA : inout std_logic
-	);
+	component i2c_core
+		port(
+			clk     : in    std_logic;
+			nReset  : in    std_logic;
+			clk_cnt : in    unsigned(7 downto 0);
+			cmd     : in    std_logic_vector(2 downto 0);
+			cmd_ack : out   std_logic;
+			busy    : out   std_logic;
+			Din     : in    std_logic;
+			Dout    : out   std_logic;
+			SCL     : inout std_logic;
+			SDA     : inout std_logic
+		);
 	end component i2c_core;
 
 	-- commands for i2c_core
@@ -114,7 +99,7 @@ architecture structural of simple_i2c is
 	signal go, host_ack : std_logic;
 begin
 	-- hookup i2c core
-	u1: i2c_core port map (clk, nReset, clk_cnt, core_cmd, core_ack, core_busy, core_txd, core_rxd, SCL, SDA);
+	u1: i2c_core port map (clk, nReset, clk_cnt, core_cmd, core_ack, core_busy, core_txd, core_rxd, SCL, SDA); -- @suppress "Positional association should not be used, use named association instead"
 
 	-- generate host-command-acknowledge
 	cmd_ack <= host_ack;
@@ -133,7 +118,7 @@ begin
 	begin
 		if (clk'event and clk = '1') then
 			if (ld = '1') then
-				sr <= din;
+				sr <= Din;
 			elsif (shift = '1') then
 				sr <= (sr(6 downto 0) & core_rxd);
 			end if;
@@ -256,7 +241,7 @@ begin
 						icore_cmd := CMD_NOP;
 					end if;
 
-				when others => -- illegal states
+				when others => -- illegal states -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
 					nxt_state := st_idle;
 					icore_cmd := CMD_NOP;
 			end case;
@@ -334,7 +319,7 @@ end architecture structural;
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 
 entity i2c_core is
 	port (
@@ -356,7 +341,7 @@ entity i2c_core is
 end entity i2c_core;
 
 architecture structural of i2c_core is
-	constant CMD_NOP	: std_logic_vector(2 downto 0) := "000";
+	
 	constant CMD_START	: std_logic_vector(2 downto 0) := "010";
 	constant CMD_STOP	: std_logic_vector(2 downto 0) := "011";
 	constant CMD_READ	: std_logic_vector(2 downto 0) := "100";
@@ -392,7 +377,7 @@ begin
 	end process gen_clken;
 
 	-- generate statemachine
-	nxt_state_decoder : process (clk, nReset, state, cmd, SDA, txd, Din)
+	nxt_state_decoder : process (clk, nReset, state, cmd, txd, Din)
 		variable nxt_state : cmds;
 		variable icmd_ack, ibusy, store_sda : std_logic;
 		variable itxd : std_logic;

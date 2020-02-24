@@ -1,0 +1,896 @@
+/data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/deframing_burst.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/deframing_burst.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Loading package axi_stream_package
+-- Compiling entity Burst_Deframer
+-- Compiling architecture Deframing of Burst_Deframer
+-- Loading entity CRC_24
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/descrambler.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/descrambler.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Compiling entity Descrambler
+-- Compiling architecture behavior of Descrambler
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7039_sim_netlist.vhdl {0 {vcom -work work -2002 -explicit -vopt /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7039_sim_netlist.vhdl
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+Start time: 16:56:11 on Feb 17,2020
+vcom -reportprogress 300 -work work -2002 -explicit -vopt /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7039_sim_netlist.vhdl 
+** Error: (vcom-7) Failed to open design unit file "/data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7039_sim_netlist.vhdl" in read mode.
+No such file or directory. (errno = ENOENT)
+End time: 16:56:11 on Feb 17,2020, Elapsed time: 0:00:00
+Errors: 1, Warnings: 0
+
+} {5.0 6.0} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/wupper_to_wishbone_fifo_sim_netlist.vhdl {1 vcom\ -work\ work\ -2002\ -explicit\ -vopt\ -stats=none\ /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/wupper_to_wishbone_fifo_sim_netlist.vhdl\nQuestaSim-64\ vcom\ 2019.1\ Compiler\ 2019.01\ Jan\ \ 1\ 2019\n--\ Loading\ package\ STANDARD\n--\ Loading\ package\ TEXTIO\n--\ Loading\ package\ std_logic_1164\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_xpm_cdc_async_rst\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_xpm_cdc_async_rst\n--\ Compiling\ entity\ \\wupper_to_wishbone_fifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wupper_to_wishbone_fifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_xpm_cdc_gray\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_xpm_cdc_gray\n--\ Compiling\ entity\ \\wupper_to_wishbone_fifo_xpm_cdc_gray__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wupper_to_wishbone_fifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_xpm_cdc_single\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_xpm_cdc_single\n--\ Compiling\ entity\ \\wupper_to_wishbone_fifo_xpm_cdc_single__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wupper_to_wishbone_fifo_xpm_cdc_single__2\\\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_prim_wrapper\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_rd_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_rd_bin_cntr\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_rd_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_rd_status_flags_as\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_wr_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_wr_bin_cntr\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_wr_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_wr_status_flags_as\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_prim_width\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_blk_mem_gen_prim_width\n--\ Loading\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_clk_x_pntrs\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_clk_x_pntrs\n--\ Loading\ entity\ wupper_to_wishbone_fifo_xpm_cdc_gray\n--\ Loading\ entity\ \\wupper_to_wishbone_fifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_rd_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_rd_logic\n--\ Loading\ entity\ wupper_to_wishbone_fifo_rd_status_flags_as\n--\ Loading\ entity\ wupper_to_wishbone_fifo_rd_bin_cntr\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_reset_blk_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_reset_blk_ramfifo\n--\ Loading\ entity\ wupper_to_wishbone_fifo_xpm_cdc_async_rst\n--\ Loading\ entity\ wupper_to_wishbone_fifo_xpm_cdc_single\n--\ Loading\ entity\ \\wupper_to_wishbone_fifo_xpm_cdc_single__2\\\n--\ Loading\ entity\ \\wupper_to_wishbone_fifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_wr_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_wr_logic\n--\ Loading\ entity\ wupper_to_wishbone_fifo_wr_status_flags_as\n--\ Loading\ entity\ wupper_to_wishbone_fifo_wr_bin_cntr\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_generic_cstr\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_blk_mem_gen_generic_cstr\n--\ Loading\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_prim_width\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_blk_mem_gen_top\n--\ Loading\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_generic_cstr\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_blk_mem_gen_v8_4_4_synth\n--\ Loading\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_top\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_v8_4_4\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_blk_mem_gen_v8_4_4\n--\ Loading\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_memory\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_memory\n--\ Loading\ entity\ wupper_to_wishbone_fifo_blk_mem_gen_v8_4_4\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_fifo_generator_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_fifo_generator_ramfifo\n--\ Loading\ entity\ wupper_to_wishbone_fifo_clk_x_pntrs\n--\ Loading\ entity\ wupper_to_wishbone_fifo_rd_logic\n--\ Loading\ entity\ wupper_to_wishbone_fifo_wr_logic\n--\ Loading\ entity\ wupper_to_wishbone_fifo_memory\n--\ Loading\ entity\ wupper_to_wishbone_fifo_reset_blk_ramfifo\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_fifo_generator_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_fifo_generator_top\n--\ Loading\ entity\ wupper_to_wishbone_fifo_fifo_generator_ramfifo\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_fifo_generator_v13_2_5_synth\n--\ Loading\ entity\ wupper_to_wishbone_fifo_fifo_generator_top\n--\ Compiling\ entity\ wupper_to_wishbone_fifo_fifo_generator_v13_2_5\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo_fifo_generator_v13_2_5\n--\ Loading\ entity\ wupper_to_wishbone_fifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ entity\ wupper_to_wishbone_fifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ wupper_to_wishbone_fifo\n--\ Loading\ entity\ wupper_to_wishbone_fifo_fifo_generator_v13_2_5\n\n {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/wishbone_to_wupper_fifo_sim_netlist.vhdl {1 vcom\ -work\ work\ -2002\ -explicit\ -vopt\ -stats=none\ /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/wishbone_to_wupper_fifo_sim_netlist.vhdl\nQuestaSim-64\ vcom\ 2019.1\ Compiler\ 2019.01\ Jan\ \ 1\ 2019\n--\ Loading\ package\ STANDARD\n--\ Loading\ package\ TEXTIO\n--\ Loading\ package\ std_logic_1164\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_xpm_cdc_async_rst\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_xpm_cdc_async_rst\n--\ Compiling\ entity\ \\wishbone_to_wupper_fifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_to_wupper_fifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_xpm_cdc_gray\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_xpm_cdc_gray\n--\ Compiling\ entity\ \\wishbone_to_wupper_fifo_xpm_cdc_gray__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_to_wupper_fifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_xpm_cdc_single\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_xpm_cdc_single\n--\ Compiling\ entity\ \\wishbone_to_wupper_fifo_xpm_cdc_single__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_to_wupper_fifo_xpm_cdc_single__2\\\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_prim_wrapper\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_rd_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_rd_bin_cntr\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_rd_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_rd_status_flags_as\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_wr_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_wr_bin_cntr\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_wr_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_wr_status_flags_as\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_prim_width\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_blk_mem_gen_prim_width\n--\ Loading\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_clk_x_pntrs\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_clk_x_pntrs\n--\ Loading\ entity\ wishbone_to_wupper_fifo_xpm_cdc_gray\n--\ Loading\ entity\ \\wishbone_to_wupper_fifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_rd_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_rd_logic\n--\ Loading\ entity\ wishbone_to_wupper_fifo_rd_status_flags_as\n--\ Loading\ entity\ wishbone_to_wupper_fifo_rd_bin_cntr\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_reset_blk_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_reset_blk_ramfifo\n--\ Loading\ entity\ wishbone_to_wupper_fifo_xpm_cdc_async_rst\n--\ Loading\ entity\ wishbone_to_wupper_fifo_xpm_cdc_single\n--\ Loading\ entity\ \\wishbone_to_wupper_fifo_xpm_cdc_single__2\\\n--\ Loading\ entity\ \\wishbone_to_wupper_fifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_wr_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_wr_logic\n--\ Loading\ entity\ wishbone_to_wupper_fifo_wr_status_flags_as\n--\ Loading\ entity\ wishbone_to_wupper_fifo_wr_bin_cntr\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_generic_cstr\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_blk_mem_gen_generic_cstr\n--\ Loading\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_prim_width\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_blk_mem_gen_top\n--\ Loading\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_generic_cstr\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_blk_mem_gen_v8_4_4_synth\n--\ Loading\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_top\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_v8_4_4\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_blk_mem_gen_v8_4_4\n--\ Loading\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_memory\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_memory\n--\ Loading\ entity\ wishbone_to_wupper_fifo_blk_mem_gen_v8_4_4\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_fifo_generator_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_fifo_generator_ramfifo\n--\ Loading\ entity\ wishbone_to_wupper_fifo_clk_x_pntrs\n--\ Loading\ entity\ wishbone_to_wupper_fifo_rd_logic\n--\ Loading\ entity\ wishbone_to_wupper_fifo_wr_logic\n--\ Loading\ entity\ wishbone_to_wupper_fifo_memory\n--\ Loading\ entity\ wishbone_to_wupper_fifo_reset_blk_ramfifo\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_fifo_generator_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_fifo_generator_top\n--\ Loading\ entity\ wishbone_to_wupper_fifo_fifo_generator_ramfifo\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_fifo_generator_v13_2_5_synth\n--\ Loading\ entity\ wishbone_to_wupper_fifo_fifo_generator_top\n--\ Compiling\ entity\ wishbone_to_wupper_fifo_fifo_generator_v13_2_5\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo_fifo_generator_v13_2_5\n--\ Loading\ entity\ wishbone_to_wupper_fifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ entity\ wishbone_to_wupper_fifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_to_wupper_fifo\n--\ Loading\ entity\ wishbone_to_wupper_fifo_fifo_generator_v13_2_5\n\n {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/clk_wiz_regmap_sim_netlist.vhdl {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/clk_wiz_regmap_sim_netlist.vhdl
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity clk_wiz_regmap_clk_wiz_regmap_clk_wiz
+-- Compiling architecture STRUCTURE of clk_wiz_regmap_clk_wiz_regmap_clk_wiz
+-- Compiling entity clk_wiz_regmap
+-- Compiling architecture STRUCTURE of clk_wiz_regmap
+-- Loading entity clk_wiz_regmap_clk_wiz_regmap_clk_wiz
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/axis_utils/axi_stream_package.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/axis_utils/axi_stream_package.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling package axi_stream_package
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/interlaken_receiver.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/interlaken_receiver.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Loading package axi_stream_package
+-- Compiling entity Interlaken_Receiver
+-- Compiling architecture Receiver of Interlaken_Receiver
+-- Loading entity Burst_Deframer
+-- Loading entity Meta_Deframer
+-- Loading entity Descrambler
+-- Loading entity Decoder
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/simulation/interlaken_interface_tb.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/simulation/interlaken_interface_tb.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package axi_stream_package
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity interlaken_interface_tb
+-- Compiling architecture tb of interlaken_interface_tb
+-- Loading package interlaken_package
+-- Loading entity interlaken_interface
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/shared/i2c_interface.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/shared/i2c_interface.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity i2c_interface
+-- Compiling architecture rtl of i2c_interface
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_ep_wrap.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_ep_wrap.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity pcie_ep_wrap
+-- Compiling architecture structure of pcie_ep_wrap
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/application/application.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/application/application.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Loading package interlaken_package
+-- Loading package axi_stream_package
+-- Compiling entity application
+-- Compiling architecture rtl of application
+-- Loading entity interlaken_interface
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/encoder.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/encoder.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Compiling entity Encoder
+-- Compiling architecture Encoding of Encoder
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wb_intercon.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wb_intercon.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package genram_pkg
+-- Loading package wishbone_pkg
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity wb_intercon
+-- Compiling architecture wb_intercon of wb_intercon
+-- Loading entity wb_syscon
+-- Loading entity wb_memory
+-- Loading entity xwb_crossbar
+-- Loading entity wupper_to_wb
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/Transceiver_10g_64b67b_sim_netlist.vhdl {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/Transceiver_10g_64b67b_sim_netlist.vhdl
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE_0
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE_0
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_66
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_66
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_67
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_67
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_68
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_68
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_common
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_common
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_common_reset
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_common_reset
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_10
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_10
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_11
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_11
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_12
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_12
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_13
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_13
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_14
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_14
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_15
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_15
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_16
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_16
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_17
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_17
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_18
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_18
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_19
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_19
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_20
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_20
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_21
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_21
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_22
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_22
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_23
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_23
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_24
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_24
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_25
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_25
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_26
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_26
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_27
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_27
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_28
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_28
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_29
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_29
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_30
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_30
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_31
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_31
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_32
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_32
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_33
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_33
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_34
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_34
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_35
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_35
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_36
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_36
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_37
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_37
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_38
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_38
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_39
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_39
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_40
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_40
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_41
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_41
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_42
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_42
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_43
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_43
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_44
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_44
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_45
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_45
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_46
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_46
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_47
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_47
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_48
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_48
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_49
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_49
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_50
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_50
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_51
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_51
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_52
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_52
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_53
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_53
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_54
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_54
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_55
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_55
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_56
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_56
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_57
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_57
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_58
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_58
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_59
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_59
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_60
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_60
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_61
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_61
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_62
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_62
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_63
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_63
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_64
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_64
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_65
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_65
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_7
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_7
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_8
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_8
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_9
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_9
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_USRCLK_SOURCE
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_USRCLK_SOURCE
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_CLOCK_MODULE_0
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_57
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_58
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_59
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_60
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_61
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_62
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_63
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_64
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_65
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_1
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_1
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_42
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_43
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_44
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_45
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_46
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_47
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_48
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_49
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_50
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_3
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_3
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_27
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_28
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_29
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_30
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_31
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_32
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_33
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_34
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_35
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_5
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_5
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_12
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_13
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_14
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_15
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_16
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_17
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_18
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_19
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_20
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_51
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_52
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_53
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_54
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_55
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_56
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_2
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_2
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_36
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_37
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_38
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_39
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_40
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_41
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_4
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_4
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_21
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_22
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_23
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_24
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_25
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_26
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_6
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_6
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_7
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_8
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_9
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_10
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_sync_block_11
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_multi_gt
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_multi_gt
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_66
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_67
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_68
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_init
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_init
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_multi_gt
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_1
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_2
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_3
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_4
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_RX_STARTUP_FSM_5
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_TX_STARTUP_FSM_6
+-- Compiling entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_support
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b_Transceiver_10g_64b67b_support
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_init
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_common
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_common_reset
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_GT_USRCLK_SOURCE
+-- Compiling entity Transceiver_10g_64b67b
+-- Compiling architecture STRUCTURE of Transceiver_10g_64b67b
+-- Loading entity Transceiver_10g_64b67b_Transceiver_10g_64b67b_support
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/fifo128KB_256bit_sim_netlist.vhdl {1 vcom\ -work\ work\ -2002\ -explicit\ -vopt\ -stats=none\ /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/fifo128KB_256bit_sim_netlist.vhdl\nQuestaSim-64\ vcom\ 2019.1\ Compiler\ 2019.01\ Jan\ \ 1\ 2019\n--\ Loading\ package\ STANDARD\n--\ Loading\ package\ TEXTIO\n--\ Loading\ package\ std_logic_1164\n--\ Compiling\ entity\ fifo128KB_256bit_xpm_cdc_gray\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_xpm_cdc_gray\n--\ Compiling\ entity\ \\fifo128KB_256bit_xpm_cdc_gray__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_xpm_cdc_gray__parameterized1\\\n--\ Compiling\ entity\ fifo128KB_256bit_xpm_cdc_single\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_xpm_cdc_single\n--\ Compiling\ entity\ \\fifo128KB_256bit_xpm_cdc_single__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_xpm_cdc_single__2\\\n--\ Compiling\ entity\ fifo128KB_256bit_xpm_cdc_sync_rst\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_xpm_cdc_sync_rst\n--\ Compiling\ entity\ \\fifo128KB_256bit_xpm_cdc_sync_rst__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_xpm_cdc_sync_rst__2\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_mux__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_mux__parameterized0\\\n--\ Compiling\ entity\ fifo128KB_256bit_blk_mem_gen_prim_wrapper\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized10\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized10\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized11\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized11\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized12\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized12\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized13\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized13\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized14\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized14\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized15\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized15\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized16\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized16\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized17\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized17\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized18\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized18\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized19\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized19\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized20\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized20\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized21\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized21\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized22\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized22\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized23\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized23\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized24\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized24\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized25\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized25\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized26\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized26\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized27\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized27\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized3\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized3\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized4\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized4\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized5\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized5\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized6\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized6\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized7\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized7\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized8\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized8\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized9\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized9\\\n--\ Compiling\ entity\ fifo128KB_256bit_compare\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_compare\n--\ Compiling\ entity\ fifo128KB_256bit_compare_1\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_compare_1\n--\ Compiling\ entity\ \\fifo128KB_256bit_compare__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_compare__parameterized0\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_compare__parameterized0_0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_compare__parameterized0_0\\\n--\ Compiling\ entity\ fifo128KB_256bit_rd_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_rd_bin_cntr\n--\ Compiling\ entity\ fifo128KB_256bit_rd_pe_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_rd_pe_as\n--\ Compiling\ entity\ fifo128KB_256bit_wr_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_wr_bin_cntr\n--\ Compiling\ entity\ fifo128KB_256bit_wr_pf_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_wr_pf_as\n--\ Compiling\ entity\ fifo128KB_256bit_blk_mem_gen_prim_width\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_blk_mem_gen_prim_width\n--\ Loading\ entity\ fifo128KB_256bit_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized0\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized1\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized10\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized10\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized10\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized11\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized11\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized11\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized12\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized12\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized12\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized13\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized13\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized13\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized14\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized14\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized14\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized15\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized15\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized15\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized16\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized16\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized16\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized17\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized17\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized17\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized18\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized18\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized18\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized19\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized19\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized19\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized2\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized20\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized20\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized20\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized21\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized21\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized21\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized22\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized22\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized22\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized23\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized23\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized23\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized24\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized24\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized24\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized25\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized25\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized25\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized26\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized26\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized26\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized27\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized27\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized27\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized3\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized3\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized3\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized4\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized4\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized4\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized5\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized5\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized5\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized6\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized6\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized6\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized7\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized7\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized7\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized8\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized8\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized8\\\n--\ Compiling\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized9\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized9\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_wrapper__parameterized9\\\n--\ Compiling\ entity\ fifo128KB_256bit_clk_x_pntrs\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_clk_x_pntrs\n--\ Loading\ entity\ \\fifo128KB_256bit_xpm_cdc_gray__parameterized1\\\n--\ Loading\ entity\ fifo128KB_256bit_xpm_cdc_gray\n--\ Compiling\ entity\ fifo128KB_256bit_rd_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_rd_status_flags_as\n--\ Loading\ entity\ fifo128KB_256bit_compare\n--\ Loading\ entity\ fifo128KB_256bit_compare_1\n--\ Compiling\ entity\ fifo128KB_256bit_reset_blk_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_reset_blk_ramfifo\n--\ Loading\ entity\ fifo128KB_256bit_xpm_cdc_single\n--\ Loading\ entity\ \\fifo128KB_256bit_xpm_cdc_single__2\\\n--\ Loading\ entity\ fifo128KB_256bit_xpm_cdc_sync_rst\n--\ Loading\ entity\ \\fifo128KB_256bit_xpm_cdc_sync_rst__2\\\n--\ Compiling\ entity\ fifo128KB_256bit_wr_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_wr_status_flags_as\n--\ Loading\ entity\ \\fifo128KB_256bit_compare__parameterized0\\\n--\ Loading\ entity\ \\fifo128KB_256bit_compare__parameterized0_0\\\n--\ Compiling\ entity\ fifo128KB_256bit_blk_mem_gen_generic_cstr\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_blk_mem_gen_generic_cstr\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_mux__parameterized0\\\n--\ Loading\ entity\ fifo128KB_256bit_blk_mem_gen_prim_width\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized9\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized10\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized11\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized12\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized13\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized14\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized15\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized16\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized17\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized18\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized0\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized19\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized20\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized21\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized22\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized23\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized24\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized25\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized26\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized27\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized1\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized2\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized3\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized4\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized5\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized6\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized7\\\n--\ Loading\ entity\ \\fifo128KB_256bit_blk_mem_gen_prim_width__parameterized8\\\n--\ Compiling\ entity\ fifo128KB_256bit_rd_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_rd_logic\n--\ Loading\ entity\ fifo128KB_256bit_rd_pe_as\n--\ Loading\ entity\ fifo128KB_256bit_rd_status_flags_as\n--\ Loading\ entity\ fifo128KB_256bit_rd_bin_cntr\n--\ Compiling\ entity\ fifo128KB_256bit_wr_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_wr_logic\n--\ Loading\ entity\ fifo128KB_256bit_wr_pf_as\n--\ Loading\ entity\ fifo128KB_256bit_wr_status_flags_as\n--\ Loading\ entity\ fifo128KB_256bit_wr_bin_cntr\n--\ Compiling\ entity\ fifo128KB_256bit_blk_mem_gen_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_blk_mem_gen_top\n--\ Loading\ entity\ fifo128KB_256bit_blk_mem_gen_generic_cstr\n--\ Compiling\ entity\ fifo128KB_256bit_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_blk_mem_gen_v8_4_4_synth\n--\ Loading\ entity\ fifo128KB_256bit_blk_mem_gen_top\n--\ Compiling\ entity\ fifo128KB_256bit_blk_mem_gen_v8_4_4\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_blk_mem_gen_v8_4_4\n--\ Loading\ entity\ fifo128KB_256bit_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ entity\ fifo128KB_256bit_memory\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_memory\n--\ Loading\ entity\ fifo128KB_256bit_blk_mem_gen_v8_4_4\n--\ Compiling\ entity\ fifo128KB_256bit_fifo_generator_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_fifo_generator_ramfifo\n--\ Loading\ entity\ fifo128KB_256bit_clk_x_pntrs\n--\ Loading\ entity\ fifo128KB_256bit_rd_logic\n--\ Loading\ entity\ fifo128KB_256bit_wr_logic\n--\ Loading\ entity\ fifo128KB_256bit_memory\n--\ Loading\ entity\ fifo128KB_256bit_reset_blk_ramfifo\n--\ Compiling\ entity\ fifo128KB_256bit_fifo_generator_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_fifo_generator_top\n--\ Loading\ entity\ fifo128KB_256bit_fifo_generator_ramfifo\n--\ Compiling\ entity\ fifo128KB_256bit_fifo_generator_v13_2_5_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_fifo_generator_v13_2_5_synth\n--\ Loading\ entity\ fifo128KB_256bit_fifo_generator_top\n--\ Compiling\ entity\ fifo128KB_256bit_fifo_generator_v13_2_5\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit_fifo_generator_v13_2_5\n--\ Loading\ entity\ fifo128KB_256bit_fifo_generator_v13_2_5_synth\n--\ Compiling\ entity\ fifo128KB_256bit\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo128KB_256bit\n--\ Loading\ entity\ fifo128KB_256bit_fifo_generator_v13_2_5\n\n {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/interface/interlaken_interface.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/interface/interlaken_interface.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Loading package axi_stream_package
+-- Compiling entity interlaken_interface
+-- Compiling architecture interface of interlaken_interface
+-- Loading entity Transceiver_10g_64b67b_BLOCK_SYNC_SM
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package VCOMPONENTS
+-- Loading entity Interlaken_Transmitter_multiChannel
+-- Loading entity Interlaken_Receiver_multiChannel
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_clocking.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_clocking.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity pcie_clocking
+-- Compiling architecture rtl of pcie_clocking
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/deframing_meta.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/deframing_meta.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Compiling entity Meta_Deframer
+-- Compiling architecture Deframing of Meta_Deframer
+-- Loading entity CRC_32
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/axis_utils/axis64Fifo.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/axis_utils/axis64Fifo.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package VCOMPONENTS
+-- Loading package axi_stream_package
+-- Compiling entity Axis64Fifo
+-- Compiling architecture rtl of Axis64Fifo
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/I2C_WRFifo_sim_netlist.vhdl {1 vcom\ -work\ work\ -2002\ -explicit\ -vopt\ -stats=none\ /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/I2C_WRFifo_sim_netlist.vhdl\nQuestaSim-64\ vcom\ 2019.1\ Compiler\ 2019.01\ Jan\ \ 1\ 2019\n--\ Loading\ package\ STANDARD\n--\ Loading\ package\ TEXTIO\n--\ Loading\ package\ std_logic_1164\n--\ Compiling\ entity\ I2C_WRFifo_xpm_cdc_async_rst\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_xpm_cdc_async_rst\n--\ Compiling\ entity\ \\I2C_WRFifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\I2C_WRFifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ I2C_WRFifo_xpm_cdc_gray\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_xpm_cdc_gray\n--\ Compiling\ entity\ \\I2C_WRFifo_xpm_cdc_gray__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\I2C_WRFifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ I2C_WRFifo_xpm_cdc_single\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_xpm_cdc_single\n--\ Compiling\ entity\ \\I2C_WRFifo_xpm_cdc_single__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\I2C_WRFifo_xpm_cdc_single__2\\\n--\ Compiling\ entity\ I2C_WRFifo_dmem\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_dmem\n--\ Compiling\ entity\ I2C_WRFifo_rd_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_rd_bin_cntr\n--\ Compiling\ entity\ I2C_WRFifo_rd_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_rd_status_flags_as\n--\ Compiling\ entity\ I2C_WRFifo_wr_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_wr_bin_cntr\n--\ Compiling\ entity\ I2C_WRFifo_wr_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_wr_status_flags_as\n--\ Compiling\ entity\ I2C_WRFifo_clk_x_pntrs\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_clk_x_pntrs\n--\ Loading\ entity\ I2C_WRFifo_xpm_cdc_gray\n--\ Loading\ entity\ \\I2C_WRFifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ I2C_WRFifo_memory\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_memory\n--\ Loading\ entity\ I2C_WRFifo_dmem\n--\ Compiling\ entity\ I2C_WRFifo_rd_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_rd_logic\n--\ Loading\ entity\ I2C_WRFifo_rd_status_flags_as\n--\ Loading\ entity\ I2C_WRFifo_rd_bin_cntr\n--\ Compiling\ entity\ I2C_WRFifo_reset_blk_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_reset_blk_ramfifo\n--\ Loading\ entity\ I2C_WRFifo_xpm_cdc_async_rst\n--\ Loading\ entity\ I2C_WRFifo_xpm_cdc_single\n--\ Loading\ entity\ \\I2C_WRFifo_xpm_cdc_single__2\\\n--\ Loading\ entity\ \\I2C_WRFifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ I2C_WRFifo_wr_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_wr_logic\n--\ Loading\ entity\ I2C_WRFifo_wr_status_flags_as\n--\ Loading\ entity\ I2C_WRFifo_wr_bin_cntr\n--\ Compiling\ entity\ I2C_WRFifo_fifo_generator_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_fifo_generator_ramfifo\n--\ Loading\ entity\ I2C_WRFifo_clk_x_pntrs\n--\ Loading\ entity\ I2C_WRFifo_rd_logic\n--\ Loading\ entity\ I2C_WRFifo_wr_logic\n--\ Loading\ entity\ I2C_WRFifo_memory\n--\ Loading\ entity\ I2C_WRFifo_reset_blk_ramfifo\n--\ Compiling\ entity\ I2C_WRFifo_fifo_generator_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_fifo_generator_top\n--\ Loading\ entity\ I2C_WRFifo_fifo_generator_ramfifo\n--\ Compiling\ entity\ I2C_WRFifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_fifo_generator_v13_2_5_synth\n--\ Loading\ entity\ I2C_WRFifo_fifo_generator_top\n--\ Compiling\ entity\ I2C_WRFifo_fifo_generator_v13_2_5\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo_fifo_generator_v13_2_5\n--\ Loading\ entity\ I2C_WRFifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ entity\ I2C_WRFifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_WRFifo\n--\ Loading\ entity\ I2C_WRFifo_fifo_generator_v13_2_5\n\n {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_init.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_init.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity pcie_init
+-- Compiling architecture rtl of pcie_init
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/crc/crc-32.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/crc/crc-32.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity CRC_32
+-- Compiling architecture rtl of CRC_32
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/shared/dna.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/shared/dna.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity dna
+-- Compiling architecture rtl of dna
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/packages/interlaken_package.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/packages/interlaken_package.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling package interlaken_package
+-- Compiling package body interlaken_package
+-- Loading package interlaken_package
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/framing_meta.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/framing_meta.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Compiling entity Meta_Framer
+-- Compiling architecture framing of Meta_Framer
+-- Loading entity CRC_32
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/data_width_package_512.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/data_width_package_512.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling package data_width_package
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/interlaken_transmitter_multiChannel.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/interlaken_transmitter_multiChannel.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package interlaken_package
+-- Loading package VCOMPONENTS
+-- Loading package axi_stream_package
+-- Compiling entity Interlaken_Transmitter_multiChannel
+-- Compiling architecture Transmitter of Interlaken_Transmitter_multiChannel
+-- Loading entity Interlaken_Transmitter
+-- Loading entity Axis64Fifo
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/clk_40MHz_sim_netlist.vhdl {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/clk_40MHz_sim_netlist.vhdl
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity clk_40MHz_clk_40MHz_clk_wiz
+-- Compiling architecture STRUCTURE of clk_40MHz_clk_40MHz_clk_wiz
+-- Compiling entity clk_40MHz
+-- Compiling architecture STRUCTURE of clk_40MHz
+-- Loading entity clk_40MHz_clk_40MHz_clk_wiz
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/register_map_sync.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/register_map_sync.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity register_map_sync
+-- Compiling architecture rtl of register_map_sync
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_slow_clock.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/pcie_slow_clock.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling entity pcie_slow_clock
+-- Compiling architecture rtl of pcie_slow_clock
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/I2C_RDFifo_sim_netlist.vhdl {1 vcom\ -work\ work\ -2002\ -explicit\ -vopt\ -stats=none\ /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/I2C_RDFifo_sim_netlist.vhdl\nQuestaSim-64\ vcom\ 2019.1\ Compiler\ 2019.01\ Jan\ \ 1\ 2019\n--\ Loading\ package\ STANDARD\n--\ Loading\ package\ TEXTIO\n--\ Loading\ package\ std_logic_1164\n--\ Compiling\ entity\ I2C_RDFifo_xpm_cdc_async_rst\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_xpm_cdc_async_rst\n--\ Compiling\ entity\ \\I2C_RDFifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\I2C_RDFifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ I2C_RDFifo_xpm_cdc_gray\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_xpm_cdc_gray\n--\ Compiling\ entity\ \\I2C_RDFifo_xpm_cdc_gray__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\I2C_RDFifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ I2C_RDFifo_xpm_cdc_single\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_xpm_cdc_single\n--\ Compiling\ entity\ \\I2C_RDFifo_xpm_cdc_single__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\I2C_RDFifo_xpm_cdc_single__2\\\n--\ Compiling\ entity\ I2C_RDFifo_dmem\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_dmem\n--\ Compiling\ entity\ I2C_RDFifo_rd_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_rd_bin_cntr\n--\ Compiling\ entity\ I2C_RDFifo_rd_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_rd_status_flags_as\n--\ Compiling\ entity\ I2C_RDFifo_wr_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_wr_bin_cntr\n--\ Compiling\ entity\ I2C_RDFifo_wr_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_wr_status_flags_as\n--\ Compiling\ entity\ I2C_RDFifo_clk_x_pntrs\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_clk_x_pntrs\n--\ Loading\ entity\ I2C_RDFifo_xpm_cdc_gray\n--\ Loading\ entity\ \\I2C_RDFifo_xpm_cdc_gray__2\\\n--\ Compiling\ entity\ I2C_RDFifo_memory\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_memory\n--\ Loading\ entity\ I2C_RDFifo_dmem\n--\ Compiling\ entity\ I2C_RDFifo_rd_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_rd_logic\n--\ Loading\ entity\ I2C_RDFifo_rd_status_flags_as\n--\ Loading\ entity\ I2C_RDFifo_rd_bin_cntr\n--\ Compiling\ entity\ I2C_RDFifo_reset_blk_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_reset_blk_ramfifo\n--\ Loading\ entity\ I2C_RDFifo_xpm_cdc_async_rst\n--\ Loading\ entity\ I2C_RDFifo_xpm_cdc_single\n--\ Loading\ entity\ \\I2C_RDFifo_xpm_cdc_single__2\\\n--\ Loading\ entity\ \\I2C_RDFifo_xpm_cdc_async_rst__1\\\n--\ Compiling\ entity\ I2C_RDFifo_wr_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_wr_logic\n--\ Loading\ entity\ I2C_RDFifo_wr_status_flags_as\n--\ Loading\ entity\ I2C_RDFifo_wr_bin_cntr\n--\ Compiling\ entity\ I2C_RDFifo_fifo_generator_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_fifo_generator_ramfifo\n--\ Loading\ entity\ I2C_RDFifo_clk_x_pntrs\n--\ Loading\ entity\ I2C_RDFifo_rd_logic\n--\ Loading\ entity\ I2C_RDFifo_wr_logic\n--\ Loading\ entity\ I2C_RDFifo_memory\n--\ Loading\ entity\ I2C_RDFifo_reset_blk_ramfifo\n--\ Compiling\ entity\ I2C_RDFifo_fifo_generator_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_fifo_generator_top\n--\ Loading\ entity\ I2C_RDFifo_fifo_generator_ramfifo\n--\ Compiling\ entity\ I2C_RDFifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_fifo_generator_v13_2_5_synth\n--\ Loading\ entity\ I2C_RDFifo_fifo_generator_top\n--\ Compiling\ entity\ I2C_RDFifo_fifo_generator_v13_2_5\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo_fifo_generator_v13_2_5\n--\ Loading\ entity\ I2C_RDFifo_fifo_generator_v13_2_5_synth\n--\ Compiling\ entity\ I2C_RDFifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ I2C_RDFifo\n--\ Loading\ entity\ I2C_RDFifo_fifo_generator_v13_2_5\n\n {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/genram_pkg.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/genram_pkg.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling package genram_pkg
+-- Compiling package body genram_pkg
+-- Loading package genram_pkg
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/WupperFifos.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/WupperFifos.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity WupperFifos
+-- Compiling architecture rtl of WupperFifos
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/scrambler.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/scrambler.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Compiling entity Scrambler
+-- Compiling architecture Scrambling of Scrambler
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/wupper.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/wupper.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity wupper
+-- Compiling architecture structure of wupper
+-- Loading entity pcie_ep_wrap
+-- Loading entity wupper_core
+-- Loading entity intr_ctrl
+-- Loading entity pcie_init
+-- Loading entity pcie_slow_clock
+-- Loading entity WupperFifos
+-- Loading entity register_map_sync
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transceiver/transceiver_10g_64b67b_block_sync_sm.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transceiver/transceiver_10g_64b67b_block_sync_sm.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity Transceiver_10g_64b67b_BLOCK_SYNC_SM
+-- Compiling architecture RTL of Transceiver_10g_64b67b_BLOCK_SYNC_SM
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wb_syscon.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wb_syscon.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity wb_syscon
+-- Compiling architecture wb_syscon of wb_syscon
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/shared/wupper_interlaken_top.vhd {0 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/shared/wupper_interlaken_top.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Loading package interlaken_package
+-- Compiling entity wupper_interlaken_top
+-- Compiling architecture structure of wupper_interlaken_top
+-- Loading entity wupper
+-- Loading package axi_stream_package
+-- Loading entity application
+-- Loading package I2C
+-- Loading entity housekeeping
+-- Loading package genram_pkg
+-- Loading package wishbone_pkg
+-- Loading entity wb_intercon
+** Error (suppressible): /data/et/myronm/wupper-interlaken/firmware/sources/shared/wupper_interlaken_top.vhd(249): (vcom-1272) Length of member of formal "toHostFifo_din" is 512; length of actual is 64.
+** Note: /data/et/myronm/wupper-interlaken/firmware/sources/shared/wupper_interlaken_top.vhd(441): VHDL Compiler exiting
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/interlaken_transmitter.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/transmitter/interlaken_transmitter.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Loading package axi_stream_package
+-- Compiling entity Interlaken_Transmitter
+-- Compiling architecture Transmitter of Interlaken_Transmitter
+-- Loading entity Burst_Framer
+-- Loading entity Meta_Framer
+-- Loading entity Scrambler
+-- Loading entity Encoder
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/intr_ctrl.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/intr_ctrl.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity intr_ctrl
+-- Compiling architecture rtl of intr_ctrl
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wupper_to_wb.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wupper_to_wb.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package genram_pkg
+-- Loading package wishbone_pkg
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity wupper_to_wb
+-- Compiling architecture Behavioral of wupper_to_wb
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/wupper_core.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/wupper_core.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity wupper_core
+-- Compiling architecture structure of wupper_core
+-- Loading entity dma_read_write
+-- Loading entity dma_control
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/fifo16KB_256bit_sim_netlist.vhdl {1 vcom\ -work\ work\ -2002\ -explicit\ -vopt\ -stats=none\ /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/fifo16KB_256bit_sim_netlist.vhdl\nQuestaSim-64\ vcom\ 2019.1\ Compiler\ 2019.01\ Jan\ \ 1\ 2019\n--\ Loading\ package\ STANDARD\n--\ Loading\ package\ TEXTIO\n--\ Loading\ package\ std_logic_1164\n--\ Compiling\ entity\ fifo16KB_256bit_xpm_cdc_gray\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_xpm_cdc_gray\n--\ Compiling\ entity\ \\fifo16KB_256bit_xpm_cdc_gray__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_xpm_cdc_gray__parameterized1\\\n--\ Compiling\ entity\ fifo16KB_256bit_xpm_cdc_single\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_xpm_cdc_single\n--\ Compiling\ entity\ \\fifo16KB_256bit_xpm_cdc_single__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_xpm_cdc_single__2\\\n--\ Compiling\ entity\ fifo16KB_256bit_xpm_cdc_sync_rst\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_xpm_cdc_sync_rst\n--\ Compiling\ entity\ \\fifo16KB_256bit_xpm_cdc_sync_rst__2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_xpm_cdc_sync_rst__2\\\n--\ Compiling\ entity\ fifo16KB_256bit_blk_mem_gen_prim_wrapper\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ entity\ fifo16KB_256bit_compare\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_compare\n--\ Compiling\ entity\ fifo16KB_256bit_compare_1\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_compare_1\n--\ Compiling\ entity\ \\fifo16KB_256bit_compare__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_compare__parameterized0\\\n--\ Compiling\ entity\ \\fifo16KB_256bit_compare__parameterized0_0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_compare__parameterized0_0\\\n--\ Compiling\ entity\ fifo16KB_256bit_rd_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_rd_bin_cntr\n--\ Compiling\ entity\ fifo16KB_256bit_wr_bin_cntr\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_wr_bin_cntr\n--\ Compiling\ entity\ fifo16KB_256bit_wr_pf_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_wr_pf_as\n--\ Compiling\ entity\ fifo16KB_256bit_blk_mem_gen_prim_width\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_blk_mem_gen_prim_width\n--\ Loading\ entity\ fifo16KB_256bit_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized0\\\n--\ Loading\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized1\\\n--\ Loading\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized2\\\n--\ Loading\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ entity\ fifo16KB_256bit_clk_x_pntrs\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_clk_x_pntrs\n--\ Loading\ entity\ \\fifo16KB_256bit_xpm_cdc_gray__parameterized1\\\n--\ Loading\ entity\ fifo16KB_256bit_xpm_cdc_gray\n--\ Compiling\ entity\ fifo16KB_256bit_rd_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_rd_status_flags_as\n--\ Loading\ entity\ fifo16KB_256bit_compare\n--\ Loading\ entity\ fifo16KB_256bit_compare_1\n--\ Compiling\ entity\ fifo16KB_256bit_reset_blk_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_reset_blk_ramfifo\n--\ Loading\ entity\ fifo16KB_256bit_xpm_cdc_single\n--\ Loading\ entity\ \\fifo16KB_256bit_xpm_cdc_single__2\\\n--\ Loading\ entity\ fifo16KB_256bit_xpm_cdc_sync_rst\n--\ Loading\ entity\ \\fifo16KB_256bit_xpm_cdc_sync_rst__2\\\n--\ Compiling\ entity\ fifo16KB_256bit_wr_status_flags_as\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_wr_status_flags_as\n--\ Loading\ entity\ \\fifo16KB_256bit_compare__parameterized0\\\n--\ Loading\ entity\ \\fifo16KB_256bit_compare__parameterized0_0\\\n--\ Compiling\ entity\ fifo16KB_256bit_blk_mem_gen_generic_cstr\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_blk_mem_gen_generic_cstr\n--\ Loading\ entity\ fifo16KB_256bit_blk_mem_gen_prim_width\n--\ Loading\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized0\\\n--\ Loading\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized1\\\n--\ Loading\ entity\ \\fifo16KB_256bit_blk_mem_gen_prim_width__parameterized2\\\n--\ Compiling\ entity\ fifo16KB_256bit_rd_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_rd_logic\n--\ Loading\ entity\ fifo16KB_256bit_rd_status_flags_as\n--\ Loading\ entity\ fifo16KB_256bit_rd_bin_cntr\n--\ Compiling\ entity\ fifo16KB_256bit_wr_logic\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_wr_logic\n--\ Loading\ entity\ fifo16KB_256bit_wr_pf_as\n--\ Loading\ entity\ fifo16KB_256bit_wr_status_flags_as\n--\ Loading\ entity\ fifo16KB_256bit_wr_bin_cntr\n--\ Compiling\ entity\ fifo16KB_256bit_blk_mem_gen_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_blk_mem_gen_top\n--\ Loading\ entity\ fifo16KB_256bit_blk_mem_gen_generic_cstr\n--\ Compiling\ entity\ fifo16KB_256bit_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_blk_mem_gen_v8_4_4_synth\n--\ Loading\ entity\ fifo16KB_256bit_blk_mem_gen_top\n--\ Compiling\ entity\ fifo16KB_256bit_blk_mem_gen_v8_4_4\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_blk_mem_gen_v8_4_4\n--\ Loading\ entity\ fifo16KB_256bit_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ entity\ fifo16KB_256bit_memory\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_memory\n--\ Loading\ entity\ fifo16KB_256bit_blk_mem_gen_v8_4_4\n--\ Compiling\ entity\ fifo16KB_256bit_fifo_generator_ramfifo\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_fifo_generator_ramfifo\n--\ Loading\ entity\ fifo16KB_256bit_clk_x_pntrs\n--\ Loading\ entity\ fifo16KB_256bit_rd_logic\n--\ Loading\ entity\ fifo16KB_256bit_wr_logic\n--\ Loading\ entity\ fifo16KB_256bit_memory\n--\ Loading\ entity\ fifo16KB_256bit_reset_blk_ramfifo\n--\ Compiling\ entity\ fifo16KB_256bit_fifo_generator_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_fifo_generator_top\n--\ Loading\ entity\ fifo16KB_256bit_fifo_generator_ramfifo\n--\ Compiling\ entity\ fifo16KB_256bit_fifo_generator_v13_2_5_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_fifo_generator_v13_2_5_synth\n--\ Loading\ entity\ fifo16KB_256bit_fifo_generator_top\n--\ Compiling\ entity\ fifo16KB_256bit_fifo_generator_v13_2_5\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit_fifo_generator_v13_2_5\n--\ Loading\ entity\ fifo16KB_256bit_fifo_generator_v13_2_5_synth\n--\ Compiling\ entity\ fifo16KB_256bit\n--\ Compiling\ architecture\ STRUCTURE\ of\ fifo16KB_256bit\n--\ Loading\ entity\ fifo16KB_256bit_fifo_generator_v13_2_5\n\n {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/crc/crc-24.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/crc/crc-24.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity CRC_24
+-- Compiling architecture rtl of CRC_24
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/data_width_package_256.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/data_width_package_256.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Compiling package data_width_package
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/wishbone_memory_sim_netlist.vhdl {1 vcom\ -work\ work\ -2002\ -explicit\ -vopt\ -stats=none\ /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/wishbone_memory_sim_netlist.vhdl\nQuestaSim-64\ vcom\ 2019.1\ Compiler\ 2019.01\ Jan\ \ 1\ 2019\n--\ Loading\ package\ STANDARD\n--\ Loading\ package\ TEXTIO\n--\ Loading\ package\ std_logic_1164\n--\ Compiling\ entity\ wishbone_memory_bindec\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_bindec\n--\ Compiling\ entity\ wishbone_memory_blk_mem_gen_mux\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_blk_mem_gen_mux\n--\ Compiling\ entity\ wishbone_memory_blk_mem_gen_prim_wrapper\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized10\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized10\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized11\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized11\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized12\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized12\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized13\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized13\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized14\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized14\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized15\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized15\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized16\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized16\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized17\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized17\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized18\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized18\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized19\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized19\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized20\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized20\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized21\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized21\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized22\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized22\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized23\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized23\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized24\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized24\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized25\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized25\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized26\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized26\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized27\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized27\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized28\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized28\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized29\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized29\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized3\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized3\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized30\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized30\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized31\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized31\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized32\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized32\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized33\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized33\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized34\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized34\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized35\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized35\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized36\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized36\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized37\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized37\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized38\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized38\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized39\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized39\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized4\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized4\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized40\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized40\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized41\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized41\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized42\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized42\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized43\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized43\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized44\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized44\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized45\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized45\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized46\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized46\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized47\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized47\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized48\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized48\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized49\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized49\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized5\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized5\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized50\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized50\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized51\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized51\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized6\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized6\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized7\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized7\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized8\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized8\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized9\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized9\\\n--\ Compiling\ entity\ wishbone_memory_blk_mem_gen_prim_width\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_blk_mem_gen_prim_width\n--\ Loading\ entity\ wishbone_memory_blk_mem_gen_prim_wrapper\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized0\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized0\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized0\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized1\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized1\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized1\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized10\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized10\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized10\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized11\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized11\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized11\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized12\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized12\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized12\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized13\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized13\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized13\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized14\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized14\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized14\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized15\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized15\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized15\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized16\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized16\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized16\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized17\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized17\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized17\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized18\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized18\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized18\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized19\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized19\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized19\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized2\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized2\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized2\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized20\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized20\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized20\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized21\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized21\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized21\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized22\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized22\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized22\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized23\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized23\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized23\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized24\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized24\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized24\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized25\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized25\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized25\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized26\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized26\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized26\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized27\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized27\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized27\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized28\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized28\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized28\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized29\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized29\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized29\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized3\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized3\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized3\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized30\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized30\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized30\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized31\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized31\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized31\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized32\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized32\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized32\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized33\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized33\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized33\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized34\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized34\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized34\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized35\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized35\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized35\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized36\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized36\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized36\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized37\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized37\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized37\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized38\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized38\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized38\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized39\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized39\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized39\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized4\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized4\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized4\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized40\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized40\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized40\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized41\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized41\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized41\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized42\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized42\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized42\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized43\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized43\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized43\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized44\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized44\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized44\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized45\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized45\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized45\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized46\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized46\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized46\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized47\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized47\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized47\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized48\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized48\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized48\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized49\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized49\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized49\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized5\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized5\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized5\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized50\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized50\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized50\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized51\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized51\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized51\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized6\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized6\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized6\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized7\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized7\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized7\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized8\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized8\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized8\\\n--\ Compiling\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized9\\\n--\ Compiling\ architecture\ STRUCTURE\ of\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized9\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_wrapper__parameterized9\\\n--\ Compiling\ entity\ wishbone_memory_blk_mem_gen_generic_cstr\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_blk_mem_gen_generic_cstr\n--\ Loading\ entity\ wishbone_memory_bindec\n--\ Loading\ entity\ wishbone_memory_blk_mem_gen_mux\n--\ Loading\ entity\ wishbone_memory_blk_mem_gen_prim_width\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized9\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized10\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized11\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized12\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized13\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized14\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized15\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized16\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized17\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized18\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized0\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized19\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized20\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized21\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized22\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized23\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized24\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized25\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized26\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized27\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized28\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized1\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized29\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized30\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized31\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized32\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized33\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized34\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized35\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized36\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized37\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized38\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized2\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized39\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized40\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized41\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized42\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized43\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized44\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized45\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized46\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized47\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized48\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized3\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized49\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized50\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized51\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized4\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized5\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized6\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized7\\\n--\ Loading\ entity\ \\wishbone_memory_blk_mem_gen_prim_width__parameterized8\\\n--\ Compiling\ entity\ wishbone_memory_blk_mem_gen_top\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_blk_mem_gen_top\n--\ Loading\ entity\ wishbone_memory_blk_mem_gen_generic_cstr\n--\ Compiling\ entity\ wishbone_memory_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_blk_mem_gen_v8_4_4_synth\n--\ Loading\ entity\ wishbone_memory_blk_mem_gen_top\n--\ Compiling\ entity\ wishbone_memory_blk_mem_gen_v8_4_4\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory_blk_mem_gen_v8_4_4\n--\ Loading\ entity\ wishbone_memory_blk_mem_gen_v8_4_4_synth\n--\ Compiling\ entity\ wishbone_memory\n--\ Compiling\ architecture\ STRUCTURE\ of\ wishbone_memory\n--\ Loading\ entity\ wishbone_memory_blk_mem_gen_v8_4_4\n\n {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/packages/pcie_package.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/packages/pcie_package.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Compiling package pcie_package
+-- Compiling package body pcie_package
+-- Loading package pcie_package
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/kintexUltrascale/pcie_x8_gen3_3_0_stub.vhdl {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/kintexUltrascale/pcie_x8_gen3_3_0_stub.vhdl
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity pcie_x8_gen3_3_0
+-- Compiling architecture stub of pcie_x8_gen3_3_0
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/shared/xadc_drp.vhd {0 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/shared/xadc_drp.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling entity xadc_drp
+-- Compiling architecture rtl of xadc_drp
+** Error: /data/et/myronm/wupper-interlaken/firmware/sources/shared/xadc_drp.vhd(114): (vcom-1436) Actual expression (infix expression) of formal "daddr_in" is not globally static.
+** Note: /data/et/myronm/wupper-interlaken/firmware/sources/shared/xadc_drp.vhd(191): VHDL Compiler exiting
+
+} {9.0 10.0} {}} /data/et/myronm/wupper-interlaken/firmware/sources/shared/i2c.vhd {2 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/shared/i2c.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Compiling package I2C
+-- Compiling entity simple_i2c
+-- Compiling architecture structural of simple_i2c
+-- Compiling entity i2c_core
+-- Compiling architecture structural of i2c_core
+** Warning: /data/et/myronm/wupper-interlaken/firmware/sources/shared/i2c.vhd(355): (vcom-1013) Initial value of "cnt" depends on value of signal "clk_cnt".
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/shared/housekeeping.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/shared/housekeeping.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Loading package I2C
+-- Compiling entity housekeeping
+-- Compiling architecture structure of housekeeping
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/xwb_crossbar.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/xwb_crossbar.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package genram_pkg
+-- Loading package wishbone_pkg
+-- Compiling entity xwb_crossbar
+-- Compiling architecture rtl of xwb_crossbar
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wishbone_pkg.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wishbone_pkg.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package genram_pkg
+-- Compiling package wishbone_pkg
+-- Compiling package body wishbone_pkg
+-- Loading package wishbone_pkg
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wb_memory.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/Wishbone/wb_memory.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package genram_pkg
+-- Loading package wishbone_pkg
+-- Compiling entity wb_memory
+-- Compiling architecture Behavioral of wb_memory
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/system_management_wiz_0_sim_netlist.vhdl {0 {vcom -work work -2002 -explicit -vopt /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/system_management_wiz_0_sim_netlist.vhdl
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+Start time: 16:56:11 on Feb 17,2020
+vcom -reportprogress 300 -work work -2002 -explicit -vopt /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/system_management_wiz_0_sim_netlist.vhdl 
+** Error: (vcom-7) Failed to open design unit file "/data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/system_management_wiz_0_sim_netlist.vhdl" in read mode.
+No such file or directory. (errno = ENOENT)
+End time: 16:56:11 on Feb 17,2020, Elapsed time: 0:00:00
+Errors: 1, Warnings: 0
+
+} {5.0 6.0} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/interlaken_receiver_multiChannel.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/interlaken_receiver_multiChannel.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package VCOMPONENTS
+-- Loading package interlaken_package
+-- Loading package axi_stream_package
+-- Compiling entity Interlaken_Receiver_multiChannel
+-- Compiling architecture Receiver of Interlaken_Receiver_multiChannel
+-- Loading entity Interlaken_Receiver
+-- Loading entity Axis64Fifo
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7038_sim_netlist.vhdl {0 {vcom -work work -2002 -explicit -vopt /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7038_sim_netlist.vhdl
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+Start time: 16:56:11 on Feb 17,2020
+vcom -reportprogress 300 -work work -2002 -explicit -vopt /data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7038_sim_netlist.vhdl 
+** Error: (vcom-7) Failed to open design unit file "/data/et/myronm/wupper-interlaken/firmware/sources/ip_cores/sim/pcie3_ultrascale_7038_sim_netlist.vhdl" in read mode.
+No such file or directory. (errno = ENOENT)
+End time: 16:56:11 on Feb 17,2020, Elapsed time: 0:00:00
+Errors: 1, Warnings: 0
+
+} {5.0 6.0} {}} /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/decoder.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/interlaken/receiver/decoder.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package interlaken_package
+-- Compiling entity Decoder
+-- Compiling architecture Decoding of Decoder
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/dma_read_write.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/dma_read_write.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity dma_read_write
+-- Compiling architecture rtl of dma_read_write
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/pcie/dma_control.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/pcie/dma_control.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Loading package NUMERIC_STD
+-- Loading package std_logic_arith
+-- Loading package STD_LOGIC_UNSIGNED
+-- Loading package data_width_package
+-- Loading package pcie_package
+-- Compiling entity dma_control
+-- Compiling architecture rtl of dma_control
+
+} {} {}} /data/et/myronm/wupper-interlaken/firmware/sources/application/LFSR.vhd {1 {vcom -work work -2002 -explicit -vopt -stats=none /data/et/myronm/wupper-interlaken/firmware/sources/application/LFSR.vhd
+QuestaSim-64 vcom 2019.1 Compiler 2019.01 Jan  1 2019
+-- Loading package STANDARD
+-- Loading package TEXTIO
+-- Loading package std_logic_1164
+-- Compiling entity LFSR
+-- Compiling architecture Behavioral of LFSR
+
+} {} {}}

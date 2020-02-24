@@ -2,10 +2,9 @@
 
 
 
-library ieee, UNISIM, work;
+library ieee, UNISIM;
 use ieee.numeric_std.all;
 use UNISIM.VCOMPONENTS.all;
-use ieee.std_logic_unsigned.all;
 use ieee.std_logic_1164.all;
 use work.pcie_package.all;
 
@@ -17,7 +16,7 @@ entity i2c_interface is
     I2C_WR               : out    bitfield_i2c_wr_r_type;
     RST                  : in     std_logic;
     ack_in               : out    std_logic;
-    ack_out              : in     std_logic;
+    --ack_out              : in     std_logic;
     appreg_clk           : in     std_logic;
     clk                  : out    std_logic;
     cmd_ack              : in     std_logic;
@@ -154,7 +153,7 @@ fifo_wr : I2C_WRFifo
           
           
           RnW <= RnW;
-          twoBytes <= twoBytes;
+          twobytes <= twobytes;
           write <= '0';
           read <= '0';
           
@@ -184,12 +183,12 @@ fifo_wr : I2C_WRFifo
                   start_s <= '1';
                   stop_s <= '0';
                   RnW <= wrfifo_dout(0);
-                  twoBytes <= wrfifo_dout(24);
+                  twobytes <= wrfifo_dout(24);
                   i2c_wr_state <= ADDRACK;
                   
               when ADDRACK =>
                   if(cmd_ack = '1') then
-                    if(twoBytes = '1') then
+                    if(twobytes = '1') then
                       if(RnW = '1') then --Write one byte, then repeated start, address and read
                         i2c_wr_state <= WRITE1B; --first write one byte, then read
                       else               --Write two bytes, then stop
@@ -281,7 +280,7 @@ fifo_wr : I2C_WRFifo
                   else
                     i2c_wr_state <= READDATAACK;
                   end if;
-              when others =>
+              when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
                   i2c_wr_state <= IDLE;
                   
           end case;

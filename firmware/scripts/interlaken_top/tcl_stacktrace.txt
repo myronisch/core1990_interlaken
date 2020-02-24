@@ -1,0 +1,31 @@
+Thu Feb 20 13:11:51 CET 2020
+Trace back: invalid command name "6335"
+    while executing
+"$new_source component editor"
+    (procedure "::SourceEdit::GotoDriver" line 87)
+    invoked from within
+"::SourceEdit::GotoDriver [lindex $DriverList 0] {*}$args"
+    (procedure "::SourceEdit::MultipleDriverDialog" line 28)
+    invoked from within
+"::SourceEdit::MultipleDriverDialog $sig $DriverList $drivers_or_readers"
+    (procedure "::SourceEdit::HandleDrivers" line 87)
+    invoked from within
+"::SourceEdit::HandleDrivers [lindex $sigList 0] $d_or_r"
+    (procedure "_showDFReadersDrivers" line 41)
+    invoked from within
+"_showDFReadersDrivers drivers .main_pane.wave.interior.cs.body.pw.wf 1"
+    ("eval" body line 1)
+    invoked from within
+"eval _showDFReadersDrivers "drivers" $winname $classic $args"
+    (procedure "Wave::ShowDFDrivers" line 2)
+    invoked from within
+"Wave::ShowDFDrivers $top 1"
+    (procedure "Wave::1Up" line 27)
+    invoked from within
+"Wave::1Up $widget $x $y"
+    (procedure "Wave::SelectUp" line 4)
+    invoked from within
+"Wave::SelectUp	 .main_pane.wave.interior.cs.body.pw.wf.grid.row0,wave.data 29 507 638 705 "
+    (command bound to event)
+  <2:/eda/fpga/mentor/questasim_2019.1/linux_x86_64/tk8.6/bgerror.tcl:106: ::tkerror {invalid command name "6335"}
+  <1:eval:1: ::tk::dialog::error::bgerror {invalid command name "6335"}

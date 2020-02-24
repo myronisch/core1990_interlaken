@@ -55,17 +55,21 @@ use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_1164.all;
 
+use work.data_width_package.all;
+
 package pcie_package is
 
   function to_sl( A: std_logic_vector) return std_logic ;
-
+  function or_reduce(slv : in std_logic_vector) return std_logic ;
   --
   -- PCIe DMA core: AXI-4 Stream interface
   type axis_type is record
-    tdata   : std_logic_vector(255 downto 0);
-    tkeep   : std_logic_vector(7 downto 0);
+    tdata   : std_logic_vector(pcie_data_width-1 downto 0);
+    tkeep   : std_logic_vector(15 downto 0);
+    tuser   : std_logic_vector(182 downto 0);
     tlast   : std_logic;
     tvalid  : std_logic;
+    state   : std_logic_vector(2 downto 0); --debugging purposes, connected to ILA
   end record;
 
   type axis_r_type is record
@@ -76,13 +80,11 @@ package pcie_package is
   -- PCIe DMA core: descriptors
   type dma_descriptor_type is record
     start_address   : std_logic_vector(63 downto 0);
-    current_address : std_logic_vector(63 downto 0);
     end_address     : std_logic_vector(63 downto 0);
     dword_count     : std_logic_vector(10 downto 0);
     read_not_write  : std_logic;     --1 means this is a read descriptor, 0: write descriptor
     enable          : std_logic;     --descriptor is valid
     wrap_around     : std_logic;     --1 means when end is reached, keep enabled and start over
-    evencycle_dma   : std_logic;     --For every time the current_address overflows, this bit toggles
     evencycle_pc    : std_logic;     --For every time the pc pointer overflows, this bit toggles.
     pc_pointer      : std_logic_vector(63 downto 0); --Last address that the PC has read / written. For write: overflow and read until this cycle.
   end record;
@@ -90,7 +92,9 @@ package pcie_package is
   type dma_descriptors_type is array (natural range <>) of dma_descriptor_type;
 
   type dma_status_type is record
-    descriptor_done: std_logic;  -- means the dma_descriptor in the array above has been handled, the enable field should then be cleared.
+    current_address : std_logic_vector(63 downto 0);
+    evencycle_dma   : std_logic;     --For every time the current_address overflows, this bit toggles
+    address_wrapped : std_logic;
   end record;
 
   type dma_statuses_type is array(natural range <>) of dma_status_type;
@@ -104,6 +108,9 @@ package pcie_package is
   end record;
 
   type interrupt_vectors_type is array (natural range <>) of interrupt_vector_type;
+  
+  type slv_array is array (natural range <>) of std_logic_vector(pcie_data_width-1 downto 0);
+  type slv12_array is array (natural range <>) of std_logic_vector(11 downto 0);
 
   --! Address Offset assignment
   --! --> BAR0 User Application Registers Addresses
@@ -166,6 +173,10 @@ package pcie_package is
   constant REG_REGISTER_RESET      : std_logic_vector(19 downto 0) := x"00440";
   constant REG_FROMHOST_FULL_THRESH: std_logic_vector(19 downto 0) := x"00450";
   constant REG_TOHOST_FULL_THRESH  : std_logic_vector(19 downto 0) := x"00460";
+  constant REG_BUSY_THRESH_ASSERT  : std_logic_vector(19 downto 0) := x"00470";
+  constant REG_BUSY_THRESH_NEGATE  : std_logic_vector(19 downto 0) := x"00480";
+  constant REG_BUSY_STATUS         : std_logic_vector(19 downto 0) := x"00490";
+  constant REG_PC_PTR_GAP          : std_logic_vector(19 downto 0) := x"004A0";
   
   -- BAR0 registers: end
 
@@ -181,6 +192,14 @@ package pcie_package is
   constant REG_INT_VEC_05          : std_logic_vector(19 downto 0) := x"00050";
   constant REG_INT_VEC_06          : std_logic_vector(19 downto 0) := x"00060";
   constant REG_INT_VEC_07          : std_logic_vector(19 downto 0) := x"00070";
+  constant REG_INT_VEC_08          : std_logic_vector(19 downto 0) := x"00080";
+  constant REG_INT_VEC_09          : std_logic_vector(19 downto 0) := x"00090";
+  constant REG_INT_VEC_10          : std_logic_vector(19 downto 0) := x"000A0";
+  constant REG_INT_VEC_11          : std_logic_vector(19 downto 0) := x"000B0";
+  constant REG_INT_VEC_12          : std_logic_vector(19 downto 0) := x"000C0";
+  constant REG_INT_VEC_13          : std_logic_vector(19 downto 0) := x"000D0";
+  constant REG_INT_VEC_14          : std_logic_vector(19 downto 0) := x"000E0";
+  constant REG_INT_VEC_15          : std_logic_vector(19 downto 0) := x"000F0";
   constant REG_INT_TAB_EN          : std_logic_vector(19 downto 0) := x"00100";
   -- BAR1 registers: end
 
@@ -210,11 +229,11 @@ package pcie_package is
   ---- ## GENERATED code BEGIN #2 ----
   ------------------------------------
 {% for register in registers if register is in_group('Bar2')
-                            and register.bitfield|count > 1
                             and (register.is_write or register.is_trigger) %}
 {% if loop.first %}
   -- Bitfields of Control Record
 {% endif %}
+{% if register.bitfield|count > 1 %}
 {% if register.parent.is_sequence %}
 {% if register.index == 0 and ((not register.parent.parent.is_sequence) or register.parent.index == 0) %}
   type {{register.type_name|lower|prepend('bitfield_')|append('_t_type' if register.has_trigger_bitfields else '_w_type' if register.has_write_bitfields else '_r_type')}} is record
@@ -222,7 +241,12 @@ package pcie_package is
     {{"%-30s"|format(bf.name)}} : {{"%-32s"|format(bf|vhdl_logic_vector|semi)}} {{bf.desc|vhdl_comment(70)}}
 {% endfor %}
   end record;
-
+  --Array of registers
+  type {{register.type_name|lower|prepend('bitfield_')|append('_t_array_type' if register.has_trigger_bitfields else '_w_array_type' if register.has_write_bitfields else '_r_array_type')}} is array (0 to {{register.parent.number-1}}) of {{register.type_name|lower|prepend('bitfield_')|append('_t_type' if register.has_trigger_bitfields else '_w_type' if register.has_write_bitfields else '_r_type')}};
+{% if(register.parent.parent.is_sequence) %}
+  --Two dimensional array of registers
+  type {{register.type_name|lower|prepend('bitfield_')|append('_t_2d_array_type' if register.has_trigger_bitfields else '_w_2d_array_type' if register.has_write_bitfields else '_r_2d_array_type')}} is array (0 to {{register.parent.parent.number-1}}) of {{register.type_name|lower|prepend('bitfield_')|append('_t_array_type' if register.has_trigger_bitfields else '_w_array_type' if register.has_write_bitfields else '_r_array_type')}};
+{% endif %}
 {% endif %}
 {% else %}
   type {{register.prefix_name|lower|prepend('bitfield_')|append('_t_type' if register.has_trigger_bitfields else '_w_type' if register.has_write_bitfields else '_r_type')}} is record
@@ -232,16 +256,30 @@ package pcie_package is
   end record;
 
 {% endif %}
+{% else %}
+{% if register.bitfield|count > 0 and register.parent.is_sequence and register.index == 0%}
+{% for bf in register.bitfield if bf.is_write or bf.is_trigger %}
+  --Array of registers (std_logic_vector)
+  type {{register.type_name|lower|prepend('bitfield_')|append('_t_array_type' if register.has_trigger_bitfields else '_w_array_type' if register.has_write_bitfields else '_r_array_type')}} is  array (0 to {{register.parent.number-1}}) of  {{"%-32s"|format(bf|vhdl_logic_vector|semi)}} {{bf.desc|vhdl_comment(70)}}
+{% endfor %}
+{% endif %}
+{% endif %}
 {% endfor %}
 
   -- Control Record
   type register_map_control_type is record
 {% for register in registers if register is in_group('Bar2') %}
-{% if register.bitfield|count > 1 and (register.is_write or register.is_trigger) %}
+{% if (register.bitfield|count > 1 and (register.is_write or register.is_trigger)) or register.parent.is_sequence %}
 {% if register.parent.is_sequence %}
-    {{"%-30s"|format(register.prefix_name)}} : {{"%-30s"|format(register.type_name|lower|prepend('bitfield_')|append('_t_type' if register.has_trigger_bitfields else '_w_type' if register.has_write_bitfields else '_r_type')|semi)}}
+{% if (register.index == 0 and ((not register.parent.parent.is_sequence) or register.parent.index == 0) ) and (register.has_trigger_bitfields or register.has_write_bitfields)%}
+{% if (register.parent.parent.is_sequence) %}
+    {{"%-30s"|format(register.type_name)}} : {{"%-30s"|format(register.type_name|lower|prepend('bitfield_')|append('_t_2d_array_type' if register.has_trigger_bitfields else '_w_2d_array_type' if register.has_write_bitfields)|semi)}}  {{register.desc|vhdl_comment(70)}} 
+{% elif register.type_name  %}
+    {{"%-30s"|format(register.type_name)}} : {{"%-30s"|format(register.type_name|lower|prepend('bitfield_')|append('_t_array_type' if register.has_trigger_bitfields else '_w_array_type' if register.has_write_bitfields)|semi)}} {{register.desc|vhdl_comment(70)}}
+{% endif %}
+{% endif %}
 {% else %}
-    {{"%-30s"|format(register.prefix_name)}} : {{"%-30s"|format(register.prefix_name|lower|prepend('bitfield_')|append('_t_type' if register.has_trigger_bitfields else '_w_type' if register.has_write_bitfields else '_r_type')|semi)}}
+    {{"%-30s"|format(register.prefix_name)}} : {{"%-30s"|format(register.prefix_name|lower|prepend('bitfield_')|append('_t_type' if register.has_trigger_bitfields else '_w_type')|semi)}}  {{register.desc|vhdl_comment(70)}} 
 {% endif %}
 {% else %}
 {% for bf in register.bitfield if bf.is_write or bf.is_trigger %}
@@ -254,6 +292,8 @@ package pcie_package is
   ---- GENERATED code END #2 ##  ----
   -----------------------------------
 
+  constant REG_BUSY_THRESH_ASSERT_C : std_logic_vector(63 downto 0) := x"0000_0000_0C80_0000"; --200 MB busy threshold default value.
+  constant REG_BUSY_THRESH_NEGATE_C : std_logic_vector(63 downto 0) := x"0000_0000_0DC0_0000"; --220 MB busy threshold default value.
 
   --!
   --! --> Read/Write User Application Registers DEFAULT values (Written by PCIe)
@@ -282,24 +322,51 @@ package pcie_package is
 -- {{monitorsection.name}}
 --
 {% for register in registers if register is in_group(monitorsection.name)
-                                         and register.bitfield|count > 1
                                          and register.has_read_bitfields %}
+{% if register.bitfield|count > 1 %}
 {% if loop.first %}
   -- Bitfields of {{monitorsection.name}}
 {% endif %}
+{% if not register.parent.is_sequence %}
   type {{register.prefix_name|lower|prepend('bitfield_')|append('_r_type')}} is record
 {% for bf in register.bitfield if not bf.is_write and not bf.is_trigger %}
     {{"%-30s"|format(bf.name)}} : {{"%-32s"|format(bf|vhdl_logic_vector|semi)}} {{bf.desc|vhdl_comment(70)}}
 {% endfor %}
   end record;
-
+{% elif register.index == 0 %}
+  type {{register.type_name|lower|prepend('bitfield_')|append('_r_type')}} is record
+{% for bf in register.bitfield if not bf.is_write and not bf.is_trigger %}
+    {{"%-30s"|format(bf.name)}} : {{"%-32s"|format(bf|vhdl_logic_vector|semi)}} {{bf.desc|vhdl_comment(70)}}
+{% endfor %}
+  end record;
+  --Array of registers
+  type {{register.type_name|lower|prepend('bitfield_')|append('_r_array_type')}} is array (0 to {{register.parent.number-1}}) of {{register.type_name|lower|prepend('bitfield_')|append('_r_type')}};
+{% if(register.parent.parent.is_sequence) %}
+  --Two dimensional array of registers
+  type {{register.type_name|lower|prepend('bitfield_')|append('_r_2d_array_type')}} is array (0 to {{register.parent.parent.number-1}}) of {{register.type_name|lower|prepend('bitfield_')|append('_r_array_type')}};
+{% endif %}
+{% endif %}
+{% else %}
+{% if register.bitfield|count > 0 and register.parent.is_sequence and register.index == 0%}
+{% for bf in register.bitfield if bf.is_read %}
+  --Array of registers (std_logic_vector)
+  type {{register.type_name|lower|prepend('bitfield_')|append('_r_array_type')}} is  array (0 to {{register.parent.number-1}}) of  {{"%-32s"|format(bf|vhdl_logic_vector|semi)}} {{bf.desc|vhdl_comment(70)}}
+{% endfor %}
+{% endif %}
+{% endif %}
 {% endfor %}
 
   -- {{monitorsection.name}}
   type {{monitorsection.record_name}}_type is record
 {% for register in registers if register is in_group(monitorsection.name) and register is in_group('Bar2') and register.has_read_bitfields %}
-{% if register.bitfield|count > 1 %}
+{% if register.bitfield|count > 1 or register.parent.is_sequence %}
+{% if register.parent.is_sequence %}
+{% if register.index == 0 %}
+    {{"%-30s"|format(register.type_name)}} : {{"%-30s"|format(register.type_name|lower|prepend('bitfield_')|append('_r_array_type')|semi)}}
+{% endif %}
+{% else %}
     {{"%-30s"|format(register.prefix_name)}} : {{"%-30s"|format(register.prefix_name|lower|prepend('bitfield_')|append('_r_type')|semi)}}
+{% endif %}
 {% else %}
 {% for bf in register.bitfield %}
     {{"%-30s"|format(bf.full_name)}} : {{"%-32s"|format(bf|vhdl_logic_vector|semi)}} {{bf.desc|vhdl_comment(70)}}
@@ -327,4 +394,14 @@ package body pcie_package is
     begin
         return A(A'low);
     end function to_sl;
+    
+    function or_reduce(slv : in std_logic_vector) return std_logic is
+      variable res_v : std_logic := '0';  -- Null slv vector will also return '0'
+    begin
+      for i in slv'range loop
+        res_v := res_v or slv(i);
+      end loop;
+      return res_v;
+    end function;
+    
 end pcie_package;

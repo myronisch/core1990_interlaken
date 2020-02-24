@@ -33,7 +33,7 @@ class Node(object):
                      'dot_name', 'prefix_name',
                      'offset', 'address', 'entries', 'ref',
                      'index', 'number', 'group',
-                     'is_bitfield', 'is_register', 'is_group', 'is_sequence']
+                     'is_bitfield', 'is_register', 'is_group', 'is_sequence', 'print_generate']
 
     is_bitfield = False
     """True is node is a bitfield."""
@@ -134,6 +134,12 @@ class Node(object):
         """Return formatted name according to 'format_name', using 'index', 'name' and 'parent.print_name'."""
 #        return 'x'+self.format_name
         return self.format_name.format(index=self.index, name=self.name, parent=self.parent.print_name)
+        
+    def print_generate(self):
+        """Return formatted generate with index"""
+        if self.parent.parent.is_sequence:
+            return self.generate.format(index=self.parent.index)
+        return self.generate.format(index=self.index)
 
     def has_endpoint(self, endpoint):
         """Return if endpoint is supported."""

@@ -50,13 +50,13 @@
 library ieee, UNISIM;
 use ieee.numeric_std.all;
 use UNISIM.VCOMPONENTS.all;
-use ieee.std_logic_unsigned.all;
+use ieee.std_logic_unsigned.all; -- @suppress "Deprecated package"
 use ieee.std_logic_1164.all;
 
 entity pcie_slow_clock is
   port (
     clk        : in     std_logic;
-    clkDiv6    : out    std_logic;
+    regmap_clk : out    std_logic;
     pll_locked : out    std_logic;
     reset_n    : in     std_logic;
     reset_out  : out    std_logic);
@@ -65,26 +65,21 @@ end entity pcie_slow_clock;
 
 
 architecture rtl of pcie_slow_clock is
-component clk_wiz_40
+component clk_wiz_regmap -- @suppress "Component declaration is not equal to its matching entity"
 port
  (-- Clock in ports
-  clk_in250           : in     std_logic;
+  clk_in1           : in     std_logic;
   -- Clock out ports
-  clk_out40          : out    std_logic;
+  clk_out25          : out    std_logic;
   -- Status and control signals
   reset             : in     std_logic;
   locked            : out    std_logic
  );
 end component;
 
-ATTRIBUTE SYN_BLACK_BOX : BOOLEAN;
-ATTRIBUTE SYN_BLACK_BOX OF clk_wiz_40 : COMPONENT IS TRUE;
 
 
-ATTRIBUTE BLACK_BOX_PAD_PIN : STRING;
-ATTRIBUTE BLACK_BOX_PAD_PIN OF clk_wiz_40 : COMPONENT IS "clk_in250,clk_out40,reset,locked";
-
-   signal clkDiv6_s: std_logic;
+   signal regmap_clk_s: std_logic;
    signal reset_s: std_logic;
    signal locked_s: std_logic;
    
@@ -94,19 +89,20 @@ begin
 reset_out <= not locked_s;
 reset_s <= not reset_n;
 pll_locked <= locked_s;
-clkDiv6 <= clkDiv6_s;
+regmap_clk <= regmap_clk_s;
 
-clk0 : clk_wiz_40
-   port map ( 
+clk0 : clk_wiz_regmap
+    port map ( 
+ 
+    -- Clock in ports
+    clk_in1 => clk,
+   -- Clock out ports  
+    clk_out25 => regmap_clk_s,
+   -- Status and control signals                
+    reset => reset_s,
+    locked => locked_s            
+  );
 
-   -- Clock in ports
-   clk_in250 => clk,
-  -- Clock out ports  
-   clk_out40 => clkDiv6_s,
-  -- Status and control signals                
-   reset => reset_s,
-   locked => locked_s            
- );
  
 end architecture rtl ; -- of pcie_slow_clock
 

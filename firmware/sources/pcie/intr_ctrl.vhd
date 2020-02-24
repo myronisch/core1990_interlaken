@@ -54,10 +54,10 @@
 
 
 
-library ieee, UNISIM, work;
+library ieee, UNISIM;
 use ieee.numeric_std.all;
 use UNISIM.VCOMPONENTS.all;
-use ieee.std_logic_unsigned.all;
+use ieee.std_logic_unsigned.all;-- @suppress "Deprecated package";
 use ieee.std_logic_1164.all;
 use work.pcie_package.all;
 
@@ -72,7 +72,7 @@ entity intr_ctrl is
     cfg_interrupt_msix_int     : out    std_logic;
     cfg_interrupt_msix_sent    : in     std_logic;
     clk                        : in     std_logic;
-    clkDiv6                    : in     std_logic;
+    regmap_clk                 : in     std_logic;
     dma_interrupt_call         : in     std_logic_vector(3 downto 0);
     interrupt_call             : in     std_logic_vector(NUMBER_OF_INTERRUPTS-1 downto 4);
     interrupt_table_en         : in     std_logic_vector(NUMBER_OF_INTERRUPTS-1 downto 0);
@@ -81,7 +81,8 @@ entity intr_ctrl is
     s_axis_cc                  : in     axis_type;
     s_axis_cq                  : in     axis_type;
     s_axis_rc                  : in     axis_type;
-    s_axis_rq                  : in     axis_type);
+    s_axis_rq                  : in     axis_type;
+    int_test                   : in     bitfield_int_test_t_type);
 end entity intr_ctrl;
 
 
@@ -107,13 +108,14 @@ architecture rtl of intr_ctrl is
   
   signal axi_busy                             : std_logic;
   signal s_interrupt_pending : std_logic := '0';
+  signal s_test_interrupt_call: std_logic_vector(NUMBER_OF_INTERRUPTS-1 downto 0);
 
 begin
 
   -- Interrupt vector assignments
-  interrupt_assign : process (clkDiv6, interrupt_vector)
+  interrupt_assign : process (regmap_clk, interrupt_vector)
   begin
-    if rising_edge (clkDiv6) then
+    if rising_edge (regmap_clk) then
       for i in 0 to (NUMBER_OF_INTERRUPTS-1) loop
         interrupt_vector_s(i).int_vec_add   <= interrupt_vector(i).int_vec_add;
         interrupt_vector_s(i).int_vec_data  <= interrupt_vector(i).int_vec_data;
@@ -127,6 +129,18 @@ begin
       end if;
     end if;
   end process;
+  
+  test_interrupt: process(regmap_clk)
+    variable trigger_p1: std_logic;
+  begin
+    if rising_edge(regmap_clk) then
+      s_test_interrupt_call <= (others => '0');
+      if int_test.TRIGGER = "1" and trigger_p1 = '0' then
+        s_test_interrupt_call(to_integer(unsigned(int_test.IRQ))) <= '1';
+      end if;
+      trigger_p1 := int_test.TRIGGER(64);
+    end if;
+  end process;
 
   --
   -- Monitor Signals
@@ -137,8 +151,9 @@ begin
   s_interrupt_call <= interrupt_call & dma_interrupt_call;
   --
   -- interrupt controller 
-  intr: process (clkDiv6, reset)
+  intr: process (regmap_clk, reset)
     variable v_cfg_interrupt_msix_int : std_logic := '0';
+    variable v_interrupt_timeout : integer range 0 to 15;
     
   begin
     if(reset = '1') then
@@ -148,20 +163,21 @@ begin
         s_cfg_interrupt_msix_data     <= (others => '0');
         s_interrupt_pending           <= '0';
         s_interrupt_latch <= (others => '0');
-    elsif(rising_edge(clkDiv6)) then
+        v_interrupt_timeout := 0;
+    elsif(rising_edge(regmap_clk)) then
       --default:
       s_cfg_interrupt_msix_int        <= v_cfg_interrupt_msix_int;
       v_cfg_interrupt_msix_int        := '0';
       s_cfg_interrupt_msix_address    <= s_cfg_interrupt_msix_address;
       s_cfg_interrupt_msix_data       <= s_cfg_interrupt_msix_data;
       s_interrupt_pending             <= s_interrupt_pending;
-      if(s_interrupt_pending = '1' and clear_interrupt_pending_s = '1') then
+      if(s_interrupt_pending = '1' and (clear_interrupt_pending_s = '1' or v_interrupt_timeout = 0)) then
         s_interrupt_pending <= '0';
       end if;
       
       if (cfg_interrupt_msix_enable = "0001") then
         for i in 0 to NUMBER_OF_INTERRUPTS - 1 loop
-          if(s_interrupt_call(i)='1') and (interrupt_table_en(i) = '1') then
+          if(s_interrupt_call(i)='1' or s_test_interrupt_call(i) = '1') and (interrupt_table_en(i) = '1') then
             s_interrupt_latch(i) <= '1';
           end if;
         end loop;
@@ -171,6 +187,7 @@ begin
                 (s_cfg_interrupt_msix_int = '0') and 
                 (s_interrupt_pending = '0')) then
             s_interrupt_pending <= '1';
+            v_interrupt_timeout := 15;
             s_interrupt_latch(i) <= '0';
             v_cfg_interrupt_msix_int      := '1'; --fire interrupt after one pipeline
             s_cfg_interrupt_msix_address  <= interrupt_vector_s(i).int_vec_add;
@@ -178,6 +195,10 @@ begin
             exit;
           end if;
         end loop;
+      end if;
+      
+      if v_interrupt_timeout > 0 then
+        v_interrupt_timeout := v_interrupt_timeout - 1;
       end if;
       
     end if; --reset

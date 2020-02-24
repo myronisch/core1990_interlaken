@@ -73,20 +73,24 @@
 
 library ieee;
 use ieee.numeric_std.all;
-use ieee.std_logic_unsigned.all;
+use ieee.std_logic_unsigned.all; -- @suppress "Deprecated package"
 use ieee.std_logic_1164.all;
+
+use work.data_width_package.all;
 
 package pcie_package is
 
   function to_sl( A: std_logic_vector) return std_logic ;
-
+  function or_reduce(slv : in std_logic_vector) return std_logic ;
   --
   -- PCIe DMA core: AXI-4 Stream interface
   type axis_type is record
-    tdata   : std_logic_vector(255 downto 0);
-    tkeep   : std_logic_vector(7 downto 0);
+    tdata   : std_logic_vector(PCIE_DATA_WIDTH-1 downto 0);
+    tkeep   : std_logic_vector(15 downto 0);
+    tuser   : std_logic_vector(182 downto 0);
     tlast   : std_logic;
     tvalid  : std_logic;
+    state   : std_logic_vector(2 downto 0); --debugging purposes, connected to ILA
   end record;
 
   type axis_r_type is record
@@ -97,13 +101,11 @@ package pcie_package is
   -- PCIe DMA core: descriptors
   type dma_descriptor_type is record
     start_address   : std_logic_vector(63 downto 0);
-    current_address : std_logic_vector(63 downto 0);
     end_address     : std_logic_vector(63 downto 0);
     dword_count     : std_logic_vector(10 downto 0);
     read_not_write  : std_logic;     --1 means this is a read descriptor, 0: write descriptor
     enable          : std_logic;     --descriptor is valid
     wrap_around     : std_logic;     --1 means when end is reached, keep enabled and start over
-    evencycle_dma   : std_logic;     --For every time the current_address overflows, this bit toggles
     evencycle_pc    : std_logic;     --For every time the pc pointer overflows, this bit toggles.
     pc_pointer      : std_logic_vector(63 downto 0); --Last address that the PC has read / written. For write: overflow and read until this cycle.
   end record;
@@ -111,7 +113,9 @@ package pcie_package is
   type dma_descriptors_type is array (natural range <>) of dma_descriptor_type;
 
   type dma_status_type is record
-    descriptor_done: std_logic;  -- means the dma_descriptor in the array above has been handled, the enable field should then be cleared.
+    current_address : std_logic_vector(63 downto 0);
+    evencycle_dma   : std_logic;     --For every time the current_address overflows, this bit toggles
+    address_wrapped : std_logic;
   end record;
 
   type dma_statuses_type is array(natural range <>) of dma_status_type;
@@ -125,6 +129,9 @@ package pcie_package is
   end record;
 
   type interrupt_vectors_type is array (natural range <>) of interrupt_vector_type;
+  
+  type slv_array is array (natural range <>) of std_logic_vector(PCIE_DATA_WIDTH-1 downto 0);
+  type slv12_array is array (natural range <>) of std_logic_vector(11 downto 0);
 
   --! Address Offset assignment
   --! --> BAR0 User Application Registers Addresses
@@ -187,6 +194,10 @@ package pcie_package is
   constant REG_REGISTER_RESET      : std_logic_vector(19 downto 0) := x"00440";
   constant REG_FROMHOST_FULL_THRESH: std_logic_vector(19 downto 0) := x"00450";
   constant REG_TOHOST_FULL_THRESH  : std_logic_vector(19 downto 0) := x"00460";
+  constant REG_BUSY_THRESH_ASSERT  : std_logic_vector(19 downto 0) := x"00470";
+  constant REG_BUSY_THRESH_NEGATE  : std_logic_vector(19 downto 0) := x"00480";
+  constant REG_BUSY_STATUS         : std_logic_vector(19 downto 0) := x"00490";
+  constant REG_PC_PTR_GAP          : std_logic_vector(19 downto 0) := x"004A0";
   
   -- BAR0 registers: end
 
@@ -202,6 +213,14 @@ package pcie_package is
   constant REG_INT_VEC_05          : std_logic_vector(19 downto 0) := x"00050";
   constant REG_INT_VEC_06          : std_logic_vector(19 downto 0) := x"00060";
   constant REG_INT_VEC_07          : std_logic_vector(19 downto 0) := x"00070";
+  constant REG_INT_VEC_08          : std_logic_vector(19 downto 0) := x"00080";
+  constant REG_INT_VEC_09          : std_logic_vector(19 downto 0) := x"00090";
+  constant REG_INT_VEC_10          : std_logic_vector(19 downto 0) := x"000A0";
+  constant REG_INT_VEC_11          : std_logic_vector(19 downto 0) := x"000B0";
+  constant REG_INT_VEC_12          : std_logic_vector(19 downto 0) := x"000C0";
+  constant REG_INT_VEC_13          : std_logic_vector(19 downto 0) := x"000D0";
+  constant REG_INT_VEC_14          : std_logic_vector(19 downto 0) := x"000E0";
+  constant REG_INT_VEC_15          : std_logic_vector(19 downto 0) := x"000F0";
   constant REG_INT_TAB_EN          : std_logic_vector(19 downto 0) := x"00100";
   -- BAR1 registers: end
 
@@ -218,10 +237,14 @@ package pcie_package is
   --** GenericBoardInformation
   constant REG_REG_MAP_VERSION                : std_logic_vector(19 downto 0) := x"00000";
   constant REG_BOARD_ID_TIMESTAMP             : std_logic_vector(19 downto 0) := x"00010";
-  constant REG_BOARD_ID_SVN                   : std_logic_vector(19 downto 0) := x"00020";
-  constant REG_STATUS_LEDS                    : std_logic_vector(19 downto 0) := x"00030";
-  constant REG_GENERIC_CONSTANTS              : std_logic_vector(19 downto 0) := x"00040";
-  constant REG_CARD_TYPE                      : std_logic_vector(19 downto 0) := x"00050";
+  constant REG_GIT_COMMIT_TIME                : std_logic_vector(19 downto 0) := x"00030";
+  constant REG_GIT_TAG                        : std_logic_vector(19 downto 0) := x"00040";
+  constant REG_GIT_COMMIT_NUMBER              : std_logic_vector(19 downto 0) := x"00050";
+  constant REG_GIT_HASH                       : std_logic_vector(19 downto 0) := x"00060";
+  constant REG_STATUS_LEDS                    : std_logic_vector(19 downto 0) := x"00070";
+  constant REG_GENERIC_CONSTANTS              : std_logic_vector(19 downto 0) := x"00080";
+  constant REG_CARD_TYPE                      : std_logic_vector(19 downto 0) := x"00090";
+  constant REG_PCIE_ENDPOINT                  : std_logic_vector(19 downto 0) := x"000a0";
 
   --** ApplicationSpecific
   constant REG_LFSR_SEED_0                    : std_logic_vector(19 downto 0) := x"01000";
@@ -233,27 +256,26 @@ package pcie_package is
   constant REG_APP_ENABLE                     : std_logic_vector(19 downto 0) := x"01060";
 
   --** HouseKeepingControlsAndMonitors
-  constant REG_MMCM_MAIN_PLL_LOCK             : std_logic_vector(19 downto 0) := x"02300";
-  constant REG_I2C_WR                         : std_logic_vector(19 downto 0) := x"02310";
-  constant REG_I2C_RD                         : std_logic_vector(19 downto 0) := x"02320";
-  constant REG_FPGA_CORE_TEMP                 : std_logic_vector(19 downto 0) := x"02330";
-  constant REG_FPGA_CORE_VCCINT               : std_logic_vector(19 downto 0) := x"02340";
-  constant REG_FPGA_CORE_VCCAUX               : std_logic_vector(19 downto 0) := x"02350";
-  constant REG_FPGA_CORE_VCCBRAM              : std_logic_vector(19 downto 0) := x"02360";
-  constant REG_FPGA_DNA                       : std_logic_vector(19 downto 0) := x"02370";
-  constant REG_INT_TEST_4                     : std_logic_vector(19 downto 0) := x"02800";
-  constant REG_INT_TEST_5                     : std_logic_vector(19 downto 0) := x"02810";
+  constant REG_MMCM_MAIN_PLL_LOCK             : std_logic_vector(19 downto 0) := x"09300";
+  constant REG_I2C_WR                         : std_logic_vector(19 downto 0) := x"09310";
+  constant REG_I2C_RD                         : std_logic_vector(19 downto 0) := x"09320";
+  constant REG_FPGA_CORE_TEMP                 : std_logic_vector(19 downto 0) := x"09330";
+  constant REG_FPGA_CORE_VCCINT               : std_logic_vector(19 downto 0) := x"09340";
+  constant REG_FPGA_CORE_VCCAUX               : std_logic_vector(19 downto 0) := x"09350";
+  constant REG_FPGA_CORE_VCCBRAM              : std_logic_vector(19 downto 0) := x"09360";
+  constant REG_FPGA_DNA                       : std_logic_vector(19 downto 0) := x"09370";
+  constant REG_INT_TEST                       : std_logic_vector(19 downto 0) := x"09380";
 
   --** Wishbone
-  constant REG_WISHBONE_CONTROL               : std_logic_vector(19 downto 0) := x"04000";
-  constant REG_WISHBONE_WRITE                 : std_logic_vector(19 downto 0) := x"04010";
-  constant REG_WISHBONE_READ                  : std_logic_vector(19 downto 0) := x"04020";
-  constant REG_WISHBONE_STATUS                : std_logic_vector(19 downto 0) := x"04030";
+  constant REG_WISHBONE_CONTROL               : std_logic_vector(19 downto 0) := x"0c000";
+  constant REG_WISHBONE_WRITE                 : std_logic_vector(19 downto 0) := x"0c010";
+  constant REG_WISHBONE_READ                  : std_logic_vector(19 downto 0) := x"0c020";
+  constant REG_WISHBONE_STATUS                : std_logic_vector(19 downto 0) := x"0c030";
 
   --** Interlaken
-  constant REG_INTERLAKEN_PACKET_LENGTH       : std_logic_vector(19 downto 0) := x"05000";
-  constant REG_INTERLAKEN_CONTROL_STATUS      : std_logic_vector(19 downto 0) := x"05010";
-  constant REG_TRANSCEIVER                    : std_logic_vector(19 downto 0) := x"05020";
+  constant REG_INTERLAKEN_PACKET_LENGTH       : std_logic_vector(19 downto 0) := x"0d000";
+  constant REG_INTERLAKEN_CONTROL_STATUS      : std_logic_vector(19 downto 0) := x"0d010";
+  constant REG_TRANSCEIVER                    : std_logic_vector(19 downto 0) := x"0d020";
   -----------------------------------
   ---- GENERATED code END #1 ##  ----
   -----------------------------------
@@ -275,6 +297,11 @@ package pcie_package is
 
   type bitfield_i2c_rd_t_type is record
     I2C_RDEN                       : std_logic_vector(64 downto 64);  -- Any write to this register pops the last I2C data from the FIFO
+  end record;
+
+  type bitfield_int_test_t_type is record
+    TRIGGER                        : std_logic_vector(64 downto 64);  -- Fire a test MSIx interrupt set in IRQ
+    IRQ                            : std_logic_vector(3 downto 0);    -- Set this field to a value equal to the MSIX interrupt to be fired. The write triggers the interrupt immediately.
   end record;
 
   type bitfield_wishbone_control_w_type is record
@@ -315,21 +342,22 @@ package pcie_package is
     APP_ENABLE                     : std_logic_vector(0 downto 0);    -- 1 Enables LFSR module or Loopback (depending on APP_MUX)
                                                                       -- 0 disable application
                                                                       
-    I2C_WR                         : bitfield_i2c_wr_t_type;       
-    I2C_RD                         : bitfield_i2c_rd_t_type;       
-    INT_TEST_4                     : std_logic_vector(64 downto 64);  -- Fire a test MSIx interrupt #4
-    INT_TEST_5                     : std_logic_vector(64 downto 64);  -- Fire a test MSIx interrupt #5
-    WISHBONE_CONTROL               : bitfield_wishbone_control_w_type;
-    WISHBONE_WRITE                 : bitfield_wishbone_write_t_type;
-    WISHBONE_READ                  : bitfield_wishbone_read_t_type;
+    I2C_WR                         : bitfield_i2c_wr_t_type;         -- House Keeping Controls and Monitors 
+    I2C_RD                         : bitfield_i2c_rd_t_type;         -- House Keeping Controls and Monitors 
+    INT_TEST                       : bitfield_int_test_t_type;       -- House Keeping Controls and Monitors 
+    WISHBONE_CONTROL               : bitfield_wishbone_control_w_type;  -- Wishbone 
+    WISHBONE_WRITE                 : bitfield_wishbone_write_t_type;  -- Wishbone 
+    WISHBONE_READ                  : bitfield_wishbone_read_t_type;  -- Wishbone 
     INTERLAKEN_PACKET_LENGTH       : std_logic_vector(15 downto 0);   -- Packet length for fromhost packet (to Interlaken)
-    INTERLAKEN_CONTROL_STATUS      : bitfield_interlaken_control_status_t_type;
-    TRANSCEIVER                    : bitfield_transceiver_w_type;  
+    INTERLAKEN_CONTROL_STATUS      : bitfield_interlaken_control_status_t_type;  -- Interlaken 
+    TRANSCEIVER                    : bitfield_transceiver_w_type;    -- Interlaken 
   end record;
   -----------------------------------
   ---- GENERATED code END #2 ##  ----
   -----------------------------------
 
+  constant REG_BUSY_THRESH_ASSERT_C : std_logic_vector(63 downto 0) := x"0000_0000_0C80_0000"; --200 MB busy threshold default value.
+  constant REG_BUSY_THRESH_NEGATE_C : std_logic_vector(63 downto 0) := x"0000_0000_0DC0_0000"; --220 MB busy threshold default value.
 
   --!
   --! --> Read/Write User Application Registers DEFAULT values (Written by PCIe)
@@ -356,8 +384,8 @@ package pcie_package is
   constant REG_I2C_WR_SLAVE_ADDRESS_C              : std_logic_vector(7 downto 1)     := "0000000";             -- Slave address
   constant REG_I2C_WR_READ_NOT_WRITE_C             : std_logic_vector(0 downto 0)     := "0";                   -- READ/<o>WRITE</o>
   constant REG_I2C_RD_I2C_RDEN_C                   : std_logic_vector(64 downto 64)   := "0";                   -- Any write to this register pops the last I2C data from the FIFO
-  constant REG_INT_TEST_4_C                        : std_logic_vector(64 downto 64)   := "0";                   -- Fire a test MSIx interrupt #4
-  constant REG_INT_TEST_5_C                        : std_logic_vector(64 downto 64)   := "0";                   -- Fire a test MSIx interrupt #5
+  constant REG_INT_TEST_TRIGGER_C                  : std_logic_vector(64 downto 64)   := "0";                   -- Fire a test MSIx interrupt set in IRQ
+  constant REG_INT_TEST_IRQ_C                      : std_logic_vector(3 downto 0)     := x"0";                  -- Set this field to a value equal to the MSIX interrupt to be fired. The write triggers the interrupt immediately.
   constant REG_WISHBONE_CONTROL_WRITE_NOT_READ_C   : std_logic_vector(32 downto 32)   := "0";                   -- wishbone write command wishbone read command
   constant REG_WISHBONE_CONTROL_ADDRESS_C          : std_logic_vector(31 downto 0)    := x"00000000";           -- Slave address for Wishbone bus
   constant REG_WISHBONE_WRITE_WRITE_ENABLE_C       : std_logic_vector(64 downto 64)   := "0";                   -- Any write to this register triggers a write to the Wupper to Wishbone fifo
@@ -379,38 +407,39 @@ package pcie_package is
 --
 -- GenericBoardInformation
 --
-  -- Bitfields of GenericBoardInformation
   type bitfield_generic_constants_r_type is record
     INTERRUPTS                     : std_logic_vector(15 downto 8);   -- Number of Interrupts
     DESCRIPTORS                    : std_logic_vector(7 downto 0);    -- Number of Descriptors
   end record;
 
-
   -- GenericBoardInformation
   type register_map_gen_board_info_type is record
     REG_MAP_VERSION                : std_logic_vector(15 downto 0);   -- Register Map Version, 1.0 formatted as 0x0100
     BOARD_ID_TIMESTAMP             : std_logic_vector(39 downto 0);   -- Board ID Date / Time in BCD format YYMMDDhhmm
-    BOARD_ID_SVN                   : std_logic_vector(15 downto 0);   -- Board ID SVN Revision
+    GIT_COMMIT_TIME                : std_logic_vector(39 downto 0);   -- Board ID GIT Commit time of current revision, Date / Time in BCD format YYMMDDhhmm
+    GIT_TAG                        : std_logic_vector(63 downto 0);   -- String containing the current GIT TAG
+    GIT_COMMIT_NUMBER              : std_logic_vector(31 downto 0);   -- Number of GIT commits after current GIT_TAG
+    GIT_HASH                       : std_logic_vector(31 downto 0);   -- Short GIT hash (32 bit)
     GENERIC_CONSTANTS              : bitfield_generic_constants_r_type;
     CARD_TYPE                      : std_logic_vector(63 downto 0);   -- Card Type:
-                                                                      --   * 709 (0x2c5) VC709
-                                                                      --   * 710 (0x2c6) HTG710
-                                                                      --   * 711 (0x2c7) BNL711
+                                                                      --   - 709 (0x2c5): FLX709, VC709
+                                                                      --   - 710 (0x2c6): FLX710, HTG710
+                                                                      --   - 711 (0x2c7): FLX711, BNL711
+                                                                      --   - 712 (0x2c8): FLX712, BNL712
+                                                                      --   - 128 (0x080): FLX128, VCU128
                                                                       
+    PCIE_ENDPOINT                  : std_logic_vector(0 downto 0);    -- Indicator of the PCIe endpoint on BNL71x cards with two endpoints. 0 or 1
 end record;
 --
 -- HouseKeepingControlsAndMonitors
 --
-  -- Bitfields of HouseKeepingControlsAndMonitors
   type bitfield_i2c_wr_r_type is record
     I2C_FULL                       : std_logic_vector(25 downto 25);  -- I2C FIFO full
   end record;
-
   type bitfield_i2c_rd_r_type is record
     I2C_EMPTY                      : std_logic_vector(8 downto 8);    -- I2C FIFO Empty
     I2C_DOUT                       : std_logic_vector(7 downto 0);    -- I2C READ Data
   end record;
-
 
   -- HouseKeepingControlsAndMonitors
   type register_map_hk_monitor_type is record
@@ -435,12 +464,10 @@ end record;
   type bitfield_wishbone_write_r_type is record
     FULL                           : std_logic_vector(32 downto 32);  -- Wishbone
   end record;
-
   type bitfield_wishbone_read_r_type is record
     EMPTY                          : std_logic_vector(32 downto 32);  -- Indicates that the Wishbone to Wupper fifo is empty
     DATA                           : std_logic_vector(31 downto 0);   -- Wishbone read data
   end record;
-
   type bitfield_wishbone_status_r_type is record
     INT                            : std_logic_vector(4 downto 4);    -- interrupt
     RETRY                          : std_logic_vector(3 downto 3);    -- Interface is not ready to accept data cycle should be retried
@@ -448,7 +475,6 @@ end record;
     ACKNOWLEDGE                    : std_logic_vector(1 downto 1);    -- Indicates the termination of a normal bus cycle
     ERROR                          : std_logic_vector(0 downto 0);    -- Address not mapped by the crossbar
   end record;
-
 
   -- Wishbone
   type wishbone_monitor_type is record
@@ -464,12 +490,10 @@ end record;
     DECODER_LOCK                   : std_logic_vector(1 downto 1);    -- Decoder lock indication
     DESCRAMBLER_LOCK               : std_logic_vector(0 downto 0);    -- Descrambler lock indication
   end record;
-
   type bitfield_transceiver_r_type is record
     TX_FAULT                       : std_logic_vector(7 downto 4);    -- SFP transceiver TX fault indication
     RX_LOS                         : std_logic_vector(3 downto 0);    -- Loss of signal indication
   end record;
-
 
   -- Interlaken
   type interlaken_monitor_type is record
@@ -496,4 +520,14 @@ package body pcie_package is
     begin
         return A(A'low);
     end function to_sl;
+    
+    function or_reduce(slv : in std_logic_vector) return std_logic is
+      variable res_v : std_logic := '0';  -- Null slv vector will also return '0'
+    begin
+      for i in slv'range loop
+        res_v := res_v or slv(i);
+      end loop;
+      return res_v;
+    end function;
+    
 end pcie_package;

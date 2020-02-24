@@ -42,9 +42,9 @@ Starting from the offset address of BAR0, BAR1 and BAR2, the register map for BA
 \hline
 0x0010 & 0,1 & \multicolumn{5}{l|}{DMA\_DESC\_0a} \\
 \cline{3-7}
- & & & RD\_POINTER & 127:64 & W & PC Read Pointer \\
+ & & & SW\_POINTER & 127:64 & W & Pointer controlled by the software, indicating read or write status for circular DMA \\
  & & & WRAP\_AROUND & 12 & W & Wrap around \\
- & & & READ\_WRITE & 11 & W & 1: fromHost/ 0: toHost \\
+ & & & FROMHOST & 11 & W & 1: fromHost/ 0: toHost \\
  & & & NUM\_WORDS & 10:0 & W & Number of 32 bit words \\
 \hline
 \multicolumn{7}{|c|}{\ldots} \\
@@ -56,9 +56,9 @@ Starting from the offset address of BAR0, BAR1 and BAR2, the register map for BA
 \hline
 0x00F0 & 0,1 & \multicolumn{5}{l|}{DMA\_DESC\_7a} \\
 \cline{3-7}
- & & & RD\_POINTER & 127:64 & W & PC Read Pointer \\
+ & & & SW\_POINTER & 127:64 & W & Pointer controlled by the software, indicating read or write status for circular DMA \\
  & & & WRAP\_AROUND & 12 & W & Wrap around \\
- & & & READ\_WRITE & 11 & W & 1: fromHost/ 0: toHost \\
+ & & & FROMHOST & 11 & W & 1: fromHost/ 0: toHost \\
  & & & NUM\_WORDS & 10:0 & W & Number of 32 bit words \\
 \hline
 \multicolumn{7}{|c|}{DMA\_DESC\_STATUS} \\
@@ -68,7 +68,7 @@ Starting from the offset address of BAR0, BAR1 and BAR2, the register map for BA
  & & & EVEN\_PC & 66 & R & Even address cycle PC \\
  & & & EVEN\_DMA & 65 & R & Even address cycle DMA \\
  & & & DESC\_DONE & 64 & R & Descriptor Done \\
- & & & CURRENT\_ADDRESS & 63:0 & R & Current Address \\
+ & & & FW\_POINTER & 63:0 & R & Pointer controlled by the firmwarre, indicating where the DMA is busy reading or writing \\
 \hline
 \multicolumn{7}{|c|}{\ldots} \\
 \hline
@@ -77,7 +77,7 @@ Starting from the offset address of BAR0, BAR1 and BAR2, the register map for BA
  & & & EVEN\_PC & 66 & R & Even address cycle PC \\
  & & & EVEN\_DMA & 65 & R & Even address cycle DMA \\
  & & & DESC\_DONE & 64 & R & Descriptor Done \\
- & & & CURRENT\_ADDRESS & 63:0 & R & Current Address \\
+ & & & FW\_POINTER & 63:0 & R & Pointer controlled by the firmwarre, indicating where the DMA is busy reading or writing \\
 \hline
 0x0300 & 0,1 & \multicolumn{2}{l|}{BAR0\_VALUE} &
 31:0 & R & Copy of BAR0 offset reg. \\
@@ -90,9 +90,6 @@ Starting from the offset address of BAR0, BAR1 and BAR2, the register map for BA
 \hline
 0x0400 & 0,1 & \multicolumn{2}{l|}{DMA\_DESC\_ENABLE} &
 7:0 & W & Enable descriptors 7:0. One bit per descriptor. Cleared when Descriptor is handled. \\
-\hline
-0x0410 & 0,1 & \multicolumn{2}{l|}{DMA\_FIFO\_FLUSH} &
-any & T & Flush (reset). Any write clears the DMA Main output FIFO \\
 \hline
 0x0420 & 0,1 & \multicolumn{2}{l|}{DMA\_RESET} &
 any & T & Reset Wupper Core (DMA Controller FSMs) \\
@@ -112,6 +109,20 @@ any & T & Resets the register map to default values. Any write triggers this res
 \cline{3-7}
  & & & THRESHOLD\_ASSERT & 27:16 & W & Assert value of the ToHost programmable full flag \\
  & & & THRESHOLD\_NEGATE & 11:0 & W & Negate value of the ToHost programmalbe full flag \\
+\hline
+0x0470 & 0,1 & \multicolumn{2}{l|}{BUSY\_THRESHOLD\_ASSERT} &
+63:0 & W & Tohost or Fromhost busy will be asserted in circular DMA mode when the server PC buffer gets full (space below ASSERT threshold).. \\
+\hline
+0x0480 & 0,1 & \multicolumn{2}{l|}{BUSY\_THRESHOLD\_NEGATE} &
+63:0 & W & Tohost or Fromhost busy will be negated in circular DMA mode when the server PC buffer gets less full (space above NEGATE threshold). \\
+\hline
+0x0490 & 0,1 & \multicolumn{5}{l|}{BUSY\_STATUS} \\
+\cline{3-7}
+ & & & FROMHOST\_BUSY & 1 & R & A fromhost descriptor passed BUSY\_THRESHOLD\_ASSERT, busy flag set \\
+ & & & TOHOST\_BUSY & 0 & R & A tohost descriptor passed BUSY\_THRESHOLD\_ASSERT, busy flag set \\
+\hline
+0x04A0 & 0,1 & \multicolumn{2}{l|}{PC\_PTR\_GAP} &
+63:0 & W & This is the minimum value that the pc\_pointer in a descriptor has to decrease in order to flip the evencycle\_pc bit \\
 \hline
 \caption{FELIX register map BAR0}\label{tab:dma_register_map_bar0} \\
 \end{longtabu}
@@ -137,7 +148,7 @@ BAR1 stores registers associated with the Interrupt vector. The offset for BAR1 
 \hline
 \multicolumn{7}{|c|}{\ldots} \\
 \hline
-0x0070 & 0,1 & \multicolumn{5}{l|}{INT\_VEC\_7} \\
+0x00F0 & 0,1 & \multicolumn{5}{l|}{INT\_VEC\_15} \\
 \cline{3-7}
  & & & INT\_CTRL & 127:96 & W & Interrupt Control \\
  & & & INT\_DATA & 95:64 & W & Interrupt Data \\
@@ -164,25 +175,37 @@ BAR2 stores registers for the control and monitor of HDL modules inside the FPGA
 \hline
 \multicolumn{7}{|c|}{Generic Board Information} \\
 \hline
-0x0000 & 0 & \multicolumn{2}{l|}{REG\_MAP\_VERSION} &
+0x0000 & 0,1 & \multicolumn{2}{l|}{REG\_MAP\_VERSION} &
 15:0 & R & Register Map Version, 1.0 formatted as 0x0100 \\
 \hline
-0x0010 & 0 & \multicolumn{2}{l|}{BOARD\_ID\_TIMESTAMP} &
+0x0010 & 0,1 & \multicolumn{2}{l|}{BOARD\_ID\_TIMESTAMP} &
 39:0 & R & Board ID Date / Time in BCD format YYMMDDhhmm \\
 \hline
-0x0020 & 0 & \multicolumn{2}{l|}{BOARD\_ID\_SVN} &
-15:0 & R & Board ID SVN Revision \\
+0x0030 & 0,1 & \multicolumn{2}{l|}{GIT\_COMMIT\_TIME} &
+39:0 & R & Board ID GIT Commit time of current revision, Date / Time in BCD format YYMMDDhhmm \\
 \hline
-0x0030 & 0 & \multicolumn{2}{l|}{STATUS\_LEDS} &
+0x0040 & 0,1 & \multicolumn{2}{l|}{GIT\_TAG} &
+63:0 & R & String containing the current GIT TAG \\
+\hline
+0x0050 & 0,1 & \multicolumn{2}{l|}{GIT\_COMMIT\_NUMBER} &
+31:0 & R & Number of GIT commits after current GIT\_TAG \\
+\hline
+0x0060 & 0,1 & \multicolumn{2}{l|}{GIT\_HASH} &
+31:0 & R & Short GIT hash (32 bit) \\
+\hline
+0x0070 & 0,1 & \multicolumn{2}{l|}{STATUS\_LEDS} &
 7:0 & W & Board GPIO Leds \\
 \hline
-0x0040 & 0 & \multicolumn{5}{l|}{GENERIC\_CONSTANTS} \\
+0x0080 & 0,1 & \multicolumn{5}{l|}{GENERIC\_CONSTANTS} \\
 \cline{3-7}
  & & & INTERRUPTS & 15:8 & R & Number of Interrupts \\
  & & & DESCRIPTORS & 7:0 & R & Number of Descriptors \\
 \hline
-0x0050 & 0 & \multicolumn{2}{l|}{CARD\_TYPE} &
-63:0 & R & Card Type:\newline   * 709 (0x2c5) VC709\newline   * 710 (0x2c6) HTG710\newline   * 711 (0x2c7) BNL711\newline  \\
+0x0090 & 0,1 & \multicolumn{2}{l|}{CARD\_TYPE} &
+63:0 & R & Card Type:\newline   - 709 (0x2c5): FLX709, VC709\newline   - 710 (0x2c6): FLX710, HTG710\newline   - 711 (0x2c7): FLX711, BNL711\newline   - 712 (0x2c8): FLX712, BNL712\newline   - 128 (0x080): FLX128, VCU128\newline  \\
+\hline
+0x00A0 & 0,1 & \multicolumn{2}{l|}{PCIE\_ENDPOINT} &
+0 & R & Indicator of the PCIe endpoint on BNL71x cards with two endpoints. 0 or 1 \\
 \hline
 \multicolumn{7}{|c|}{Application Specific} \\
 \hline
@@ -209,10 +232,10 @@ any & T & Writing any value to this register triggers the LFSR module to reset t
 \hline
 \multicolumn{7}{|c|}{House Keeping Controls And Monitors} \\
 \hline
-0x2300 & 0 & \multicolumn{2}{l|}{MMCM\_MAIN\_PLL\_LOCK} &
+0x9300 & 0 & \multicolumn{2}{l|}{MMCM\_MAIN\_PLL\_LOCK} &
 0 & R & Main MMCM PLL Lock Status \\
 \hline
-0x2310 & 0 & \multicolumn{5}{l|}{I2C\_WR} \\
+0x9310 & 0 & \multicolumn{5}{l|}{I2C\_WR} \\
 \cline{3-7}
  & & & I2C\_WREN & any & T & Any write to this register triggers an I2C read or write sequence \\
  & & & I2C\_FULL & 25 & R & I2C FIFO full \\
@@ -222,53 +245,53 @@ any & T & Writing any value to this register triggers the LFSR module to reset t
  & & & SLAVE\_ADDRESS & 7:1 & W & Slave address \\
  & & & READ\_NOT\_WRITE & 0 & W & READ/<o>WRITE</o> \\
 \hline
-0x2320 & 0 & \multicolumn{5}{l|}{I2C\_RD} \\
+0x9320 & 0 & \multicolumn{5}{l|}{I2C\_RD} \\
 \cline{3-7}
  & & & I2C\_RDEN & any & T & Any write to this register pops the last I2C data from the FIFO \\
  & & & I2C\_EMPTY & 8 & R & I2C FIFO Empty \\
  & & & I2C\_DOUT & 7:0 & R & I2C READ Data \\
 \hline
-0x2330 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_TEMP} &
+0x9330 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_TEMP} &
 11:0 & R & XADC temperature monitor for the FPGA CORE\newline for Virtex7\newline temp (C)= ((FPGA\_CORE\_TEMP* 503.975)/4096)-273.15\newline for Kintex Ultrascale\newline temp (C)= ((FPGA\_CORE\_TEMP* 502.9098)/4096)-273.8195\newline  \\
 \hline
-0x2340 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_VCCINT} &
+0x9340 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_VCCINT} &
 11:0 & R & XADC voltage measurement VCCINT = (FPGA\_CORE\_VCCINT *3.0)/4096 \\
 \hline
-0x2350 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_VCCAUX} &
+0x9350 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_VCCAUX} &
 11:0 & R & XADC voltage measurement VCCAUX = (FPGA\_CORE\_VCCAUX *3.0)/4096 \\
 \hline
-0x2360 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_VCCBRAM} &
+0x9360 & 0 & \multicolumn{2}{l|}{FPGA\_CORE\_VCCBRAM} &
 11:0 & R & XADC voltage measurement VCCBRAM = (FPGA\_CORE\_VCCBRAM *3.0)/4096 \\
 \hline
-0x2370 & 0,1 & \multicolumn{2}{l|}{FPGA\_DNA} &
+0x9370 & 0,1 & \multicolumn{2}{l|}{FPGA\_DNA} &
 63:0 & R & Unique identifier of the FPGA \\
 \hline
-0x2800 & 0 & \multicolumn{2}{l|}{INT\_TEST\_4} &
+0x9800 & 0 & \multicolumn{2}{l|}{INT\_TEST\_4} &
 any & T & Fire a test MSIx interrupt \#4 \\
 \hline
-0x2810 & 0 & \multicolumn{2}{l|}{INT\_TEST\_5} &
+0x9810 & 0 & \multicolumn{2}{l|}{INT\_TEST\_5} &
 any & T & Fire a test MSIx interrupt \#5 \\
 \hline
 \multicolumn{7}{|c|}{Wishbone} \\
 \hline
-0x4000 & 0 & \multicolumn{5}{l|}{WISHBONE\_CONTROL} \\
+0xC000 & 0 & \multicolumn{5}{l|}{WISHBONE\_CONTROL} \\
 \cline{3-7}
  & & & WRITE\_NOT\_READ & 32 & W & wishbone write command wishbone read command \\
  & & & ADDRESS & 31:0 & W & Slave address for Wishbone bus \\
 \hline
-0x4010 & 0 & \multicolumn{5}{l|}{WISHBONE\_WRITE} \\
+0xC010 & 0 & \multicolumn{5}{l|}{WISHBONE\_WRITE} \\
 \cline{3-7}
  & & & WRITE\_ENABLE & any & T & Any write to this register triggers a write to the Wupper to Wishbone fifo \\
  & & & FULL & 32 & R & Wishbone \\
  & & & DATA & 31:0 & W & Wishbone \\
 \hline
-0x4020 & 0 & \multicolumn{5}{l|}{WISHBONE\_READ} \\
+0xC020 & 0 & \multicolumn{5}{l|}{WISHBONE\_READ} \\
 \cline{3-7}
  & & & READ\_ENABLE & any & T & Any write to this register triggers a read from the Wishbone to Wupper fifo \\
  & & & EMPTY & 32 & R & Indicates that the Wishbone to Wupper fifo is empty \\
  & & & DATA & 31:0 & R & Wishbone read data \\
 \hline
-0x4030 & 0 & \multicolumn{5}{l|}{WISHBONE\_STATUS} \\
+0xC030 & 0 & \multicolumn{5}{l|}{WISHBONE\_STATUS} \\
 \cline{3-7}
  & & & INT & 4 & R & interrupt \\
  & & & RETRY & 3 & R & Interface is not ready to accept data cycle should be retried \\
@@ -278,16 +301,16 @@ any & T & Fire a test MSIx interrupt \#5 \\
 \hline
 \multicolumn{7}{|c|}{Interlaken} \\
 \hline
-0x5000 & 0 & \multicolumn{2}{l|}{INTERLAKEN\_PACKET\_LENGTH} &
+0xD000 & 0 & \multicolumn{2}{l|}{INTERLAKEN\_PACKET\_LENGTH} &
 15:0 & W & Packet length for fromhost packet (to Interlaken) \\
 \hline
-0x5010 & 0 & \multicolumn{5}{l|}{INTERLAKEN\_CONTROL\_STATUS} \\
+0xD010 & 0 & \multicolumn{5}{l|}{INTERLAKEN\_CONTROL\_STATUS} \\
 \cline{3-7}
  & & & TRANSCEIVER\_RESET & any & T & Any write to this register triggers a transceiver reset \\
  & & & DECODER\_LOCK & 1 & R & Decoder lock indication \\
  & & & DESCRAMBLER\_LOCK & 0 & R & Descrambler lock indication \\
 \hline
-0x5020 & 0 & \multicolumn{5}{l|}{TRANSCEIVER} \\
+0xD020 & 0 & \multicolumn{5}{l|}{TRANSCEIVER} \\
 \cline{3-7}
  & & & LOOPBACK & 8 & W & Interlaken \\
  & & & TX\_FAULT & 7:4 & R & SFP transceiver TX fault indication \\

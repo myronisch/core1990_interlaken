@@ -87,9 +87,15 @@ def prepend(value, prefix):
 
 
 def version(value):
-    """Convert MajorVersion.MinorVersion to MajorVersion*0x100+MinorVersion."""
+    """Convert MajorVersion.MinorVersion to a 4 digit BCD number."""
     v = value.split('.')
-    return int(v[0]) * 0x100 + int(v[1])
+    minorL = v[1]
+    majorL = v[0]
+    minorH = int(minorL)/10
+    minorL = int(minorL)%10
+    majorH = int(majorL)/10
+    majorL = int(majorL)%10
+    return int(majorH)*0x1000 + int(majorL)*0x100 + int(minorH)*0x10 + int(minorL)
 
 
 def vhdl_constant(value, bits=1):

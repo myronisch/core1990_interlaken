@@ -73,35 +73,6 @@ architecture rtl of xwb_crossbar is
   alias c_address : t_wishbone_address_array is g_address;
   alias c_mask    : t_wishbone_address_array is g_mask;
 
-  -- Confirm that no address ranges overlap
-  function f_ranges_ok
-    return boolean
-  is
-    constant zero : t_wishbone_address := (others => '0');
-  begin
-    for i in 0 to g_num_slaves-2 loop
-      for j in i+1 to g_num_slaves-1 loop
-        assert not (((c_mask(i) and c_mask(j)) and (c_address(i) xor c_address(j))) = zero) or
-               ((c_mask(i) or not c_address(i)) = zero) or -- disconnected slave?
-               ((c_mask(j) or not c_address(j)) = zero)    -- disconnected slave?
-        report "Address ranges must be distinct (slaves " & 
-	       Integer'image(i) & "[" & f_bits2string(c_address(i)) & "/" &
-	                                f_bits2string(c_mask(i)) & "] & " & 
-	       Integer'image(j) & "[" & f_bits2string(c_address(j)) & "/" &
-	                                f_bits2string(c_mask(j)) & "])"
-        severity Failure;
-      end loop;
-    end loop;
-    for i in 0 to g_num_slaves-1 loop
-      report "Mapping slave #" & 
-             Integer'image(i) & "[" & f_bits2string(c_address(i)) & "/" &
-                                      f_bits2string(c_mask(i)) & "]"
-      severity Note;
-    end loop;
-    return true;
-  end f_ranges_ok;
-  constant c_ok : boolean := f_ranges_ok;
-
   -- Crossbar connection matrix
   type matrix is array (g_num_masters-1 downto 0, g_num_slaves downto 0) of std_logic;
   
@@ -200,7 +171,7 @@ architecture rtl of xwb_crossbar is
     -- A slave is busy iff it services an in-progress cycle
     for slave in g_num_slaves downto 0 loop
       for master in g_num_masters-1 downto 0 loop
-        tmp_row(master) := matrix_old(master, slave) and slave_i(master).CYC;
+        tmp_row(master) := matrix_old(master, slave) and slave_i(master).cyc;
       end loop;
       sbusy(slave) := vector_OR(tmp_row);
     end loop;
@@ -210,19 +181,19 @@ architecture rtl of xwb_crossbar is
       for slave in g_num_slaves downto 0 loop
         tmp_column(slave) := matrix_old(master, slave);
       end loop;
-      mbusy(master) := vector_OR(tmp_column) and slave_i(master).CYC;
+      mbusy(master) := vector_OR(tmp_column) and slave_i(master).cyc;
     end loop;
 
     -- Decode the request address to see if master wants access
     for master in g_num_masters-1 downto 0 loop
       for slave in g_num_slaves-1 downto 0 loop
-        tmp := not vector_OR((slave_i(master).ADR and c_mask(slave)) xor c_address(slave));
+        tmp := not vector_OR((slave_i(master).adr and c_mask(slave)) xor c_address(slave));
         tmp_column(slave) := tmp;
-        request(master, slave) := slave_i(master).CYC and slave_i(master).STB and tmp;
+        request(master, slave) := slave_i(master).cyc and slave_i(master).stb and tmp;
       end loop;
       tmp_column(g_num_slaves) := '0';
       -- If no slaves match request, bind to 'error device'
-      request(master, g_num_slaves) := slave_i(master).CYC and slave_i(master).STB and not vector_OR(tmp_column);
+      request(master, g_num_slaves) := slave_i(master).cyc and slave_i(master).stb and not vector_OR(tmp_column);
     end loop;
 
     -- Arbitrate among the requesting masters
@@ -287,27 +258,27 @@ architecture rtl of xwb_crossbar is
   begin
     -- Rename all the signals ready for big_or
     for master in g_num_masters-1 downto 0 loop
-      CYC_row(master) := slave_i(master).CYC and granted(master, slave);
-      STB_row(master) := slave_i(master).STB and granted(master, slave);
+      CYC_row(master) := slave_i(master).cyc and granted(master, slave);
+      STB_row(master) := slave_i(master).stb and granted(master, slave);
       for bit in c_wishbone_address_width-1 downto 0 loop
-        ADR_matrix(bit)(master) := slave_i(master).ADR(bit) and granted(master, slave);
+        ADR_matrix(bit)(master) := slave_i(master).adr(bit) and granted(master, slave);
       end loop;
       for bit in (c_wishbone_address_width/8)-1 downto 0 loop
-        SEL_matrix(bit)(master) := slave_i(master).SEL(bit) and granted(master, slave);
+        SEL_matrix(bit)(master) := slave_i(master).sel(bit) and granted(master, slave);
       end loop;
-      WE_row(master) := slave_i(master).WE and granted(master, slave);
+      WE_row(master) := slave_i(master).we and granted(master, slave);
       for bit in c_wishbone_data_width-1 downto 0 loop
-        DAT_matrix(bit)(master) := slave_i(master).DAT(bit) and granted(master, slave);
+        DAT_matrix(bit)(master) := slave_i(master).dat(bit) and granted(master, slave);
       end loop;
     end loop;
     
     return (
-       CYC => vector_OR(CYC_row),
-       STB => vector_OR(STB_row),
-       ADR => slave_matrix_OR(ADR_matrix),
-       SEL => slave_matrix_OR(SEL_matrix),
-       WE  => vector_OR(WE_row),
-       DAT => slave_matrix_OR(DAT_matrix));
+       cyc => vector_OR(CYC_row),
+       stb => vector_OR(STB_row),
+       adr => slave_matrix_OR(ADR_matrix),
+       sel => slave_matrix_OR(SEL_matrix),
+       we  => vector_OR(WE_row),
+       dat => slave_matrix_OR(DAT_matrix));
   end slave_logic;
 
   subtype master_row is std_logic_vector(g_num_slaves downto 0);
@@ -337,22 +308,22 @@ architecture rtl of xwb_crossbar is
   begin
     -- We use inverted logic on STALL so that if no slave granted => stall
     for slave in g_num_slaves downto 0 loop
-      ACK_row(slave) := master_ie(slave).ACK and granted(master, slave);
-      ERR_row(slave) := master_ie(slave).ERR and granted(master, slave);
-      RTY_row(slave) := master_ie(slave).RTY and granted(master, slave);
-      STALL_row(slave) := not master_ie(slave).STALL and granted(master, slave);
+      ACK_row(slave) := master_ie(slave).ack and granted(master, slave);
+      ERR_row(slave) := master_ie(slave).err and granted(master, slave);
+      RTY_row(slave) := master_ie(slave).rty and granted(master, slave);
+      STALL_row(slave) := not master_ie(slave).stall and granted(master, slave);
       for bit in c_wishbone_data_width-1 downto 0 loop
-        DAT_matrix(bit)(slave) := master_ie(slave).DAT(bit) and granted(master, slave);
+        DAT_matrix(bit)(slave) := master_ie(slave).dat(bit) and granted(master, slave);
       end loop;
     end loop;
     
     return (
-      ACK => vector_OR(ACK_row),
-      ERR => vector_OR(ERR_row),
-      RTY => vector_OR(RTY_row),
-      STALL => not vector_OR(STALL_row),
-      DAT => master_matrix_OR(DAT_matrix),
-      INT => '0');
+      ack => vector_OR(ACK_row),
+      err => vector_OR(ERR_row),
+      rty => vector_OR(RTY_row),
+      stall => not vector_OR(STALL_row),
+      dat => master_matrix_OR(DAT_matrix),
+      int => '0');
   end master_logic;
 begin
   -- The virtual error slave is pretty straight-forward:
@@ -360,16 +331,16 @@ begin
   master_ie(g_num_slaves-1 downto 0) <= master_i;
   
   master_ie(g_num_slaves) <= (
-    ACK   => '0', 
-    ERR   => virtual_ERR,
-    RTY   => '0', 
-    STALL => '0',
-    DAT   => (others => '0'),
-    INT   => '0');
+    ack   => '0', 
+    err   => virtual_ERR,
+    rty   => '0', 
+    stall => '0',
+    dat   => (others => '0'),
+    int   => '0');
   virtual_error_slave : process(clk_sys_i)
   begin
     if rising_edge(clk_sys_i) then
-      virtual_ERR <= master_oe(g_num_slaves).CYC and master_oe(g_num_slaves).STB;
+      virtual_ERR <= master_oe(g_num_slaves).cyc and master_oe(g_num_slaves).stb;
     end if;
   end process virtual_error_slave;
   

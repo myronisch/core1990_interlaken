@@ -46,10 +46,10 @@
 
 
 
-library ieee, UNISIM, work;
+library ieee, UNISIM;
 use ieee.numeric_std.all;
 use UNISIM.VCOMPONENTS.all;
-use ieee.std_logic_unsigned.all;
+use ieee.std_logic_unsigned.all; -- @suppress "Deprecated package"
 use ieee.std_logic_1164.all;
 use work.pcie_package.all;
 use work.I2C.all;
@@ -79,7 +79,7 @@ architecture structure of housekeeping is
   signal nReset                         : std_logic;
   signal clk                            : std_logic;
   signal cmd_ack                        : std_logic;
-  signal ack_out                        : std_logic;
+  --signal ack_out                        : std_logic;
   signal Dout                           : std_logic_vector(7 downto 0);
   signal Din                            : std_logic_vector(7 downto 0);
   signal ack_in                         : std_logic;
@@ -88,29 +88,29 @@ architecture structure of housekeeping is
   signal stop                           : std_logic;
   signal start                          : std_logic;
   signal ena                            : std_logic;
-  signal reset                          : std_logic;
-  signal AUTOMATIC_CLOCK_SWITCH_ENABLED : std_logic_vector(0 downto 0);
+  
+  
 
   component i2c_interface
-    port (
-      Din                  : out    std_logic_vector(7 downto 0);
-      Dout                 : in     std_logic_vector(7 downto 0);
-      I2C_RD               : out    bitfield_i2c_rd_r_type;
-      I2C_WR               : out    bitfield_i2c_wr_r_type;
-      RST                  : in     std_logic;
-      ack_in               : out    std_logic;
-      ack_out              : in     std_logic;
-      appreg_clk           : in     std_logic;
-      clk                  : out    std_logic;
-      cmd_ack              : in     std_logic;
-      ena                  : out    std_logic;
-      nReset               : out    std_logic;
-      read                 : out    std_logic;
-      register_map_control : in     register_map_control_type;
-      rst_soft             : in     std_logic;
-      start                : out    std_logic;
-      stop                 : out    std_logic;
-      write                : out    std_logic);
+  	port(
+  		Din                  : out std_logic_vector(7 downto 0);
+  		Dout                 : in  std_logic_vector(7 downto 0);
+  		I2C_RD               : out bitfield_i2c_rd_r_type;
+  		I2C_WR               : out bitfield_i2c_wr_r_type;
+  		RST                  : in  std_logic;
+  		ack_in               : out std_logic;
+  		appreg_clk           : in  std_logic;
+  		clk                  : out std_logic;
+  		cmd_ack              : in  std_logic;
+  		ena                  : out std_logic;
+  		nReset               : out std_logic;
+  		read                 : out std_logic;
+  		register_map_control : in  register_map_control_type;
+  		rst_soft             : in  std_logic;
+  		start                : out std_logic;
+  		stop                 : out std_logic;
+  		write                : out std_logic
+  	);
   end component i2c_interface;
 
   component xadc_drp
@@ -153,7 +153,7 @@ begin
       ack_in  => ack_in,
       Din     => Din,
       cmd_ack => cmd_ack,
-      ack_out => ack_out,
+      ack_out => open,
       Dout    => Dout,
       SCL     => SCL,
       SDA     => SDA);
@@ -164,9 +164,9 @@ begin
       Dout                 => Dout,
       I2C_RD               => register_map_hk_monitor.I2C_RD,
       I2C_WR               => register_map_hk_monitor.I2C_WR,
-      RST                  => RST,
+      RST                  => rst,
       ack_in               => ack_in,
-      ack_out              => ack_out,
+      --ack_out              => ack_out,
       appreg_clk           => appreg_clk,
       clk                  => clk,
       cmd_ack              => cmd_ack,

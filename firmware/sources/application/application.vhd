@@ -46,40 +46,45 @@
 
 
 
-library ieee, UNISIM, work;
+library ieee, UNISIM;
 use ieee.numeric_std.all;
+use ieee.std_logic_unsigned.all; -- @suppress "Deprecated package" (used for sigasi to recognize - operator with std_logic vector)
 use UNISIM.VCOMPONENTS.all;
-use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 use ieee.std_logic_1164.all;
 use work.pcie_package.all;
 use work.interlaken_package.all;
+use work.axi_stream_package.ALL;
 
 entity application is
   generic(
-    NUMBER_OF_INTERRUPTS : integer := 8;
-    CARD_TYPE            : integer := 709;
+    --NUMBER_OF_INTERRUPTS : integer := 8;
     BurstMax             : integer := 256;
-    Lanes                : positive := 4
+    Lanes                : positive := 4;
+    DATA_WIDTH           : integer := 256;
+    NUMBER_OF_INTERRUPTS : integer;
+    CLOCKING_MODE : string := "independent_clock";
+	RELATED_CLOCKS : integer range 0 to 1 := 0;
+	FIFO_MEMORY_TYPE : string := "auto";
+	PACKET_FIFO : string := "false"
     );
   port (
     SYSCLK_P             : in     std_logic;--200 MHz clock at H19/G18
     SYSCLK_N             : in     std_logic;
     GTREFCLK_IN_P        : in     std_logic; -- Transceiver SFP clock
     GTREFCLK_IN_N        : in     std_logic;
-    appreg_clk           : in     std_logic;
-    clk250               : in     std_logic;
     flush_fifo           : in     std_logic;
-    fromHostFifo_dout    : in     std_logic_vector(63 downto 0);
+    fromHostFifo_dout    : in     std_logic_vector(DATA_WIDTH-1 downto 0);
     fromHostFifo_empty   : in     std_logic;
     fromHostFifo_rd_clk  : out    std_logic;
     fromHostFifo_rd_en   : out    std_logic;
     fromHostFifo_rst     : out    std_logic;
-    interrupt_call       : out    std_logic_vector(NUMBER_OF_INTERRUPTS-1 downto 4);
+    --interrupt_call       : out    std_logic_vector(NUMBER_OF_INTERRUPTS-1 downto 4);
     register_map_control : in     register_map_control_type; --! contains all read/write registers that control the application. The record members are described in pcie_package.vhd
     interlaken_monitor   : out    interlaken_monitor_type;
     reset_hard           : in     std_logic;
     reset_soft           : in     std_logic;
-    toHostFifo_din       : out    std_logic_vector(63 downto 0);
+    toHostFifo_din       : out    std_logic_vector(DATA_WIDTH-1 downto 0);
     toHostFifo_prog_full : in     std_logic;
     toHostFifo_rst       : out    std_logic;
     toHostFifo_wr_clk    : out    std_logic;
@@ -89,7 +94,7 @@ entity application is
     RX_In_P              : in     std_logic_vector(Lanes-1 downto 0);
     RX_In_N              : in     std_logic_vector(Lanes-1 downto 0);
     SFP_RX_LOS           : in     std_logic_vector(3 downto 0)
-
+    
  
     
     );
@@ -97,45 +102,48 @@ end entity application;
 
 architecture rtl of application is
 
-
-  
-    signal s_fromHostFifo_rd_en     : std_logic;
+    
     signal reset                    : std_logic;
     signal s_flush_fifo             : std_logic;
-    signal loopback_valid           : std_logic;
+    
     signal fromHostFifo_empty_s  :  std_logic; 
     
     ---- Interlaken instance signals
-    signal  RX_FlowControl_s     : std_logic_vector(15 downto 0);
-    signal  RX_Channel_s         : std_logic_vector(7 downto 0);
-    
-    signal  TX_FIFO_progfull_s   : std_logic;
-
-    signal  TX_FIFO_Full_s       : std_logic;
-    signal  TX_FIFO_Write_s      : std_logic;
-    signal  TX_SOP_s             : std_logic;
-    signal  TX_SOP_s_p1          : std_logic;
-    signal  TX_EOP_s             : std_logic;
-    signal  TX_EOP_Valid_s       : std_logic_vector(f_log2(Lanes)+2 downto 0); --std_logic_vector(2 downto 0); 
-    signal  fromHostFifo_rd_en_s_p1 : std_logic;
-    signal  fromHostFifo_rd_en_s : std_logic;
-    signal  toHostFifo_wr_en_s   : std_logic;
+    signal  TX_FlowControl_s     : slv_16_array(0 to Lanes-1);
+    --signal  RX_Channel_s         : std_logic_vector(7 downto 0);
+ 
+    --signal  TX_FIFO_progfull_s   : std_logic;
+    --signal  TX_FIFO_Full_s       : std_logic;
+    --signal  TX_FIFO_Write_s      : std_logic;
+    --signal  TX_SOP_s             : std_logic;
+    --signal  TX_SOP_s_p1          : std_logic;
+    --signal  TX_EOP_s             : std_logic;
+    --signal  fromHostFifo_rd_en_s_p1 : std_logic;
+    --signal  fromHostFifo_rd_en_s : std_logic;
+    --signal  toHostFifo_wr_en_s   : std_logic;
     --signal  TX_FIFO_Valid        : std_logic;
     
-    signal  RX_FIFO_Read_s       : std_logic;
-    signal  RX_FIFO_Empty_s      : std_logic;
-    signal  RX_FIFO_FULL_s       : std_logic;
-    signal  RX_SOP_s             : std_logic;
-    signal  RX_EOP_s             : std_logic;
-    signal  RX_EOP_Valid_s       : std_logic_vector(f_log2(Lanes)+2 downto 0);
-    signal  RX_FIFO_Valid        : std_logic;  
-    signal  RX_FIFO_Valid_p1     : std_logic;
-    signal  RX_FIFO_Read_s_p1    : std_logic;
+    signal m_axis : axis_64_array_type(0 to Lanes-1);
+    signal m_axis_prog_empty : axis_tready_array_type(0 to Lanes-1);
+    signal m_axis_aclk : std_logic;
+    signal m_axis_tready : axis_tready_array_type(0 to Lanes-1);
+     
+    signal s_axis : axis_64_array_type(0 to Lanes-1);
+    signal s_axis_prog_empty : axis_tready_array_type(0 to Lanes-1);
+    signal s_axis_aclk : std_logic;
+    signal s_axis_tready : axis_tready_array_type(0 to Lanes-1);
+    
+    --signal  RX_FIFO_Read_s       : std_logic;
+    --signal  RX_FIFO_Empty_s      : std_logic;
+    --signal  RX_EOP_s             : std_logic;
+    --signal  RX_EOP_Valid_s       : std_logic_vector(f_log2(Lanes)+2 downto 0);
+    --signal  RX_FIFO_Valid        : std_logic;  
+    --signal  RX_FIFO_Valid_p1     : std_logic;
 
     signal  ToWupperState        : std_logic;  
-    signal  FromWupperState      : std_logic;  
-    signal  RX_TO_WU             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";   -- IL channel 0
-    signal  WU_TO_TX             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";   -- IL channel 0
+      
+    --signal  RX_TO_WU             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";   -- IL channel 0
+    --signal  WU_TO_TX             : std_logic_vector(63 downto 0) := X"0000_0000_0000_0000";   -- IL channel 0
     signal  ToWupperCounter      : std_logic_vector(15 downto 0) := X"0000";  -- counts the passed (64 bit) data bursts
     signal  FromWuppercounter    : std_logic_vector(15 downto 0) := X"0000";  -- counts thw data packets read from the wupper fifo
     signal  CRC24_Error_s        : std_logic_vector(Lanes-1 downto 0);--std_logic := '0';
@@ -144,15 +152,15 @@ architecture rtl of application is
     signal  CRC32_occured        : std_logic := '0';
     signal  send_sync_word       : std_logic;
     signal  send_sync_word_p1    : std_logic;
-    signal  send_sync_word_p2    : std_logic;
-    signal  RX_EOP_s_p1          : std_logic;
+    
+    --signal  RX_EOP_s_p1          : std_logic;
     
     signal  Decoder_lock_s       : std_logic_vector(Lanes-1 downto 0);--std_logic; --interlaken_monitor_type;
     signal  Descrambler_lock_s   : std_logic_vector(Lanes-1 downto 0);--std_logic;
     signal  PacketLength         : std_logic_vector(15 downto 0) := X"0010";
     
-    signal  toHostFifo_din_s     : std_logic_vector(63 downto 0) ;
-    signal  fromHostFifo_dout_s     : std_logic_vector(63 downto 0) ;
+    signal  toHostFifo_din_s     : std_logic_vector(DATA_WIDTH-1 downto 0) ;
+    
     signal  clk40                : std_logic;
     signal  clk150               : std_logic;
     signal  locked               : std_logic;
@@ -160,10 +168,10 @@ architecture rtl of application is
     signal  loopback_in          : std_logic_vector(2 downto 0);
     
     -- Output signal to use with Channel Bonding -- 
-    signal  Interlaken_Channels_Output   : slv_64_array(0 to Lanes-1);   -- Channel 0 is currently mapped to  RX_TO_WU.
-    signal  Interlaken_Channels_Input    : slv_64_array(0 to Lanes-1);   -- Channel 0 is currently mapped to  WU_TO_TX.
+    --signal  Interlaken_Channels_Output   : slv_64_array(0 to Lanes-1);   -- Channel 0 is currently mapped to  RX_TO_WU.
+    --signal  Interlaken_Channels_Input    : slv_64_array(0 to Lanes-1);   -- Channel 0 is currently mapped to  WU_TO_TX.
        -------------------------- Generate System Clock ---------------------------
-     component clk_40MHz
+     component clk_40MHz -- @suppress "Component declaration "clk_40MHz" has none or multiple matching entity declarations"
      port (
          --Clock in- and output signals
          clk_in1_p         : in     std_logic;
@@ -175,6 +183,12 @@ architecture rtl of application is
          locked            : out    std_logic;
          reset             : in     std_logic );
      end component;
+     
+     --signal TX_SOP : std_logic;
+     --signal TX_EOP : std_logic;
+     --signal TX_EOP_Valid_Total : std_logic_vector(f_log2(Lanes)+2 downto 0);
+     
+     
 --   
 --    component ila_0
 
@@ -244,11 +258,6 @@ begin
 
 --    );
 
-
-
-
-
-
     fromHostFifo_rd_clk <= clk150;
     toHostFifo_wr_clk   <= clk150;
     reset <= not locked;
@@ -259,13 +268,8 @@ begin
     -- Loss Of Signal register
     interlaken_monitor.TRANSCEIVER.RX_LOS <= SFP_RX_LOS; 
     
-    g0: if(NUMBER_OF_INTERRUPTS>4) generate
-        interrupt_call(4 downto 4) <= register_map_control.INT_TEST_4;
-        g1: if(NUMBER_OF_INTERRUPTS>5) generate
-            interrupt_call(5 downto 5) <= register_map_control.INT_TEST_5;
-            interrupt_call(NUMBER_OF_INTERRUPTS-1 downto 6) <= (others => '0');
-        end generate;
-    end generate;
+    TX_FlowControl_s <= (others => (others => '0')); --TODO: implement TX flowcontrol
+    
 -----------------------------
   
   System_Clock : clk_40MHz
@@ -284,67 +288,46 @@ begin
   
   il0: entity work.interlaken_interface 
       generic map(
-           BurstMax     => BurstMax,  -- Configurable value of BurstMax
-           BurstShort   => 64,        -- Configurable value of BurstShort
-           PacketLength => 2024,       -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
-           Lanes        => Lanes)         -- Number of Lanes (Transmission channels) Default: 4
+           BurstMax => BurstMax, -- Configurable value of BurstMax
+           BurstShort => 64, -- Configurable value of BurstShort
+           PacketLength => 2024, -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
+           Lanes => Lanes, -- Number of Lanes (Transmission channels) Default: 4
+           CLOCKING_MODE => CLOCKING_MODE,
+           RELATED_CLOCKS => RELATED_CLOCKS,
+           FIFO_MEMORY_TYPE => FIFO_MEMORY_TYPE,
+           PACKET_FIFO => PACKET_FIFO      )
       port map(
           ----40 MHz input, from clock generator------------
-          clk40  => clk40,                                      --: in std_logic;
-          clk150 => clk150,                                     --: in std_logic;
-          reset  => reset,                                      --: in std_logic;
-          
+          clk40 => clk40, --: in std_logic;
+          --clk150 => clk150,                                     --: in std_logic;
+          reset => reset, --: in std_logic;
           ----125 MHz input, to transceiver (SGMII clock)--
-          GTREFCLK_IN_P => GTREFCLK_IN_P,                       --: in std_logic;
-          GTREFCLK_IN_N => GTREFCLK_IN_N,                       --: in std_logic;
-          
-          
-          ----Data signals---------------------------------
-          TX_Data(0)     => WU_TO_TX, --fromHostFifo_dout,                  
-          TX_Data(1)     => Interlaken_Channels_Output(1),   -- Extra TX channels can be mapped here instead of this signal 
-          TX_Data(2)     => Interlaken_Channels_Output(2),   -- 
-          TX_Data(3)     => Interlaken_Channels_Output(3),   --
-          RX_Data(0)     => RX_TO_WU, -- toHostFifo_din,              
-          RX_Data(1)     => Interlaken_Channels_Input(1),    -- Extra RX channels can be mapped here instead of this signal 
-          RX_Data(2)     => Interlaken_Channels_Input(2),    --
-          RX_Data(3)     => Interlaken_Channels_Input(3),    --
-          
+          GTREFCLK_IN_P => GTREFCLK_IN_P, --: in std_logic;
+          GTREFCLK_IN_N => GTREFCLK_IN_N, --: in std_logic;
           ----Transceiver related transmission-------------
-          TX_Out_P  => TX_Out_P,                                --: out std_logic_vector(Lanes-1 downto 0);
-          TX_Out_N  => TX_Out_N,                                --: out std_logic_vector(Lanes-1 downto 0);
-          RX_In_P   => RX_In_P,                                 --: in std_logic_vector(Lanes-1 downto 0);
-          RX_In_N   => RX_In_N,                                 --: in std_logic_vector(Lanes-1 downto 0);
-          
-          ----Transmitter input/ready signals--------------
-          TX_SOP            => TX_SOP_s,                        --: in std_logic;
-          TX_EOP            => TX_EOP_s,                        --: in std_logic;
-          TX_EOP_Valid_Total      => TX_EOP_Valid_s,                  --: in std_logic_vector(2 downto 0);
-          TX_FlowControl    => RX_FlowControl_s,                --: in std_logic_vector(15 downto 0);
-        --  TX_Channel        => RX_Channel_s,                    --: in std_logic_vector(7 downto 0);
-      
-     
+          TX_Out_P => TX_Out_P, --: out std_logic_vector(Lanes-1 downto 0);
+          TX_Out_N => TX_Out_N, --: out std_logic_vector(Lanes-1 downto 0);
+          RX_In_P => RX_In_P, --: in std_logic_vector(Lanes-1 downto 0);
+          RX_In_N => RX_In_N, --: in std_logic_vector(Lanes-1 downto 0);
+          --TX_SOP => TX_SOP,
+          --TX_EOP => TX_EOP,
+          --TX_EOP_Valid_Total => TX_EOP_Valid_Total,
+          TX_FlowControl => TX_FlowControl_s, --: in std_logic_vector(15 downto 0);
+          s_axis => s_axis,
+          s_axis_aclk => s_axis_aclk,
+          s_axis_tready => s_axis_tready,
+          m_axis_aclk => m_axis_aclk,
           ----Receiver output signals-------------    
-          RX_SOP            => RX_SOP_s,                        --: out std_logic;                         
-          RX_EOP            => RX_EOP_s,                        --: out std_logic;                         
-          RX_EOP_Valid_Total      => RX_EOP_Valid_s,                  --: out std_logic_vector(2 downto 0);      
-          RX_FlowControl    => RX_FlowControl_s,                --: out std_logic_vector(15 downto 0);     
+          --RX_FlowControl    => RX_FlowControl_s,                --: out std_logic_vector(15 downto 0);     
           --RX_Channel        => RX_Channel_s,                    --: out std_logic_vector(7 downto 0);      
-          RX_FIFO_Valid      => RX_FIFO_Valid,                  --: out std_logic;
-          RX_FIFO_Read      => RX_FIFO_Read_s,                  --: in std_logic;
-
-          ----Transmitter status signals----------   
-          TX_FIFO_Full      => TX_FIFO_Full_s,                  --: out std_logic;
-          TX_FIFO_Write     => TX_FIFO_Write_s,                 --: in std_logic;
-          TX_FIFO_progfull  => TX_FIFO_progfull_s,              --: out std_logic;
-      
-                
+          m_axis => m_axis,
+          m_axis_tready => m_axis_tready,
+          m_axis_prog_empty => m_axis_prog_empty,
           ----Receiver status signals-------------
-          RX_FIFO_Full      => RX_FIFO_FULL_s,                  --: out std_logic;
-          RX_FIFO_Empty     => RX_FIFO_Empty_s,                 --: out std_logic;
-          Decoder_lock      => Decoder_lock_s ,                 
-          Descrambler_lock  => Descrambler_lock_s ,--interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0),              
-          CRC24_Error       => CRC24_Error_s,                   --: out std_logic;
-          CRC32_Error       => CRC32_Error_s,                   --: out std_logic
+          --Decoder_lock      => Decoder_lock_s ,                 
+          --Descrambler_lock  => Descrambler_lock_s ,--interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0),              
+          --CRC24_Error       => CRC24_Error_s,                   --: out std_logic;
+          --CRC32_Error       => CRC32_Error_s,                   --: out std_logic
           loopback_in => loopback_in
           
       );
@@ -353,9 +336,9 @@ begin
       interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DECODER_LOCK(1)  <= Decoder_lock_s(0) ;
       interlaken_monitor.INTERLAKEN_CONTROL_STATUS.DESCRAMBLER_LOCK(0) <= Descrambler_lock_s(0);
       --
-      RX_FIFO_Read_s <= not RX_FIFO_Empty_s and not send_sync_word and not toHostFifo_prog_full; -- Read data when not empty and no sync_word is beiging sent
-      toHostFifo_wr_en <= toHostFifo_wr_en_s; -- Write data in wupper fifo, or write sync word in fifo
-      send_sync_word <= RX_EOP_s AND (NOT send_sync_word_p1) and RX_FIFO_valid;      
+      --RX_FIFO_Read_s <= not RX_FIFO_Empty_s and not send_sync_word and not toHostFifo_prog_full; -- Read data when not empty and no sync_word is beiging sent
+      --toHostFifo_wr_en <= toHostFifo_wr_en_s; -- Write data in wupper fifo, or write sync word in fifo
+      --send_sync_word <= RX_EOP_s AND (NOT send_sync_word_p1) and RX_FIFO_Valid;      
       
       toHostFifo_din <= toHostFifo_din_s;
       
@@ -367,20 +350,20 @@ begin
         
         if rising_edge(clk150) then
             if reset = '1' then
-                ToWupperstate <= '0';
-                RX_FIFO_Valid_p1 <= '0';
+                ToWupperState <= '0';
+                --RX_FIFO_Valid_p1 <= '0';
                 send_sync_word_p1 <= '0';
-                RX_EOP_s_p1 <= '0';
+                --RX_EOP_s_p1 <= '0';
                 ToWupperCounter <= X"0000";
-                toHostFifo_din_s <= SYNC_INFO_WORD;
+                --toHostFifo_din_s <= SYNC_INFO_WORD;
                 CRC24_occured <= '0';
                 CRC32_occured <= '0';
             else
                -- if RX_FIFO_Read_s = '1' then
-                    RX_EOP_s_p1 <= RX_EOP_s;
+                    --RX_EOP_s_p1 <= RX_EOP_s;
                     send_sync_word_p1 <= send_sync_word;
-                    RX_FIFO_Valid_p1 <= RX_FIFO_Valid;
-                    toHostFifo_wr_en_s <= '0';
+                    --RX_FIFO_Valid_p1 <= RX_FIFO_Valid;
+                    --toHostFifo_wr_en_s <= '0';
                     -- Check CRC error signals
                     if CRC24_Error_s(0) = '1' then
                         CRC24_occured <= '1';
@@ -394,18 +377,18 @@ begin
                     if ToWupperState = '1' then  -- Send data to fifo
                         if send_sync_word = '1' then                      -- EOP signal received, next clock cycle: send sync word
                             
-                            SYNC_INFO_WORD(37 downto 33) := RX_EOP_Valid_s; -- Nuumber of bytes that are valid from the previous 8-byte data word
-                            ToWupperstate <= '0';
+                            --SYNC_INFO_WORD(37 downto 33) := RX_EOP_Valid_s; -- Nuumber of bytes that are valid from the previous 8-byte data word
+                            ToWupperState <= '0';
                         end if;
 
-                        if RX_FIFO_Valid = '1'  then
-                             ToWupperCounter <= ToWupperCounter + 1;
-                             toHostFifo_wr_en_s <= '1';
-                             toHostFifo_din_s <= RX_TO_WU(63 downto 0);       -- Write the data to the ToHost FIFO of Wupper
-                        else
-                             toHostFifo_wr_en_s <= '0';  --No valid data to write
-                             toHostFifo_din_s <= RX_TO_WU(63 downto 0);       -- Fifo data ports will be connected but not written
-                        end if;
+                      --  if RX_FIFO_Valid = '1'  then
+                      --       ToWupperCounter <= ToWupperCounter + 1;
+                      --       toHostFifo_wr_en_s <= '1';
+                      --       --//toHostFifo_din_s <= RX_TO_WU(63 downto 0);       -- Write the data to the ToHost FIFO of Wupper
+                      --  else
+                      --       toHostFifo_wr_en_s <= '0';  --No valid data to write
+                      --       --toHostFifo_din_s <= RX_TO_WU(63 downto 0);       -- Fifo data ports will be connected but not written
+                      --  end if;
                         
                         
                     elsif ToWupperState  = '0' then                         -- Send synchronization word.
@@ -415,10 +398,10 @@ begin
                         SYNC_INFO_WORD(39) := CRC24_occured; 
                         CRC24_occured <= '0';
                         CRC32_occured <= '0';
-                        toHostFifo_din_s <= SYNC_INFO_WORD;                   -- Write the SYNC_INFO_WORD to the FIFO
-                        toHostFifo_wr_en_s <= '1';
+                        --toHostFifo_din_s <= SYNC_INFO_WORD;                   -- Write the SYNC_INFO_WORD to the FIFO
+                        --toHostFifo_wr_en_s <= '1';
                         ToWupperCounter <= (others => '0');
-                        ToWupperstate <= '1';
+                        ToWupperState <= '1';
                     end if;
                 --end if;
             end if;        
@@ -428,37 +411,37 @@ begin
       
 --      Wupper to Interlaken
     fromHostFifo_empty_s <= fromHostFifo_empty;
-    fromHostFifo_rd_en <= fromHostFifo_rd_en_s;
-    TX_FIFO_Write_s <= fromHostFifo_rd_en_s_p1; 
+    --fromHostFifo_rd_en <= fromHostFifo_rd_en_s;
+    --TX_FIFO_Write_s <= fromHostFifo_rd_en_s_p1; 
     
-    fromHostFifo_rd_en_s <= not fromHostFifo_empty_s and (not TX_FIFO_progfull_s)  and Descrambler_lock_s(0); 
-    Wu_TO_TX <= fromHostFifo_dout;
+    --fromHostFifo_rd_en_s <= not fromHostFifo_empty_s and (not TX_FIFO_progfull_s)  and Descrambler_lock_s(0); 
+    --WU_TO_TX <= fromHostFifo_dout;
                    
       process(clk150)
       begin
         if(rising_edge(clk150)) then
             if reset = '1' then
-                FromWupperCounter <= (others => '0');
-                TX_EOP_s <= '0';
-                TX_SOP_s <= '0';
+                FromWuppercounter <= (others => '0');
+                --TX_EOP_s <= '0';
+                --TX_SOP_s <= '0';
                 --TX_EOP_Valid_s <= (others => '0');
             else
-               fromHostFifo_rd_en_s_p1 <= fromHostFifo_rd_en_s;
-               if fromHostFifo_rd_en_s = '1' then  -- Wait with sending data to the Interlaken TX, untill the RX IL is initialised
-                      FromWupperCounter <= FromWupperCounter + 1;
-                      --TX_EOP_Valid_s <= "00000";
-                      if FromWupperCounter = X"0000" then     -- Transmit a SOP (Start Of Packet)
-                          TX_SOP_s <= '1';
-                          TX_EOP_S <= '0';
-                      elsif FromWupperCounter = X"0001" then  -- Reset TX SOP after one clock period
-                          TX_SOP_s <= '0';
-                      elsif FromWupperCounter = PacketLength-1 then  -- When the set packet length is reached
-                          TX_EOP_s <= '1';                  -- Transmit the EOP (End Of Packet)
-                          --TX_EOP_Valid_s <= "11111";          -- Signal that the previous Data is valid
-                          FromWupperCounter <= (others => '0');
-                      end if;   
-                                     
-                end if;
+               --fromHostFifo_rd_en_s_p1 <= fromHostFifo_rd_en_s;
+               --if fromHostFifo_rd_en_s = '1' then  -- Wait with sending data to the Interlaken TX, untill the RX IL is initialised
+               --       FromWuppercounter <= FromWuppercounter + 1;
+               --       --TX_EOP_Valid_s <= "00000";
+               --       if FromWuppercounter = X"0000" then     -- Transmit a SOP (Start Of Packet)
+               --           --TX_SOP_s <= '1';
+               --           --TX_EOP_s <= '0';
+               --       elsif FromWuppercounter = X"0001" then  -- Reset TX SOP after one clock period
+               --           --TX_SOP_s <= '0';
+               --       elsif FromWuppercounter = PacketLength-1 then  -- When the set packet length is reached
+               --           --TX_EOP_s <= '1';                  -- Transmit the EOP (End Of Packet)
+               --           --TX_EOP_Valid_s <= "11111";          -- Signal that the previous Data is valid
+               --           FromWuppercounter <= (others => '0');
+               --       end if;   
+               --                      
+               -- end if;
             end if;
         end if;        
       end process;

@@ -46,9 +46,9 @@
 
 --! @brief ieee
 
-library work, ieee, UNISIM;
+library ieee, UNISIM;
 use UNISIM.VCOMPONENTS.all;
-use ieee.std_logic_unsigned.all;
+use ieee.std_logic_unsigned.all;-- @suppress "Deprecated package"
 use ieee.std_logic_1164.all;
 
 
@@ -65,7 +65,25 @@ generic
     PCIE_USERCLK1_FREQ : integer := 5;                       -- PCIe user clock 1 frequency
     PCIE_USERCLK2_FREQ : integer := 4;                       -- PCIe user clock 2 frequency
     PCIE_OOBCLK_MODE   : integer := 1;                       -- PCIe oob clock mode
-    PCIE_DEBUG_MODE    : integer := 0                        -- PCIe Debug mode
+    PCIE_DEBUG_MODE    : integer := 0;                        -- PCIe Debug mode
+    CLKIN2_PERIOD : real;
+    CLKOUT5_DIVIDE : integer;
+    CLKOUT5_DUTY_CYCLE : real;
+    CLKOUT5_PHASE : real;
+    CLKOUT5_USE_FINE_PS : boolean;
+    CLKOUT6_DIVIDE : integer;
+    CLKOUT6_DUTY_CYCLE : real;
+    CLKOUT6_PHASE : real;
+    CLKOUT6_USE_FINE_PS : boolean;
+    IS_CLKINSEL_INVERTED : bit;
+    IS_PSEN_INVERTED : bit;
+    IS_PSINCDEC_INVERTED : bit;
+    IS_PWRDWN_INVERTED : bit;
+    IS_RST_INVERTED : bit;
+    REF_JITTER2 : real;
+    SS_EN : string;
+    SS_MODE : string;
+    SS_MOD_PERIOD : integer
 );
 port
 (
@@ -174,6 +192,7 @@ architecture rtl of pcie_clocking is
     signal    userclk1_1     : std_logic;
     signal    userclk2_1     : std_logic;
     signal    mmcm_lock      : std_logic;
+   
     
     
 begin
@@ -210,6 +229,24 @@ mmcm0: MMCME2_ADV
 generic map
 (
 
+    CLKIN2_PERIOD => CLKIN2_PERIOD,
+    CLKOUT5_DIVIDE => CLKOUT5_DIVIDE,
+    CLKOUT5_DUTY_CYCLE => CLKOUT5_DUTY_CYCLE,
+    CLKOUT5_PHASE => CLKOUT5_PHASE,
+    CLKOUT5_USE_FINE_PS => CLKOUT5_USE_FINE_PS,
+    CLKOUT6_DIVIDE => CLKOUT6_DIVIDE,
+    CLKOUT6_DUTY_CYCLE => CLKOUT6_DUTY_CYCLE,
+    CLKOUT6_PHASE => CLKOUT6_PHASE,
+    CLKOUT6_USE_FINE_PS => CLKOUT6_USE_FINE_PS,
+    IS_CLKINSEL_INVERTED => IS_CLKINSEL_INVERTED,
+    IS_PSEN_INVERTED => IS_PSEN_INVERTED,
+    IS_PSINCDEC_INVERTED => IS_PSINCDEC_INVERTED,
+    IS_PWRDWN_INVERTED => IS_PWRDWN_INVERTED,
+    IS_RST_INVERTED => IS_RST_INVERTED,
+    REF_JITTER2 => REF_JITTER2,
+    SS_EN => SS_EN,
+    SS_MODE => SS_MODE,
+    SS_MOD_PERIOD => SS_MOD_PERIOD,
     BANDWIDTH                  => ("OPTIMIZED"),
     CLKOUT4_CASCADE            => FALSE,
     COMPENSATION               => ("ZHOLD"),
@@ -246,47 +283,43 @@ port map
 (
 
      ---------- Input ------------------------------------
-    CLKIN1                     => CLK_TXOUTCLK,
-    CLKIN2                     => '0',                     -- not used, comment out CLKIN2 if it cause implementation issues
-    CLKINSEL                   => '1',
-    CLKFBIN                    => mmcm_fb,
-    RST                        => CLK_RST,
-    PWRDWN                     => '0', 
-    
     ---------- Output ------------------------------------
-    CLKFBOUT                   => mmcm_fb,
-    CLKFBOUTB                  => open,
-    CLKOUT0                    => clk_125mhz,
-    CLKOUT0B                   => open,
-    CLKOUT1                    => clk_250mhz,
-    CLKOUT1B                   => open,
-    CLKOUT2                    => userclk1,
-    CLKOUT2B                   => open,
-    CLKOUT3                    => userclk2,
-    CLKOUT3B                   => open,
-    CLKOUT4                    => oobclk,
-    CLKOUT5                    => open,
-    CLKOUT6                    => open,
-    LOCKED                     => mmcm_lock,
-    
-    ---------- Dynamic Reconfiguration -------------------
-    DCLK                       => '0',
-    DADDR                      => (others => '0'),
-    DEN                        => '0',
-    DWE                        => '0',
-    DI                         => (others => '0'),
-    DO                         => open,
-    DRDY                       => open,
-    
-    ---------- Dynamic Phase Shift -----------------------
-    PSCLK                      => '0',
-    PSEN                       => '0',
-    PSINCDEC                   => '0',
-    PSDONE                     => open,
-    
+    CLKFBOUT => mmcm_fb,
+    CLKFBOUTB => open,
+    CLKFBSTOPPED => open,
     ---------- Status ------------------------------------
-    CLKINSTOPPED               => open,
-    CLKFBSTOPPED               => open  
+    CLKINSTOPPED => open,
+    CLKOUT0 => clk_125mhz,
+    CLKOUT0B => open,
+    CLKOUT1 => clk_250mhz,
+    CLKOUT1B => open,
+    CLKOUT2 => userclk1,
+    CLKOUT2B => open,
+    CLKOUT3 => userclk2,
+    CLKOUT3B => open,
+    CLKOUT4 => oobclk,
+    CLKOUT5 => open,
+    CLKOUT6 => open,
+    DO => open,
+    DRDY => open,
+    LOCKED => mmcm_lock,
+    PSDONE => open,
+    CLKFBIN => mmcm_fb,
+    CLKIN1 => CLK_TXOUTCLK,
+    CLKIN2 => '0', -- not used, comment out CLKIN2 if it cause implementation issues
+    CLKINSEL => '1',
+    DADDR => (others => '0'),
+    ---------- Dynamic Reconfiguration -------------------
+    DCLK => '0',
+    DEN => '0',
+    DI => (others => '0'),
+    DWE => '0',
+    ---------- Dynamic Phase Shift -----------------------
+    PSCLK => '0',
+    PSEN => '0',
+    PSINCDEC => '0',
+    PWRDWN => '0',
+    RST => CLK_RST  
 
 ); 
   

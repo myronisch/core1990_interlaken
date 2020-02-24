@@ -78,12 +78,6 @@ architecture wb_intercon of wb_intercon is
     ------------------------------------------------------------------
     signal  CLK:            std_logic;
     signal  RST, EXTRST:    std_logic; 
-    signal  read_en:        std_logic;
-    signal  write_en:       std_logic;
-    signal  full_signal:    std_logic;  
-    signal  empty_signal:   std_logic; 
-    signal  register_map_monitor:   register_map_monitor_type;
-    signal  register_map_control:   register_map_control_type;          
     signal  Slave_o:    t_wishbone_slave_out_array(g_num_masters-1 downto 0);
     signal  Slave_i:    t_wishbone_slave_in_array(g_num_masters-1 downto 0);
     signal  Master_o:   t_wishbone_master_out_array(g_num_slaves-1 downto 0);
@@ -140,12 +134,12 @@ begin
 
    U03: entity work.wupper_to_wb
    port map(
-       control_in           =>  control_in,
-       monitor_out          =>  monitor_out,        
-       wishbone_clk_i       =>  wupper_clk_i,
-       wupper_clk_i         =>  wupper_clk_i,
-       RST_I                =>  RST,     
-       master_o             =>  Master_o(0), 
-       master_i             =>  Master_i(0)                 
+       master_i => Master_i(0),
+       master_o => Master_o(0),
+       control_in => control_in,
+       monitor_out => monitor_out,
+       wishbone_clk_i => wupper_clk_i,
+       wupper_clk_i => wupper_clk_i,
+       rst_i => RST                 
     );               
 end architecture wb_intercon;
