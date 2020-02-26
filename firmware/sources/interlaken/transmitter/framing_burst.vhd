@@ -267,18 +267,18 @@ begin
                         end if;
 
                         --CRC24_En <= s_axis.tvalid and s_axis_tready_s;  -- <= '1' --s_axis.tvalid; -- Makes CRC-32 error
-
+                        
+                        if (CRC24_P1 = '1') then
+                            CRC24_RST <= '1';
+                            CRC24_P1 <= '0';
+                        end if;
+                    if(Byte_Counter <= BurstShort) then
                         if(meta_tready = '0' or BURST_tready = '0') then
                             Data_Valid <= '0';
                         end if;
 
                         if ( (Byte_Counter >= (BurstMax-8)) or (s_axis.tlast = '1') or (Channel_send_idle='1') ) then
                             BURST_tready <= '0';
-                        end if;
-
-                        if (CRC24_P1 = '1') then
-                            CRC24_RST <= '1';
-                            CRC24_P1 <= '0';
                         end if;
 
                         if Word_Control_out = '1' then
@@ -294,6 +294,17 @@ begin
                                 valid_temp <= '0';
                             end if;
                         end if;
+                        if (Channel_send_idle = '1') then 
+                            CRC24_TX <= "010"&X"C000_0001_0000_0000";--END OF PACKET
+                        elsif((TX_Enable='0') or ((s_axis.tvalid='0') and (s_axis_tready_s='0') and (TX_Enable='0'))) then 
+                         CRC24_TX <= "010"&X"8000_0001_0000_0000"; --IDLE PACKETS
+                        end if;
+                    elsif (s_axis.tlast = '1') then
+                        CRC24_TX <= "010"&X"9000_0001_0000_0000"; --End OF BURST PACKET
+                        CRC24_TX(55 downto 40) <= FlowControl;
+                        CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;
+                        Data_Valid <= '1';
+                     end if;
 ---------------original DATA
               --TODO add these situations
               --         if (Byte_Counter >= BurstShort) then
@@ -308,7 +319,7 @@ begin
               --             CRC24_TX(55 downto 40) <= FlowControl;
               --             Data_Valid <= '1';
               --             CRC24_RST <= '1';
-              --             if (Channel_send_idle = '1')then
+              --             if (Channel_send_idle = '1')thenEOP
               --                 CRC24_TX <= "010"&X"C000_0001_0000_0000";
               --             else
               --                 CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
