@@ -173,10 +173,10 @@ begin
         wait for SYSCLK_PERIOD/2;
     end process;
     
-    
-    simulation : process
+    --TODO write a testbench for the Framing Burst (To test the statemachine)
+    Simulation_Framing_Burst : process
     begin
-        m_axis_tready <= (others => '1');
+         m_axis_tready <= (others => '1');
         --Test Data patern 1 to FFFFFF
         for i in 0 to Lanes-1 loop
             s_axis(i).tvalid <= '0';
@@ -189,134 +189,182 @@ begin
             s_axis(i).tkeep <= (others => '0');
             s_axis(i).tuser <= (others => '0');
         end loop;
-        for j in 0 to 16777215 loop --FFFFFF
-            for i in 0 to Lanes-1 loop
-                s_axis(i).tdata <= x"0000000000000000"+j;
+        
+        --Testing the tlast 
+        for packet in 0 to 20 loop --20 packets
+            
+            for i in 0 to Lanes-1 loop                          -- For all lanes
+                s_axis(i).tlast <= '1';                         -- Set tlast '1'
+                s_axis(i).tdata <= x"0000000000000000";         -- start data
             end loop;
-            wait for SYSCLK_PERIOD;
+            wait for DCLK_PERIOD;
+            for j in 1 to 20 loop --20 bursts
+                
+                for i in 0 to Lanes-1 loop                      -- For all lanes
+                    s_axis(i).tlast <= '0';                     -- Set tlast '0'
+                    s_axis(i).tdata <= x"0000000000000000"+j;   -- Set data pattern
+                end loop;
+                wait for DCLK_PERIOD;                           -- Wait for data clk
+                
+            end loop;
+            for i in 0 to Lanes-1 loop                          -- For all lanes
+              s_axis(i).tlast <= '1';                           -- Set tlast '1'
+            end loop;
+            
+            
+            
         end loop;
         wait;
+        end process;
+    
+    
+ --   Simulation_Interlaken_TX_to_RX : process
+ --   begin
+ --       m_axis_tready <= (others => '1');
+ --       --Test Data patern 1 to FFFFFF
+ --       for i in 0 to Lanes-1 loop
+ --           s_axis(i).tvalid <= '0';
+ --           s_axis(i).tlast <='0';
+ --       end loop;
+ --       wait until (Reset = '0');
+ --       wait until (HealthInterface = '1');-- Wait for lock before sending data
+ --       for i in 0 to Lanes-1 loop
+ --           s_axis(i).tvalid <= '1';
+ --           s_axis(i).tkeep <= (others => '0');
+ --           s_axis(i).tuser <= (others => '0');
+ --       end loop;
+ --       for j in 0 to 16777215 loop --FFFFFF
+ --           for i in 0 to Lanes-1 loop
+ --               s_axis(i).tdata <= x"0000000000000000"+j;
+ --           end loop;
+ --           wait for SYSCLK_PERIOD;
+ --       end loop;
+ --       wait;
+ --   end process;
+    
+    
+---old sim
+--        wait for 1 ps;
+--            --TX_Enable <= '0';
+--        TX_EOP <= '0';
+--        TX_SOP <= '0';
+--        TX_Channel <= X"01";
+--        TX_EOP_Valid <= "111";
+--        TX_Data <= (others=>'0');
+--        Reset <= '1';
+--        TX_FlowControl <= (others => '0');
+--        
+--        wait for 20*SYSCLK_PERIOD;
+--        
+--        wait for SYSCLK_PERIOD;
+--        Reset <= '0';
+--        --TX_SOP <= '1';
+--        --TX_Enable <= '1';
+--        TX_Data <= X"1f5e5d5c5b5a5958";
+--        wait for SYSCLK_PERIOD;
+--        --TX_EOP <= '1';
+--        
+--        wait until (TX_Link_Up = '1');
+--    
+--        wait for SYSCLK_PERIOD*10;
+--        TX_FlowControl(0) <= '1';
+--        TX_SOP <= '1';
+--        TX_EOP <= '1';
+--        TX_Data <= X"2f5e5d5c5b5a5958";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_EOP <= '0';
+--        TX_Data <= X"3f5e5d5c5b5a5958";
+--        wait for SYSCLK_PERIOD;
+--        
+--         
+--        TX_SOP <= '0';
+--        TX_EOP <= '0';
+--        TX_EOP <= '0';
+--        --reset <= '1';
+--        TX_Data <= X"4f21a2a3a4a5a6a7";
+--        wait for SYSCLK_PERIOD;
+----        TX_FlowControl(0) <= '1';
+--        TX_SOP <= '1';
+--        TX_Data <= X"5f5e5a5c5b60f2a0";      
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_SOP <= '0';
+--        TX_EOP <= '1';
+--        TX_Data  <= X"635e22a3a4a5a7a7";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_EOP <= '0';
+--        --TX_SOP <= '1';
+--        TX_Data  <= X"70000FFF000000F0";
+--        wait for SYSCLK_PERIOD*2;
+--        
+--        TX_SOP <= '1';
+--        TX_Data <= X"2f5e5d5c5b5a5958";
+--        wait for SYSCLK_PERIOD;
+--              
+--        TX_SOP <= '0';
+--        TX_EOP <= '1';
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_EOP <= '0';
+--        --TX_SOP <= '0';
+--        TX_Data  <= X"8050505050050505";
+--        --wait for SYSCLK_PERIOD*3;                          
+--        wait for SYSCLK_PERIOD;
+--        TX_Data  <= X"9486576758050505";
+--        wait for SYSCLK_PERIOD; 
+--        
+--        TX_EOP <= '1';                          
+--        TX_Data <= X"60b35d5dc4a582a7";
+--        wait for SYSCLK_PERIOD; --Test influencing pause state position
+--        
+--        TX_EOP <= '0';
+--        wait for SYSCLK_PERIOD*16;
+--        
+--        TX_SOP <= '1';
+--        TX_Data <= X"4f21a2a3a4a5a6a7";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_Data <= X"995e5a5c5b60f2a0";      
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_Data  <= X"635e22a3a4a5a7a7";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_Data  <= X"70000FFF000000F0";
+--        wait for SYSCLK_PERIOD*2;
+--        
+--        TX_Data <= X"2f5e5d5c5b5a5958";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_Data <= X"4f21a2a3a4a5a6a7";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_Data <= X"5f5e5a5c5b60f2a0";      
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_Data  <= X"635e22a3a4a5a7a7";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_Data  <= X"70000FFF000000F0";
+--        wait for SYSCLK_PERIOD*2;
+--        
+--        
+--        TX_Data <= X"2f5e5d5c5b5a5958";
+--        wait for SYSCLK_PERIOD*12;
+--        
+--        TX_Data <= X"4f5e5d5c5b5a5958";
+--        wait for SYSCLK_PERIOD;
+--        
+--        TX_SOP <= '0';
+--        TX_EOP <= '1';
+--        wait for SYSCLK_PERIOD;
+--        
+--        wait for SYSCLK_PERIOD*4;
+--        wait;
 
-        --        wait for 1 ps;
-        --            --TX_Enable <= '0';
-        --        TX_EOP <= '0';
-        --        TX_SOP <= '0';
-        --        TX_Channel <= X"01";
-        --        TX_EOP_Valid <= "111";
-        --        TX_Data <= (others=>'0');
-        --        Reset <= '1';
-        --        TX_FlowControl <= (others => '0');
-        --        
-        --        wait for 20*SYSCLK_PERIOD;
-        --        
-        --        wait for SYSCLK_PERIOD;
-        --        Reset <= '0';
-        --        --TX_SOP <= '1';
-        --        --TX_Enable <= '1';
-        --        TX_Data <= X"1f5e5d5c5b5a5958";
-        --        wait for SYSCLK_PERIOD;
-        --        --TX_EOP <= '1';
-        --        
-        --        wait until (TX_Link_Up = '1');
-        --    
-        --        wait for SYSCLK_PERIOD*10;
-        --        TX_FlowControl(0) <= '1';
-        --        TX_SOP <= '1';
-        --        TX_EOP <= '1';
-        --        TX_Data <= X"2f5e5d5c5b5a5958";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_EOP <= '0';
-        --        TX_Data <= X"3f5e5d5c5b5a5958";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --         
-        --        TX_SOP <= '0';
-        --        TX_EOP <= '0';
-        --        TX_EOP <= '0';
-        --        --reset <= '1';
-        --        TX_Data <= X"4f21a2a3a4a5a6a7";
-        --        wait for SYSCLK_PERIOD;
-        ----        TX_FlowControl(0) <= '1';
-        --        TX_SOP <= '1';
-        --        TX_Data <= X"5f5e5a5c5b60f2a0";      
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_SOP <= '0';
-        --        TX_EOP <= '1';
-        --        TX_Data  <= X"635e22a3a4a5a7a7";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_EOP <= '0';
-        --        --TX_SOP <= '1';
-        --        TX_Data  <= X"70000FFF000000F0";
-        --        wait for SYSCLK_PERIOD*2;
-        --        
-        --        TX_SOP <= '1';
-        --        TX_Data <= X"2f5e5d5c5b5a5958";
-        --        wait for SYSCLK_PERIOD;
-        --              
-        --        TX_SOP <= '0';
-        --        TX_EOP <= '1';
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_EOP <= '0';
-        --        --TX_SOP <= '0';
-        --        TX_Data  <= X"8050505050050505";
-        --        --wait for SYSCLK_PERIOD*3;                          
-        --        wait for SYSCLK_PERIOD;
-        --        TX_Data  <= X"9486576758050505";
-        --        wait for SYSCLK_PERIOD; 
-        --        
-        --        TX_EOP <= '1';                          
-        --        TX_Data <= X"60b35d5dc4a582a7";
-        --        wait for SYSCLK_PERIOD; --Test influencing pause state position
-        --        
-        --        TX_EOP <= '0';
-        --        wait for SYSCLK_PERIOD*16;
-        --        
-        --        TX_SOP <= '1';
-        --        TX_Data <= X"4f21a2a3a4a5a6a7";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_Data <= X"995e5a5c5b60f2a0";      
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_Data  <= X"635e22a3a4a5a7a7";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_Data  <= X"70000FFF000000F0";
-        --        wait for SYSCLK_PERIOD*2;
-        --        
-        --        TX_Data <= X"2f5e5d5c5b5a5958";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_Data <= X"4f21a2a3a4a5a6a7";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_Data <= X"5f5e5a5c5b60f2a0";      
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_Data  <= X"635e22a3a4a5a7a7";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_Data  <= X"70000FFF000000F0";
-        --        wait for SYSCLK_PERIOD*2;
-        --        
-        --        
-        --        TX_Data <= X"2f5e5d5c5b5a5958";
-        --        wait for SYSCLK_PERIOD*12;
-        --        
-        --        TX_Data <= X"4f5e5d5c5b5a5958";
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        TX_SOP <= '0';
-        --        TX_EOP <= '1';
-        --        wait for SYSCLK_PERIOD;
-        --        
-        --        wait for SYSCLK_PERIOD*4;
-        --        wait;
-    end process;
+
 
 end architecture tb;
 

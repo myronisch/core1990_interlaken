@@ -5,51 +5,51 @@ use work.axi_stream_package.all;
 
 entity Burst_Framer is
     generic (
-        BurstMax   : positive :=256;      -- Configurable value of BurstMax
+        BurstMax   : positive :=256;   -- Configurable value of BurstMax
         BurstShort : positive :=8      -- Configurable value of BurstShort
     );
     port (
-        clk	  : in std_logic;			                      -- System clock
-        reset : in std_logic;			                      -- Reset, use for initialization
-        TX_Enable     : in std_logic;                         -- Enable the TX
-        Data_out         : out std_logic_vector(66 downto 0); -- To scrambling/framing
-        Data_valid_out   : out std_logic;				      -- Indicate data transmitted is valid
-        FlowControl  : in std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
-        meta_tready    : in std_logic;                          -- Request from the MetaFraming to read data from the FIFO
-        Gearboxready : in std_logic;
+        clk	             : in std_logic;			            -- System clock
+        reset            : in std_logic;			            -- Reset, use for initialization
+        TX_Enable        : in std_logic;                        -- Enable the TX
+        Data_out         : out std_logic_vector(66 downto 0);   -- To scrambling/framing
+        Data_valid_out   : out std_logic;				        -- Indicate data transmitted is valid
+        FlowControl      : in std_logic_vector(15 downto 0);    -- Flow control data (yet unutilized)
+        meta_tready      : in std_logic;                        -- Request from the MetaFraming to read data from the FIFO
+        Gearboxready     : in std_logic;
         s_axis           : in axis_64_type;
         s_axis_tready    : out  std_logic
     );
 end Burst_Framer;
 
 architecture framing of Burst_Framer is
-    --type state_type is (IDLE, DATA, WORD);
-    type state_type is (IDLE, DATA, WORD,EOP_SET, EOP_FULL,FILL,EOP_EMPTY,IDLE_EMPTY,IDLE_SET,IDLE_FULL);
+    type state_type is (IDLE, DATA, WORD);
+    --type state_type is (IDLE, DATA, WORD,EOP_SET, EOP_FULL,FILL,EOP_EMPTY,IDLE_EMPTY,IDLE_SET,IDLE_FULL);
     signal pres_state, next_state : state_type;
     signal Channel_send_idle : std_logic;
 
-    signal Data_Temp             : std_logic_vector(66 downto 0) := (others => '0');
-    signal Byte_Counter          : integer range 0 to BurstMax;
-    signal Word_Control_out      : std_logic;
-    signal Data_Valid            : std_logic := '0';
-    signal BURST_tready          : std_logic;
-    signal Word_valid_out        : std_logic;
-    signal HDR_P1, HDR_P2 : std_logic_vector(2 downto 0);
-    signal Valid_P1, Valid_P2 : std_logic
+    signal Data_Temp            : std_logic_vector(66 downto 0) := (others => '0');
+    signal Byte_Counter         : integer range 0 to BurstMax;
+    signal Word_Control_out     : std_logic;
+    signal Data_Valid           : std_logic := '0';
+    signal BURST_tready         : std_logic;
+    signal Word_valid_out       : std_logic;
+    signal HDR_P1, HDR_P2       : std_logic_vector(2 downto 0);
+    signal Valid_P1, Valid_P2   : std_logic
 	;
 
-    signal Data_P1, Data_P2                    : std_logic_vector(63 downto 0);    -- Pipelined data
-    signal Data_valid_temp : std_logic;
-    signal valid_temp : std_logic := '0';
-    signal CRC24_TX  : std_logic_vector(66 downto 0) := (others => '0');   -- Data transmitted to CRC-24
-    signal CRC24_Out : std_logic_vector(23 downto 0);   -- Calculated CRC-24 which returns
-    signal CRC24_RST : std_logic;                       -- CRC24 reset
-    signal CRC24_P1  : std_logic;                       -- CRC24 reset pipelining
-    --signal CRC24_Stored : std_logic_vector(31 downto 0); --TODO CRC24 process cleanup
-    signal CRC_P1, CRC_P2 : std_logic;
-    signal CalcCrc   : std_logic;                       -- CRC24_EN and Gearboxready
-    signal TX_ValidBytes_s : std_logic_vector(2 downto 0);
-    signal s_axis_tready_s : std_logic;
+    signal Data_P1, Data_P2     : std_logic_vector(63 downto 0);                    -- Pipelined data
+    signal Data_valid_temp      : std_logic;
+    signal valid_temp           : std_logic := '0';
+    signal CRC24_TX             : std_logic_vector(66 downto 0) := (others => '0'); -- Data transmitted to CRC-24
+    signal CRC24_Out            : std_logic_vector(23 downto 0);                    -- Calculated CRC-24 which returns
+    signal CRC24_RST            : std_logic;                                        -- CRC24 reset
+    signal CRC24_P1             : std_logic;                                        -- CRC24 reset pipelining
+    --signal CRC24_Stored       : std_logic_vector(31 downto 0);                    --TODO CRC24 process cleanup in the pipeline
+    signal CRC_P1, CRC_P2       : std_logic;
+    signal CalcCrc              : std_logic;                                        -- CRC24_EN and Gearboxready
+    signal TX_ValidBytes_s      : std_logic_vector(2 downto 0);
+    signal s_axis_tready_s      : std_logic;
 
 
 begin
