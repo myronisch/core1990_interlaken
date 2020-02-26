@@ -297,12 +297,13 @@ begin
                            valid_temp <= '0';
                         end if;
                         
-                        if (Channel_send_idle = '1') then
-                            CRC24_TX <= "010"&X"C000_0001_0000_0000";--END OF PACKET
-                        elsif((TX_Enable='0') or ((s_axis.tvalid='0') and (s_axis_tready_s='0') and (TX_Enable='0'))) then
-                            CRC24_TX <= "010"&X"8000_0001_0000_0000"; --IDLE PACKETS
+                        if (Byte_Counter >= BurstShort) then
+                            if (Channel_send_idle = '1') then
+                                CRC24_TX <= "010"&X"C000_0001_0000_0000";--END OF PACKET
+                            elsif((TX_Enable='0') or ((s_axis.tvalid='0') and (s_axis_tready_s='0') and (TX_Enable='0'))) then
+                                CRC24_TX <= "010"&X"8000_0001_0000_0000"; --IDLE PACKETS
+                            end if;
                         end if;
-                        
                         if (s_axis.tlast = '1') then
                             CRC24_TX <= "010"&X"9000_0001_0000_0000"; --End OF BURST PACKET
                             CRC24_TX(55 downto 40) <= FlowControl;

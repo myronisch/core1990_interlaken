@@ -180,6 +180,7 @@ begin
         --Test Data patern 1 to FFFFFF
         for i in 0 to Lanes-1 loop
             s_axis(i).tvalid <= '0';
+            s_axis(i).tlast <='0';
         end loop;
         wait until (Reset = '0');
         wait until (HealthInterface = '1');-- Wait for lock before sending data
