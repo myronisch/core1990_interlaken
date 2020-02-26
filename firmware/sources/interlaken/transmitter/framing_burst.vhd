@@ -219,7 +219,7 @@ begin
             end case;
         end if;
     end process state_decoder;
- 
+
     output : process (clk) is
     begin
         if rising_edge(clk) then
@@ -237,12 +237,12 @@ begin
                         valid_temp <= '0';
                         Data_Temp <= "001"&s_axis.tdata;
                         Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
- 
+
                         if(TX_Enable = '1') then
                             CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Idle packet, data follows
                             Data_Valid <= '1';
                             Data_valid_temp <= '1'; --Start of a new packet is always valid
- 
+
                             if (s_axis.tvalid = '1' and s_axis_tready_s = '1') then -- Indicates the start of data flow
                                 CRC24_TX <= "010"&X"E000_0001_0000_0000"; -- Start packet 
                                 CRC24_TX(55 downto 40) <= FlowControl;
@@ -250,7 +250,7 @@ begin
                         else
                             CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
                         end if;
- 
+
                         if(s_axis.tlast = '1' or Channel_send_idle = '1') then
                             BURST_tready <= '0';
                             Data_Valid<='1';
@@ -262,49 +262,49 @@ begin
                         Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
                         CRC24_RST <= '0';
                         BURST_tready <= '1';
- 
+
                         if s_axis_tready_s = '1' then
                             Byte_Counter <= Byte_Counter + 8;
                         end if;
- 
+
                         --CRC24_En <= s_axis.tvalid and s_axis_tready_s;  -- <= '1' --s_axis.tvalid; -- Makes CRC-32 error
- 
+
                         if (CRC24_P1 = '1') then
                             CRC24_RST <= '1';
                             CRC24_P1 <= '0';
                         end if;
- 
+
                         if ( (Byte_Counter >= (BurstMax-8)) or (s_axis.tlast = '1') or (Channel_send_idle='1') ) then
                             BURST_tready <= '0';
                         end if;
-                        
+
                         if(meta_tready = '0' or BURST_tready = '0') then
                             Data_Valid <= '0';
-                        end if;                        
- 
+                        end if;
+
                         if Word_Control_out = '1' then
                             Word_Control_out <= '0';
                             CRC24_P1 <= '1';
                         end if;
- 
+
                         if Word_valid_out = '1' then
-                           Data_valid_temp <= '1';
-                           Word_valid_out <= '0';
-                         end if;
-    
+                            Data_valid_temp <= '1';
+                            Word_valid_out <= '0';
+                        end if;
+
                         if valid_temp = '1' then
-                           Data_valid_temp <= '1';
-                           valid_temp <= '0';
+                            Data_valid_temp <= '1';
+                            valid_temp <= '0';
                         end if;
                         
-                        if (Byte_Counter >= BurstShort) then
+                        
                             if (Channel_send_idle = '1') then
-                                CRC24_TX <= "010"&X"C000_0001_0000_0000";--END OF PACKET
-                            elsif((TX_Enable='0') or ((s_axis.tvalid='0') and (s_axis_tready_s='0') and (TX_Enable='0'))) then
-                                CRC24_TX <= "010"&X"8000_0001_0000_0000"; --IDLE PACKETS
-                            end if;
+                            CRC24_TX <= "010"&X"C000_0001_0000_0000";--END OF PACKET
+                        elsif((TX_Enable='0') or ((s_axis.tvalid='0') and (s_axis_tready_s='0') and (TX_Enable='0'))) then
+                            CRC24_TX <= "010"&X"8000_0001_0000_0000"; --IDLE PACKETS
                         end if;
-                        if (s_axis.tlast = '1') then
+
+                        if (s_axis.tlast = '1' and Byte_Counter <= BurstShort) then
                             CRC24_TX <= "010"&X"9000_0001_0000_0000"; --End OF BURST PACKET
                             CRC24_TX(55 downto 40) <= FlowControl;
                             CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;
@@ -330,7 +330,7 @@ begin
                     --                 CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
                     --             end if;
                     --         end if;
- 
+
                     when WORD =>
                         BURST_tready <= '1';
                         Byte_Counter <= 0;
@@ -355,270 +355,270 @@ begin
         end if;
     end process output;
 
- --   state_decoder : process (pres_state, Channel_send_idle, TX_Enable, s_axis.tlast, Byte_Counter, meta_tready, Gearboxready) is
- --    begin
- --        if(Gearboxready = '0' or meta_tready = '0') then
- --            next_state <= pres_state;
- --        else
- --            case pres_state is
- --                when IDLE =>
- --                    if (TX_Enable = '1' and s_axis.tlast = '0' and Channel_send_idle = '0') then
- --                        next_state <= DATA;
- --                   elsif (TX_Enable = '1' and s_axis.tlast = '1') then
- --                        next_state <= EOP_SET;
- --                   elsif (TX_Enable = '1' and  Channel_send_idle = '1') then
- --                       next_state <= IDLE_SET;
- --                    else
- --                        next_state <= IDLE;
- --                   end if;
- --                when DATA =>
- --                    if(s_axis.tlast = '1' ) then
- --                        next_state <= EOP_SET;
- --                   elsif (Channel_send_idle = '1') then
- --                       next_state <= IDLE_SET;
- --                    elsif (Byte_Counter >= (BurstMax-8)) then
- --                        next_state <= WORD;
- --                   else
- --                       next_state <= DATA;
- --                   end if;
- --                when WORD =>
- --                    next_state <= DATA;
- --               when EOP_SET =>
- --                   if (Byte_Counter >= BurstShort) then
- --                       next_state <= EOP_FULL;
- --                   else
- --                       next_state <= EOP_EMPTY;
- --                   end if;
- --               when IDLE_SET =>
- --                   if (Byte_Counter >= BurstShort) then
- --                       next_state <= IDLE_FULL;
- --                   else
- --                       next_state <= IDLE_EMPTY;
- --                   end if;
- --               when EOP_EMPTY =>
- --                   if (Byte_Counter >= BurstShort) then
- --                       next_state <= IDLE;
- --                   else
- --                       next_state <= FILL;
- --                   end if;
- --               when FILL =>
- --                   if (Byte_Counter >= BurstShort-8) then
- --                       next_state <= IDLE;
- --                   else
- --                       next_state <= FILL;
- --                   end if;
- --               when EOP_FULL =>
- --                   next_state <= IDLE;
- --                when others =>
- --                    next_state <= IDLE;
- --            end case;
- --        end if;
- --    end process state_decoder;
- --   
- --    output : process (clk) is
- --    begin
- --      if rising_edge(clk) then
- --          CRC24_RST <= '0';
- --    
- --          -- X"Type/SOP/EOP(2)FlowC(2)_FlowC(2)Channel(2)_Mutiple(2)CRC24(2)_CRC24(2)CRC24(2)" Structure of packet
- --          if(Gearboxready = '1' and  meta_tready = '1' ) then
- --              case pres_state is
- --                  when IDLE =>        -- Wait for SOP, start reading FIFO and save last cycle data
- --                  --CRC24_En <= '0'; -- Reset CRC calculations
- --                      CRC24_RST <= '1';
- --                      Data_Valid <= '0';
- --                      Word_Control_out <= '0';
- --                      BURST_tready <= '1';
- --                      Byte_Counter <= 8;
- --                      CRC24_P1 <= '0';
- --                      valid_temp <= '0';
- --   
- --                      Data_Temp <= "001"&s_axis.tdata;
- --                      Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
- --   
- --                      if (s_axis.tvalid = '1' and s_axis_tready_s = '1' and TX_Enable = '1') then -- Indicates the start of data flow
- --                           CRC24_TX <= "010"&X"E000_0001_0000_0000"; -- Start packet 
- --                         CRC24_TX(55 downto 40) <= FlowControl;
- --                         Data_Valid <= '1';
- --                         Data_valid_temp <= '1'; --Start of a new packet is always valid
- --                         -- elsif (TX_flowcontrol(0) = '0') then  -- TODO Flowcontrol is not used? why as condition? 
- --                         --    CRC24_TX <= "010"&X"C000_0001_0000_0000"; --  C000_0001_0000_0000
- --                         --   CRC24_TX(55 downto 40) <= RX_prog_full;
- --                     elsif (TX_Enable = '1') then
- --                         CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Idle packet, data follows
- --                         Data_Valid <= '1';
- --                         Data_valid_temp <= '1'; --Start of a new packet is always valid
- --   
- --                     else
- --                         CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
- --                     end if;
- --   
- --                     if((s_axis.tlast = '1' or Channel_send_idle = '1') and TX_Enable = '1') then
- --                         BURST_tready <= '0';
- --                         Data_Valid <= '1';
- --                     end if;
- --  
- --                  when DATA =>        -- Process input data, count the transmitted bytes, send data to output and CRC-24
- --                      if s_axis_tready_s = '1' then
- --                          Byte_Counter <= Byte_Counter + 8;
- --                      end if;
- --                      CRC24_TX <= Data_Temp;
- --                      Data_Temp <= "001"&s_axis.tdata;
- --                      Data_Valid <= Data_valid_temp;
- --                      Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
- --                      --                    if s_axis.tvalid = '0' then
- --   
- --                       --                        Data_Control <= '1';
- --                      --                        Data_temp <= X"8000_0001_0000_0000";
- --                      --                    end if;
- --                      CRC24_RST <= '0';
- --                      --CRC24_En <= s_axis.tvalid and s_axis_tready_s;  -- <= '1' --s_axis.tvalid; -- Makes CRC-32 error
- --                      BURST_tready <= '1';
- --   
- --                      --added
- --                      if(meta_tready = '0' or BURST_tready = '0') then
- --                          Data_Valid <= '0';
- --                      end if;
- --   
- --                      if (Byte_Counter >= (BurstMax-8)) then
- --                          BURST_tready <= '0';
- --                      elsif(s_axis.tlast = '1'  or Channel_send_idle = '1') then
- --                          BURST_tready <= '0';
- --                      end if;
- --   
- --                      if (CRC24_P1 = '1') then
- --                          CRC24_RST <= '1';
- --                          CRC24_P1 <= '0';
- --                      end if;
- --   
- --                      if Word_Control_out = '1' then
- --                          Word_Control_out <= '0';
- --                          CRC24_P1 <= '1';
- --                      end if;
- --   
- --                      if Word_valid_out = '1' then
- --                          Data_valid_temp <= '1';
- --                          Word_valid_out <= '0';
- --                      end if;
- --   
- --                      if valid_temp = '1' then
- --                          Data_valid_temp <= '1';
- --                          valid_temp <= '0';
- --                      end if;
- --   
- --                  when WORD =>        -- Reset byte count, send frame to CRC-24, stop reading FIFO to make room for output frame 
- --                      BURST_tready <= '1';
- --                      Byte_Counter <= 0;
- --                      --CRC24_En <= '1';
- --   
- --                      CRC24_TX <= Data_Temp;
- --                      Data_Temp <= "010"&X"C000_0001_0000_0000"; -- Burst no start nor end packet (Idle words)
- --                      Data_Temp(55 downto 40) <= FlowControl;
- --   
- --                      Data_Valid <= Data_valid_temp;
- --                      Data_valid_temp <= '1';
- --                      if (s_axis.tvalid = '1' and s_axis_tready_s = '1') then
- --                          Word_valid_out <= '1';
- --                      end if;
- --                      Word_Control_out <= '1';
- --  
- --                 when EOP_SET =>     -- Transmit last bytes from buffer and add this to byte count
- --                       if s_axis_tready_s = '1' then
- --                           Byte_Counter <= Byte_Counter + 8;
- --                       end if;
- --                      CRC24_TX <= Data_Temp;
- --                      Data_Temp <= "001"&s_axis.tdata; -- Still read out data and save because FIFO takes a cycle to respond
- --  
- --                      Data_Valid <= Data_valid_temp;
- --                       Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
- --  
- --                     --HealthLane <= '1';     -- set status of lane to healthy
- --                     --HealthInterface <= '1'; -- set status of interface to healthy
- --  
- --                     --CRC24_En <= '1';
- --                       CRC24_RST <= '0';
- --                       if (CRC24_P1 = '1') then
- --                           CRC24_RST <= '1';
- --                           CRC24_P1 <= '0';
- --                       end if;
- --                   when IDLE_SET =>     -- Transmit last bytes from buffer and add this to byte count
- --                       if s_axis_tready_s = '1' then
- --                           Byte_Counter <= Byte_Counter + 8;
- --                       end if;
- --   
- --                       CRC24_TX <= Data_Temp;
- --                       Data_Temp <= "001"&s_axis.tdata; -- Still read out data and save because FIFO takes a cycle to respond
- --   
- --                       Data_Valid <= Data_valid_temp;
- --                       Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
- --   
- --                       --HealthLane <= '1';     -- set status of lane to healthy
- --                       --HealthInterface <= '1'; -- set status of interface to healthy
- --   
- --                       --CRC24_En <= '1';
- --                       CRC24_RST <= '0';
- --                       if (CRC24_P1 = '1') then
- --                           CRC24_RST <= '1';
- --                           CRC24_P1 <= '0';
- --                       end if; 
- --                 
- --             
- --             when EOP_EMPTY =>    -- Count bytes, send frame to CRC-24 and output idle word containing CRC and EOP
- --                       if (Byte_Counter >= BurstShort) then
- --                           BURST_tready <= '1';
- --                       end if;
- --                       if s_axis_tready_s = '1' then
- --                           Byte_Counter <= Byte_Counter + 8;
- --                       end if;
- --                       CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet 1001
- --                       CRC24_TX(55 downto 40) <= FlowControl;
- --                       CRC24_TX(59 downto 57) <= TX_ValidBytes_s;  -- '1' & TX_ValidBytes_s; 
- --                       Data_Valid <= '1';
- --                when IDLE_EMPTY =>  -- Count bytes, send frame to CRC-24 and output idle word containing CRC and EOP
- --                    if (Byte_Counter >= BurstShort) then
- --                        BURST_tready <= '1';
- --                    end if;
- --                    if s_axis_tready_s = '1' then
- --                        Byte_Counter <= Byte_Counter + 8;
- --                    end if;
- --                    CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Burst end packet 1001
- --                    --CRC24_TX(55 downto 40) <= RX_prog_full;
- --                    Data_Valid <= '1';
- --  
- --                  When FILL =>       -- Continue sending idle words to fill up the minimum frame length
- --                   --                BURST_tready <= '1';
- --                       if s_axis_tready_s = '1' then
- --                           Byte_Counter <= Byte_Counter + 8;
- --                       end if;                    CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
- --                       CRC24_TX(55 downto 40) <= FlowControl;
- --                       --CRC24_En <= '0';
- --                       Data_Valid <= '1';
- --                       CRC24_RST <= '1';
- --                       if (Byte_Counter >= BurstShort-8) then
- --                           BURST_tready <= '1';
- --                       end if;
- --  
- --                  when EOP_FULL =>    -- Send frame to CRC-24 and output burst word containing CRC and EOP
- --                      BURST_tready <= '1';
- --                      CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
- --                      CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;
- --                      CRC24_TX(55 downto 40) <= FlowControl;
- --                      Data_Valid <= '1';
- --                 when IDLE_FULL =>    -- Send frame to CRC-24 and output burst word containing CRC and EOP
- --                       BURST_tready <= '1';
- --                       CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
- --                       CRC24_TX(55 downto 40) <= FlowControl;
- --                       Data_Valid <= '1';
- --   
- --             end case;
- --          else
- --              CRC24_RST <= CRC24_RST;
- --              if s_axis.tvalid = '1' and s_axis_tready_s = '1'then
- --                  valid_temp <= '1';
- --              end if;
- --            end if;
- --        end if;
- --    end process output;
+    --   state_decoder : process (pres_state, Channel_send_idle, TX_Enable, s_axis.tlast, Byte_Counter, meta_tready, Gearboxready) is
+    --    begin
+    --        if(Gearboxready = '0' or meta_tready = '0') then
+    --            next_state <= pres_state;
+    --        else
+    --            case pres_state is
+    --                when IDLE =>
+    --                    if (TX_Enable = '1' and s_axis.tlast = '0' and Channel_send_idle = '0') then
+    --                        next_state <= DATA;
+    --                   elsif (TX_Enable = '1' and s_axis.tlast = '1') then
+    --                        next_state <= EOP_SET;
+    --                   elsif (TX_Enable = '1' and  Channel_send_idle = '1') then
+    --                       next_state <= IDLE_SET;
+    --                    else
+    --                        next_state <= IDLE;
+    --                   end if;
+    --                when DATA =>
+    --                    if(s_axis.tlast = '1' ) then
+    --                        next_state <= EOP_SET;
+    --                   elsif (Channel_send_idle = '1') then
+    --                       next_state <= IDLE_SET;
+    --                    elsif (Byte_Counter >= (BurstMax-8)) then
+    --                        next_state <= WORD;
+    --                   else
+    --                       next_state <= DATA;
+    --                   end if;
+    --                when WORD =>
+    --                    next_state <= DATA;
+    --               when EOP_SET =>
+    --                   if (Byte_Counter >= BurstShort) then
+    --                       next_state <= EOP_FULL;
+    --                   else
+    --                       next_state <= EOP_EMPTY;
+    --                   end if;
+    --               when IDLE_SET =>
+    --                   if (Byte_Counter >= BurstShort) then
+    --                       next_state <= IDLE_FULL;
+    --                   else
+    --                       next_state <= IDLE_EMPTY;
+    --                   end if;
+    --               when EOP_EMPTY =>
+    --                   if (Byte_Counter >= BurstShort) then
+    --                       next_state <= IDLE;
+    --                   else
+    --                       next_state <= FILL;
+    --                   end if;
+    --               when FILL =>
+    --                   if (Byte_Counter >= BurstShort-8) then
+    --                       next_state <= IDLE;
+    --                   else
+    --                       next_state <= FILL;
+    --                   end if;
+    --               when EOP_FULL =>
+    --                   next_state <= IDLE;
+    --                when others =>
+    --                    next_state <= IDLE;
+    --            end case;
+    --        end if;
+    --    end process state_decoder;
+    --   
+    --    output : process (clk) is
+    --    begin
+    --      if rising_edge(clk) then
+    --          CRC24_RST <= '0';
+    --    
+    --          -- X"Type/SOP/EOP(2)FlowC(2)_FlowC(2)Channel(2)_Mutiple(2)CRC24(2)_CRC24(2)CRC24(2)" Structure of packet
+    --          if(Gearboxready = '1' and  meta_tready = '1' ) then
+    --              case pres_state is
+    --                  when IDLE =>        -- Wait for SOP, start reading FIFO and save last cycle data
+    --                  --CRC24_En <= '0'; -- Reset CRC calculations
+    --                      CRC24_RST <= '1';
+    --                      Data_Valid <= '0';
+    --                      Word_Control_out <= '0';
+    --                      BURST_tready <= '1';
+    --                      Byte_Counter <= 8;
+    --                      CRC24_P1 <= '0';
+    --                      valid_temp <= '0';
+    --   
+    --                      Data_Temp <= "001"&s_axis.tdata;
+    --                      Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
+    --   
+    --                      if (s_axis.tvalid = '1' and s_axis_tready_s = '1' and TX_Enable = '1') then -- Indicates the start of data flow
+    --                           CRC24_TX <= "010"&X"E000_0001_0000_0000"; -- Start packet 
+    --                         CRC24_TX(55 downto 40) <= FlowControl;
+    --                         Data_Valid <= '1';
+    --                         Data_valid_temp <= '1'; --Start of a new packet is always valid
+    --                         -- elsif (TX_flowcontrol(0) = '0') then  -- TODO Flowcontrol is not used? why as condition? 
+    --                         --    CRC24_TX <= "010"&X"C000_0001_0000_0000"; --  C000_0001_0000_0000
+    --                         --   CRC24_TX(55 downto 40) <= RX_prog_full;
+    --                     elsif (TX_Enable = '1') then
+    --                         CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Idle packet, data follows
+    --                         Data_Valid <= '1';
+    --                         Data_valid_temp <= '1'; --Start of a new packet is always valid
+    --   
+    --                     else
+    --                         CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
+    --                     end if;
+    --   
+    --                     if((s_axis.tlast = '1' or Channel_send_idle = '1') and TX_Enable = '1') then
+    --                         BURST_tready <= '0';
+    --                         Data_Valid <= '1';
+    --                     end if;
+    --  
+    --                  when DATA =>        -- Process input data, count the transmitted bytes, send data to output and CRC-24
+    --                      if s_axis_tready_s = '1' then
+    --                          Byte_Counter <= Byte_Counter + 8;
+    --                      end if;
+    --                      CRC24_TX <= Data_Temp;
+    --                      Data_Temp <= "001"&s_axis.tdata;
+    --                      Data_Valid <= Data_valid_temp;
+    --                      Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
+    --                      --                    if s_axis.tvalid = '0' then
+    --   
+    --                       --                        Data_Control <= '1';
+    --                      --                        Data_temp <= X"8000_0001_0000_0000";
+    --                      --                    end if;
+    --                      CRC24_RST <= '0';
+    --                      --CRC24_En <= s_axis.tvalid and s_axis_tready_s;  -- <= '1' --s_axis.tvalid; -- Makes CRC-32 error
+    --                      BURST_tready <= '1';
+    --   
+    --                      --added
+    --                      if(meta_tready = '0' or BURST_tready = '0') then
+    --                          Data_Valid <= '0';
+    --                      end if;
+    --   
+    --                      if (Byte_Counter >= (BurstMax-8)) then
+    --                          BURST_tready <= '0';
+    --                      elsif(s_axis.tlast = '1'  or Channel_send_idle = '1') then
+    --                          BURST_tready <= '0';
+    --                      end if;
+    --   
+    --                      if (CRC24_P1 = '1') then
+    --                          CRC24_RST <= '1';
+    --                          CRC24_P1 <= '0';
+    --                      end if;
+    --   
+    --                      if Word_Control_out = '1' then
+    --                          Word_Control_out <= '0';
+    --                          CRC24_P1 <= '1';
+    --                      end if;
+    --   
+    --                      if Word_valid_out = '1' then
+    --                          Data_valid_temp <= '1';
+    --                          Word_valid_out <= '0';
+    --                      end if;
+    --   
+    --                      if valid_temp = '1' then
+    --                          Data_valid_temp <= '1';
+    --                          valid_temp <= '0';
+    --                      end if;
+    --   
+    --                  when WORD =>        -- Reset byte count, send frame to CRC-24, stop reading FIFO to make room for output frame 
+    --                      BURST_tready <= '1';
+    --                      Byte_Counter <= 0;
+    --                      --CRC24_En <= '1';
+    --   
+    --                      CRC24_TX <= Data_Temp;
+    --                      Data_Temp <= "010"&X"C000_0001_0000_0000"; -- Burst no start nor end packet (Idle words)
+    --                      Data_Temp(55 downto 40) <= FlowControl;
+    --   
+    --                      Data_Valid <= Data_valid_temp;
+    --                      Data_valid_temp <= '1';
+    --                      if (s_axis.tvalid = '1' and s_axis_tready_s = '1') then
+    --                          Word_valid_out <= '1';
+    --                      end if;
+    --                      Word_Control_out <= '1';
+    --  
+    --                 when EOP_SET =>     -- Transmit last bytes from buffer and add this to byte count
+    --                       if s_axis_tready_s = '1' then
+    --                           Byte_Counter <= Byte_Counter + 8;
+    --                       end if;
+    --                      CRC24_TX <= Data_Temp;
+    --                      Data_Temp <= "001"&s_axis.tdata; -- Still read out data and save because FIFO takes a cycle to respond
+    --  
+    --                      Data_Valid <= Data_valid_temp;
+    --                       Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
+    --  
+    --                     --HealthLane <= '1';     -- set status of lane to healthy
+    --                     --HealthInterface <= '1'; -- set status of interface to healthy
+    --  
+    --                     --CRC24_En <= '1';
+    --                       CRC24_RST <= '0';
+    --                       if (CRC24_P1 = '1') then
+    --                           CRC24_RST <= '1';
+    --                           CRC24_P1 <= '0';
+    --                       end if;
+    --                   when IDLE_SET =>     -- Transmit last bytes from buffer and add this to byte count
+    --                       if s_axis_tready_s = '1' then
+    --                           Byte_Counter <= Byte_Counter + 8;
+    --                       end if;
+    --   
+    --                       CRC24_TX <= Data_Temp;
+    --                       Data_Temp <= "001"&s_axis.tdata; -- Still read out data and save because FIFO takes a cycle to respond
+    --   
+    --                       Data_Valid <= Data_valid_temp;
+    --                       Data_valid_temp <= s_axis.tvalid and s_axis_tready_s;
+    --   
+    --                       --HealthLane <= '1';     -- set status of lane to healthy
+    --                       --HealthInterface <= '1'; -- set status of interface to healthy
+    --   
+    --                       --CRC24_En <= '1';
+    --                       CRC24_RST <= '0';
+    --                       if (CRC24_P1 = '1') then
+    --                           CRC24_RST <= '1';
+    --                           CRC24_P1 <= '0';
+    --                       end if; 
+    --                 
+    --             
+    --             when EOP_EMPTY =>    -- Count bytes, send frame to CRC-24 and output idle word containing CRC and EOP
+    --                       if (Byte_Counter >= BurstShort) then
+    --                           BURST_tready <= '1';
+    --                       end if;
+    --                       if s_axis_tready_s = '1' then
+    --                           Byte_Counter <= Byte_Counter + 8;
+    --                       end if;
+    --                       CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet 1001
+    --                       CRC24_TX(55 downto 40) <= FlowControl;
+    --                       CRC24_TX(59 downto 57) <= TX_ValidBytes_s;  -- '1' & TX_ValidBytes_s; 
+    --                       Data_Valid <= '1';
+    --                when IDLE_EMPTY =>  -- Count bytes, send frame to CRC-24 and output idle word containing CRC and EOP
+    --                    if (Byte_Counter >= BurstShort) then
+    --                        BURST_tready <= '1';
+    --                    end if;
+    --                    if s_axis_tready_s = '1' then
+    --                        Byte_Counter <= Byte_Counter + 8;
+    --                    end if;
+    --                    CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Burst end packet 1001
+    --                    --CRC24_TX(55 downto 40) <= RX_prog_full;
+    --                    Data_Valid <= '1';
+    --  
+    --                  When FILL =>       -- Continue sending idle words to fill up the minimum frame length
+    --                   --                BURST_tready <= '1';
+    --                       if s_axis_tready_s = '1' then
+    --                           Byte_Counter <= Byte_Counter + 8;
+    --                       end if;                    CRC24_TX <= "010"&X"8000_0001_0000_0000"; -- Idle fill packets 1000
+    --                       CRC24_TX(55 downto 40) <= FlowControl;
+    --                       --CRC24_En <= '0';
+    --                       Data_Valid <= '1';
+    --                       CRC24_RST <= '1';
+    --                       if (Byte_Counter >= BurstShort-8) then
+    --                           BURST_tready <= '1';
+    --                       end if;
+    --  
+    --                  when EOP_FULL =>    -- Send frame to CRC-24 and output burst word containing CRC and EOP
+    --                      BURST_tready <= '1';
+    --                      CRC24_TX <= "010"&X"9000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
+    --                      CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;
+    --                      CRC24_TX(55 downto 40) <= FlowControl;
+    --                      Data_Valid <= '1';
+    --                 when IDLE_FULL =>    -- Send frame to CRC-24 and output burst word containing CRC and EOP
+    --                       BURST_tready <= '1';
+    --                       CRC24_TX <= "010"&X"C000_0001_0000_0000"; -- Burst end packet -> 1101 if more data follows or 1001 if no data follows
+    --                       CRC24_TX(55 downto 40) <= FlowControl;
+    --                       Data_Valid <= '1';
+    --   
+    --             end case;
+    --          else
+    --              CRC24_RST <= CRC24_RST;
+    --              if s_axis.tvalid = '1' and s_axis_tready_s = '1'then
+    --                  valid_temp <= '1';
+    --              end if;
+    --            end if;
+    --        end if;
+    --    end process output;
 
 
 end architecture framing;
