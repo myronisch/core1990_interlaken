@@ -2,7 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use work.interlaken_package.all;
 use work.axi_stream_package.ALL;
- 
 
 entity Interlaken_Transmitter is
     generic(
@@ -28,11 +27,8 @@ end entity Interlaken_Transmitter;
 architecture Transmitter of Interlaken_Transmitter is
 
     signal Data_Burst_Out : std_logic_vector(66 downto 0);
-    signal Data_Valid_Burst_Out : std_logic;
-    signal Data_Valid_Meta_Out : std_logic;
     signal Data_Meta_Out : std_logic_vector(66 downto 0);
     signal meta_tready : std_logic;
-    signal Data_Valid_Scrambler_Out : std_logic;
     signal Data_Scrambler_Out : std_logic_vector(66 downto 0);
     signal Gearbox_Pause : std_logic;
     signal TX_Enable : std_logic;
@@ -51,7 +47,6 @@ begin
             reset => reset,
             TX_Enable => TX_Enable,
             Data_out => Data_Burst_Out,
-            Data_valid_out => Data_Valid_Burst_Out,
             FlowControl => FlowControl,
             meta_tready => meta_tready,
             Gearboxready => Gearbox_Pause,
@@ -72,8 +67,6 @@ begin
 		
 		Data_In           => Data_Burst_Out,
             Data_Out          => Data_Meta_Out,--TX_Data_Out,
-            Data_Valid_In     => Data_Valid_Burst_Out,
-            Data_Valid_Out    => Data_Valid_Meta_Out,
             Gearboxready      => Gearbox_Pause,
             FIFO_read         => meta_tready
         );
@@ -86,8 +79,6 @@ begin
             Data_Out => Data_Scrambler_Out,
             Lane_Number => "0001",
             Scrambler_En => '1',
-            Data_Valid_In => Data_Valid_Meta_Out,
-            Data_Valid_Out => Data_Valid_Scrambler_Out,
             Gearboxready => Gearbox_Pause
         );
 
@@ -96,15 +87,12 @@ begin
             Clk             => clk,
             Data_In         => Data_Scrambler_Out,
             Data_Out        => TX_Lane_Data_Out,
-            Data_valid_in   => Data_Valid_Scrambler_Out,
-            Data_valid_out  => open, --TODO Remove or connect
             Encoder_En      => '1',
             Encoder_Rst     => reset,
             Gearboxready    => Gearbox_Pause
         );
 
     Gearbox_Pause <= TX_Gearboxready ;--or GearboxSignal;
-
     --   Gearbox : process(clk, reset)
     --   begin
     --       if reset = '1' then

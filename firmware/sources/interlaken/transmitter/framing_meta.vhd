@@ -17,8 +17,6 @@ entity Meta_Framer is
 
         Data_In          : in std_logic_vector(66 downto 0);  -- Input data
         Data_Out         : out std_logic_vector(66 downto 0); -- To scrambling/framing
-        Data_Valid_In    : in std_logic;				      -- Indicate data received is valid
-        Data_Valid_Out   : out std_logic;				      -- Indicate data transmitted is valid
         --Data_Control_In  : in std_logic;                      -- Control word indication from the burst component
         --Data_Control_Out : out std_logic;                     -- Control word indication
 
@@ -35,13 +33,9 @@ architecture framing of Meta_Framer is
     signal Packet_Counter : integer range 0 to PacketLength;
 
     signal HDR, HDR_Meta, HDR_Burst  : std_logic_vector(2 downto 0);
-    signal Data_Valid : std_logic;
     signal Data_P1, Data_P2, Data_P3 : std_logic_vector (63 downto 0);        -- Pipeline for framing
     signal HDR_P1, HDR_P2 : std_logic_vector(2 downto 0);
     signal HDR_IN_P1, HDR_IN_P2, HDR_IN_P3 : std_logic_vector(2 downto 0);
-
-    signal Data_valid_p1, Data_valid_p2, Data_valid_p3, Data_valid_framed : std_logic;
-    signal Data_valid_Framed_P1, Data_valid_Framed_P2: std_logic;
 
     signal Data_Framed, Data_Framed_P1, Data_Framed_P2: std_logic_vector (63 downto 0);
 
@@ -84,7 +78,6 @@ begin
             Data_Framed_P2       <= (others => '0');
             Data_Out             <= (others => '0');
             -- Data_Control_Out     <= '0';
-            Data_Valid_Out       <= '0';
         elsif (rising_edge(clk)) then
             Gearboxready_P1 <= Gearboxready;
             CRC32_Rst_P1 <= CRC32_Rst;
@@ -96,15 +89,12 @@ begin
                 Data_Framed_P1  <= Data_Framed;
                 Data_Framed_P2  <= Data_Framed_P1;
                 Data_Out(63 downto 0)   <= Data_Framed_P2;
-                Data_valid_Framed_P1 <= (Data_Valid or Data_valid_framed);
-                Data_valid_Framed_P2 <= Data_valid_Framed_P1;
-                Data_Valid_Out       <= Data_valid_Framed_P2;
                 HDR_P1 <= HDR; -- Waiting for CRC calculation to be ready
                 HDR_P2 <= HDR_P1;
                 Data_Out(66 downto 64) <= HDR_P2;
-                if((Data_valid_Framed_P2 = '1') and (Data_Framed_P2(63 downto 58) = "011001")) then
-                    Data_Out(31 downto 0) <= CRC32_Out_v;
-                end if;
+                if((Data_Framed_P2(63 downto 58) = "011001")) then
+                   Data_Out(31 downto 0) <= CRC32_Out_v;
+                end if; 
             end if;
         end if;
     end process diagnostic;
@@ -193,55 +183,40 @@ begin
             else
                 case pres_state is
                     when IDLE =>
-                        Data_Valid <= '0';
                         Data_Framed <= (others => '0');
                         FIFO_read <= '1';
                         HDR_Meta <= "001";
                         if (TX_Enable = '1') then--and Data_valid_in = '1') then -- Only start real transmission when there is valid data
                             Data_Framed <= SYNCHRONIZATION; -- Predefined sync word 78f6_78f6_78f6_78f6 
                             HDR_Meta <= "010";
-                            Data_Valid <= '1';
                             CRC32_Rst <= '1';      --CRC-32
                         end if;
                         Packet_Counter <= 1;
                         Data_P1 <= Data_In(63 downto 0);
-                        Data_valid_p1 <= Data_Valid_In;
                         CRC32_En <= '1';        --CRC-32
 
                     when SCRAM =>
-                        Data_Valid <= '1';
                         Packet_Counter <= Packet_Counter + 1;
                         Data_Framed <= SCRAM_STATE_INIT_VALUE; -- Scrambler state (real data added later)
                         Data_P2 <= Data_P1;
                         Data_P1 <= Data_In(63 downto 0);
-                        Data_valid_p2 <= Data_valid_p1;
-                        Data_valid_p1 <= Data_Valid_In;
 
                     when SKIP =>
-                        Data_Valid <= '1';
                         Packet_Counter <= Packet_Counter + 1;
                         Data_Framed <= SKIP_WORD; -- Predefined skip word 
                         Data_P3 <= Data_P2;
                         Data_P2 <= Data_P1;
                         Data_P1 <= Data_In(63 downto 0);
-                        Data_valid_p3 <= Data_valid_p2;
-                        Data_valid_p2 <= Data_valid_p1;
-                        Data_valid_p1 <= Data_Valid_In;
 
                     when DATA =>
                         CRC32_En <= '1';
                         Packet_Counter <= Packet_Counter + 1;
                         HDR_Meta <= "001";
-                        Data_Valid <= '0'; -- why 0
 
                         Data_Framed <= Data_P3;
                         Data_P3 <= Data_P2;
                         Data_P2 <= Data_P1;
                         Data_P1 <= Data_In(63 downto 0);
-                        Data_valid_framed <= Data_valid_p3;
-                        Data_valid_p3 <= Data_valid_p2;
-                        Data_valid_p2 <= Data_valid_p1;
-                        Data_valid_p1 <= Data_Valid_In;
 
                         --changed size from -2 to -3!!
                         if(Packet_Counter >= (PacketLength - 6) and Packet_Counter < (PacketLength - 3)) then -- Still 4 packets incoming after FIFO read disable
@@ -255,25 +230,18 @@ begin
                         Data_Framed <= Data_P3;
                         Data_P3 <= Data_P2;
                         Data_P2 <= Data_P1;
-                        Data_valid_framed <= Data_valid_p3;
-                        Data_valid_p3 <= Data_valid_p2;
-                        Data_valid_p2 <= Data_valid_p1;
 
                     when P2 =>
                         Packet_Counter <= Packet_Counter + 1;
                         Data_Framed <= Data_P3;
                         Data_P3 <= Data_P2;
-                        Data_valid_framed <= Data_valid_p3;
-                        Data_valid_p3 <= Data_valid_p2;
 
                     when P3 =>
                         Packet_Counter <= Packet_Counter + 1;
                         Data_Framed <= Data_P3;
-                        Data_valid_framed <= Data_valid_p3;
                         FIFO_read <= '1';
 
                     when DIAG =>
-                        Data_Valid <= '1';
                         Packet_Counter <= Packet_Counter + 1;
                         --FIFO_Read <= '1';
 

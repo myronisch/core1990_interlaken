@@ -7,18 +7,20 @@ entity interlaken_interface_tb is
 end entity interlaken_interface_tb;
 
 architecture tb of interlaken_interface_tb is
-
-    constant   REFCLK_PERIOD           :   time   :=  8.0 ns;
-    constant   SYSCLK_PERIOD           :   time   :=  25.0 ns;
-    constant   DCLK_PERIOD             :   time   :=  5.0 ns;
-    constant   Lanes                   : integer  :=  4;
-    constant   BurstMax     : positive := 256;      -- Configurable value of BurstMax
-    constant   BurstShort   : positive := 8;      -- Configurable value of BurstShort
-    constant   PacketLength : positive := 192;     -- Configurable value of PacketLength -- 24 packets * 8  = 192 B
-    constant   CLOCKING_MODE : string := "independent_clock";
-    constant   RELATED_CLOCKS : integer range 0 to 1 := 0;
-    constant   FIFO_MEMORY_TYPE : string := "auto";
-    constant   PACKET_FIFO : string := "false";
+    constant    clk300_period           : time                 :=  3.333 ns;
+    constant    clk150_period           : time                 :=  6.666 ns;
+    constant    REFCLK_PERIOD           : time                 :=  8.0 ns;
+    constant    SYSCLK_PERIOD           : time                 :=  25.0 ns;
+    constant    DCLK_PERIOD             : time                 :=  5.0 ns;
+    constant    Lanes                   : integer              :=  4;
+    constant    BurstMax                : positive             := 256;                -- Configurable value of BurstMax
+    constant    BurstShort              : positive             := 64;                 -- Configurable value of BurstShort
+    constant    PacketLength            : positive             := 256;                -- Configurable value of PacketLength of META frame-- 24 packets * 8  = 192 B
+    constant    CLOCKING_MODE           : string               := "independent_clock";
+    constant    RELATED_CLOCKS          : integer range 0 to 1 := 0;
+    constant    FIFO_MEMORY_TYPE        : string               := "auto";
+    constant    PACKET_FIFO             : string               := "false";
+    constant    LOOPBACK                : boolean              := false;
 
     --signal System_Clock_In_P : std_logic;
     --signal System_Clock_In_N : std_logic;
@@ -61,7 +63,8 @@ architecture tb of interlaken_interface_tb is
     --signal BurstShort : positive;
     --signal PacketLength : positive;
     --signal clk40 : std_logic;
-    --signal clk150 : std_logic;
+    signal clk150 : std_logic;
+    signal clk300 : std_logic;
     --signal TX_Data : slv_64_array(0 to Lanes-1);
     --signal RX_In_P : std_logic_vector(Lanes-1 downto 0);
     --signal RX_In_N : std_logic_vector(Lanes-1 downto 0);
@@ -82,10 +85,14 @@ architecture tb of interlaken_interface_tb is
     signal HealthInterface : std_logic;
     signal Descrambler_lock : std_logic_vector(Lanes-1 downto 0); --TODO use as status bit -- @suppress "signal Descrambler_lock is never read"
     signal Channel : std_logic_vector(7 downto 0); --TODO use as status bit -- @suppress "signal Channel is never read"
+    signal stat_rx_aligned : STD_LOGIC;
+    
 	
 begin
+    g_loopback: if LOOPBACK generate
     RX_In_N <=  TX_Out_N;
     RX_In_P <=  TX_Out_P;
+    end generate;
 
     uut : entity work.interlaken_interface
         generic map(
@@ -131,13 +138,44 @@ begin
             HealthLane => HealthLane,
             HealthInterface => HealthInterface
         );
+g_noloopback: if LOOPBACK = false generate
+    il0: entity work.interlaken150G_wrapper
+    port map(
+        clk300 => clk150,
+        clk150 => clk150,
+        GTREFCLK_IN_P => GTREFCLK_IN_P,
+        GTREFCLK_IN_N => GTREFCLK_IN_N,
+        TX_Out_P => RX_In_P,
+        TX_Out_N => RX_In_N,
+        RX_In_P => TX_Out_P,
+        RX_In_N => TX_Out_N,
+        stat_rx_aligned => stat_rx_aligned,
+        reset => Reset
+    );
+end generate;
 
     process
     begin
         Reset <=  '1';
-        wait for SYSCLK_PERIOD * 10;
+        wait for SYSCLK_PERIOD * 30;
         Reset <=  '0';
         wait;
+    end process;
+
+    process
+    begin
+        clk150  <=  '1';        
+        wait for clk150_period/2;
+        clk150  <=  '0';
+        wait for clk150_period/2;
+    end process;
+    
+    process
+    begin
+        clk300  <=  '1';        
+        wait for clk300_period/2;
+        clk300  <=  '0';
+        wait for clk300_period/2;
     end process;
 
     process
@@ -149,7 +187,6 @@ begin
         GTREFCLK_IN_P  <=  '1';
         wait for REFCLK_PERIOD/2;
     end process;
-
     
     process
     begin
@@ -173,32 +210,38 @@ begin
         wait for SYSCLK_PERIOD/2;
     end process;
     
-    --TODO write a testbench for the Framing Burst (To test the statemachine)
-    Simulation_Framing_Burst : process
+Simulation_Framing_Burst : process
     begin
-         m_axis_tready <= (others => '1');
+        m_axis_tready <= (others => '1');
+        
         --Test Data patern 1 to FFFFFF
         for i in 0 to Lanes-1 loop
             s_axis(i).tvalid <= '0';
             s_axis(i).tlast <='0';
         end loop;
+        
         wait until (Reset = '0');
-        wait until (HealthInterface = '1');-- Wait for lock before sending data
+        
+        if LOOPBACK  then 
+            wait until (HealthInterface = '1'); -- Wait for lock before sending data -- @suppress "Dead code"
+        else
+            wait until (stat_rx_aligned = '1'); -- @suppress "Dead code"
+        end if;
+        
+    
         for i in 0 to Lanes-1 loop
             s_axis(i).tvalid <= '1';
             s_axis(i).tkeep <= (others => '0');
             s_axis(i).tuser <= (others => '0');
         end loop;
         
-        --Testing the tlast 
-        for packet in 0 to 20 loop --20 packets
+        for packet in 0 to 256 loop -- Send 256 packets of 1 to 256
             
             for i in 0 to Lanes-1 loop                          -- For all lanes
-                s_axis(i).tlast <= '1';                         -- Set tlast '1'
                 s_axis(i).tdata <= x"0000000000000000";         -- start data
             end loop;
             wait for DCLK_PERIOD;
-            for j in 1 to 20 loop --20 bursts
+            for j in 1 to 256 loop --256 bursts
                 
                 for i in 0 to Lanes-1 loop                      -- For all lanes
                     s_axis(i).tlast <= '0';                     -- Set tlast '0'
@@ -210,12 +253,19 @@ begin
             for i in 0 to Lanes-1 loop                          -- For all lanes
               s_axis(i).tlast <= '1';                           -- Set tlast '1'
             end loop;
-            
-            
-            
+
         end loop;
+        wait for DCLK_PERIOD;
+        
+        for i in 0 to Lanes-1 loop --Set to idle state
+            s_axis(i).tdata <= x"0000000000000000";
+            s_axis(i).tvalid <= '0';
+            s_axis(i).tlast <='0';      
+        
+        end loop;
+        
         wait;
-        end process;
+end process;
     
     
  --   Simulation_Interlaken_TX_to_RX : process

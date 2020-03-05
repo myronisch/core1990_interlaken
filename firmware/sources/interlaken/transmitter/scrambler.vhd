@@ -15,8 +15,6 @@ entity Scrambler is
         --Data_Control_In : in std_logic;                       -- Indicates a control word
         --Data_Control_Out: out std_logic;                      -- Output control word indication
 
-        Data_Valid_In   : in std_logic;                       -- Input valid
-        Data_Valid_Out	: out std_logic;    				  -- Output valid
         Gearboxready    : in std_logic
     );
 end Scrambler;
@@ -99,7 +97,6 @@ begin
             Poly(57 downto 54)  <= Lane_Number(3 downto 0);
             Data_Out            <= (others => '0');
             --Data_Control_Out    <= '0';
-            Data_Valid_Out      <= '0';
         elsif (rising_edge(Clk)) then
             --if (Data_Valid_In = '1' and Gearboxready = '1') then
             if (Gearboxready = '1'and Scrambler_En ='1') then
@@ -118,7 +115,6 @@ begin
 
                 end if;
                 Data_Out(65 downto 64) <= Data_In(65 downto 64);  -- Data word header
-                Data_Valid_Out <= Data_Valid_In;
             end if;
         end if;
     end process;

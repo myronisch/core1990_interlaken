@@ -18,6 +18,7 @@ set VHDL_FILES [concat $VHDL_FILES \
     interlaken/transmitter/interlaken_transmitter_multiChannel.vhd \
     interlaken/transmitter/scrambler.vhd \
     interlaken/interface/interlaken_interface.vhd \
+    interlaken/test/interlaken150G_wrapper.vhd \
 ]
 
 set SIM_FILES [concat $SIM_FILES \
@@ -53,5 +54,6 @@ set XDC_FILES_VC709 [concat $XDC_FILES_VC709 \
 ]  
 set XCI_FILES [concat $XCI_FILES \
   Transceiver_10g_64b67b.xci \
+  interlaken_0.xci \
 ]
 

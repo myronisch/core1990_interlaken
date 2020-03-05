@@ -109,9 +109,6 @@ begin
             Error_StateMismatch => Error_StateMismatch,
             Error_NoSync => Error_NoSync
         );
-
-    
-    
         
     Decoder : entity work.Decoder
         port map (
@@ -126,7 +123,5 @@ begin
             Sync_Error => Error_Decoder_Sync,
             Bitslip => Bitslip
         );
-
-    
 
 end architecture Receiver;

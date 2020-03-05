@@ -244,14 +244,19 @@ begin
 
                     if (Data_Valid_In = '1') then
                         Data_Valid <= '1';
-                        MetaCounter <= MetaCounter + 1;
+                        if MetaCounter /= PacketLength then
+                            MetaCounter <= MetaCounter + 1;
+                        else
+                            MetaCounter <= 0;
+                            pres_state <= IDLE; --Error occurred
+                        end if;
                         Data_HDR <= Data_In(66 downto 64);
                         --Data_In_P1 <= Data_In; ---
-                        if (Data_In(65 downto 64) = "10" and Data_In(63) = '0' and 
-                        MetaCounter = 0 and
-                        ((Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_P ) or 
-                        (Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_N ))
-                        ) then
+                        if (    Data_In(65 downto 64) = "10" and Data_In(63) = '0' and 
+                                MetaCounter = 0 and
+                                ((Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_P ) or 
+                                (Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_N ))
+                            ) then
                             scram_state_word_detected <= '1';
                             Poly <= Data_In(57 downto 0);
                             Data_Descrambled <= Data_In(63 downto 0);
