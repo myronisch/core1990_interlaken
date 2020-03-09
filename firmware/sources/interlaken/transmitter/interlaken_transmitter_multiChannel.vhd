@@ -59,7 +59,7 @@ begin
         signal axis           : axis_64_type;
         signal m_axis_aresetn : std_logic;
         signal axis_tready    : std_logic;
-        
+        signal FlowControl_s     : slv_16_array(0 to Lanes-1);
 
     begin
 
@@ -75,13 +75,13 @@ begin
                 reset => reset,
                 TX_Lane_Data_Out => TX_Data_Out(i)(66 downto 0),       
                 TX_Gearboxready => TX_Gearboxready(i),
-                FlowControl => not FlowControl(i), -- Per channel flow control, 1 means Xon, 0 means Xoff, hence not.
+                FlowControl => FlowControl_s(i), -- Per channel flow control, 1 means Xon, 0 means Xoff.
                 HealthLane => HealthLane(i),
                 HealthInterface => HealthInterface_s,
                 s_axis => axis, --: out axis_64_type;
                 s_axis_tready => axis_tready --: in std_logic;
             );
-
+        FlowControl_s(i) <= not FlowControl(i);
         m_axis_aresetn <= not reset;
 
         fifo0 : entity work.Axis64Fifo
