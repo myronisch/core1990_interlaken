@@ -6,15 +6,10 @@ entity Scrambler is
     port (
         Clk				: in std_logic;			              -- System clock
         Scram_Rst		: in std_logic;			              -- Scrambler reset, use for initialization
-
         Data_In 		: in std_logic_vector (66 downto 0);  -- Data input
         Data_Out 		: out std_logic_vector (66 downto 0); -- Data output
-
         LaneNumber		: in std_logic_vector (3 downto 0);   -- Each lane number starts with different scrambler word  
         Scrambler_En	: in std_logic; 					  -- Input valid
-        --Data_Control_In : in std_logic;                       -- Indicates a control word
-        --Data_Control_Out: out std_logic;                      -- Output control word indication
-
         Gearboxready    : in std_logic
     );
 end Scrambler;
@@ -96,9 +91,7 @@ begin
             Poly                <= (others => '1');
             Poly(57 downto 54)  <= LaneNumber(3 downto 0);
             Data_Out            <= (others => '0');
-            --Data_Control_Out    <= '0';
         elsif (rising_edge(Clk)) then
-            --if (Data_Valid_In = '1' and Gearboxready = '1') then
             if (Gearboxready = '1'and Scrambler_En ='1') then
                 if (Data_In(65 downto 63) = "100") then                     --Checks if incoming data is control word
                     if(Data_In(62 downto 58)= META_TYPE_SYNCHRONIZATION) then       -- Sync words are not scrambled  

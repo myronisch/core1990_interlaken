@@ -24,57 +24,18 @@ architecture tb of interlaken_interface_tb is
 
     --signal System_Clock_In_P : std_logic;
     --signal System_Clock_In_N : std_logic;
-
     signal GTREFCLK_IN_P : std_logic;
     signal GTREFCLK_IN_N : std_logic;
-
     signal Reset 		: std_logic;
-
     signal TX_Out_P     : std_logic_vector(3 downto 0);
     signal TX_Out_N     : std_logic_vector(3 downto 0);
     signal RX_In_P      : std_logic_vector(3 downto 0);
     signal RX_In_N      : std_logic_vector(3 downto 0);
-
-    --signal TX_Link_Up      : std_logic;                         -- In case signal is high transmission may start
-    --signal TX_SOP          : std_logic;
-    --signal TX_EOP          : std_logic;
-    --signal TX_EOP_Valid    : std_logic_vector(2 downto 0);
-    --signal TX_FlowControl  : std_logic_vector(15 downto 0);
-    --signal TX_Channel      : std_logic_vector(7 downto 0);
-
-    --signal RX_SOP        	: std_logic;                         -- Start of Packet
-    --signal RX_EOP        	: std_logic;                         -- End of Packet
-    --signal RX_EOP_Valid 	: std_logic_vector(2 downto 0);      -- Valid bytes packet contains
-    --signal RX_FlowControl	: std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
-    --signal RX_Channel    	: std_logic_vector(7 downto 0);      -- Select transmit channel (yet unutilized)
-
-    --signal RX_Link_Up       : std_logic;
-
-    --signal TX_Overflow      : std_logic;
-    --signal TX_Underflow     : std_logic;
-
-    --signal RX_FIFO_Full      : std_logic;
-    --signal RX_FIFO_Empty     : std_logic;
-    --signal Decoder_lock      : std_logic;
-    --signal Descrambler_lock  : std_logic;
-    --signal CRC24_Error       : std_logic;
-    --signal CRC32_Error       : std_logic;
-    --signal BurstMax : positive;
-    --signal BurstShort : positive;
-    --signal PacketLength : positive;
-    --signal clk40 : std_logic;
     signal clk150 : std_logic;
     signal clk300 : std_logic;
-    --signal TX_Data : slv_64_array(0 to Lanes-1);
-    --signal RX_In_P : std_logic_vector(Lanes-1 downto 0);
-    --signal RX_In_N : std_logic_vector(Lanes-1 downto 0);
-    --signal TX_EOP_Valid_Total : std_logic_vector(f_log2(Lanes) + 2 downto 0);
     signal m_axis_aclk : std_logic;
     signal m_axis_tready : axis_tready_array_type(0 to Lanes-1);
-    --signal TX_FIFO_Write : std_logic;
-    --signal loopback_in : std_logic_vector(2 downto 0);
     signal s_axis : axis_64_array_type(0 to Lanes-1);
-    --signal s_axis_prog_empty : axis_tready_array_type(0 to Lanes-1);
     signal s_axis_aclk : std_logic;
     signal s_axis_tready : axis_tready_array_type(0 to Lanes-1); -- @suppress "signal s_axis_tready is never read"
     signal m_axis : axis_64_array_type(0 to Lanes-1); -- @suppress "signal m_axis is never read"
@@ -107,23 +68,18 @@ begin
         )
         port map(
             clk40 => clk40,
-            --clk150 => clk150,
             reset => Reset,
             GTREFCLK_IN_P => GTREFCLK_IN_P,
             GTREFCLK_IN_N => GTREFCLK_IN_N,
             TX_Out_P => TX_Out_P,
             TX_Out_N => TX_Out_N,
-            --TX_Data => TX_Data,
             RX_In_P => RX_In_P,
             RX_In_N => RX_In_N,
-            --TX_SOP => TX_SOP,
-            --TX_EOP => TX_EOP,
-            --TX_EOP_Valid_Total => TX_EOP_Valid_Total,
             TX_FlowControl => (others => (others => '0')),
             s_axis => s_axis,
-            --s_axis_prog_empty => s_axis_prog_empty,
             s_axis_aclk => s_axis_aclk,
             s_axis_tready => s_axis_tready,
+            FlowControl => open,
             m_axis_aclk => m_axis_aclk,
             m_axis => m_axis,
             m_axis_tready => m_axis_tready,
@@ -131,9 +87,6 @@ begin
             Decoder_Lock => Decoder_lock,
             Descrambler_lock => Descrambler_lock,
             Channel => Channel,
-            --Decoder_lock => Decoder_lock,
-            --Descrambler_lock => Descrambler_lock,
-            --TX_FIFO_Write => TX_FIFO_Write,
             loopback_in => "000",
             HealthLane => HealthLane,
             HealthInterface => HealthInterface
@@ -400,7 +353,6 @@ end process;
 --        
 --        TX_Data  <= X"70000FFF000000F0";
 --        wait for SYSCLK_PERIOD*2;
---        
 --        
 --        TX_Data <= X"2f5e5d5c5b5a5958";
 --        wait for SYSCLK_PERIOD*12;

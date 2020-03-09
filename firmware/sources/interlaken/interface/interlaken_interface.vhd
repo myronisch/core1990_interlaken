@@ -48,7 +48,7 @@ entity interlaken_interface is
         -- TX_Channel      : in slv_8_array(0 to Lanes-1);   -- already done by transmitter
 
         ----Receiver output signals-----------------------
-        --RX_FlowControl	: out std_logic_vector(15 downto 0);     -- Flow control data (yet unutilized)
+        FlowControl	: out slv_16_array(0 to Lanes-1);     -- Flow control data (yet unutilized)
         m_axis_aclk       : in std_logic;
         m_axis            : out axis_64_array_type(0 to Lanes-1);
         m_axis_tready     : in axis_tready_array_type(0 to Lanes-1);
@@ -787,6 +787,7 @@ begin
             clk => RX_User_Clock,
             reset => reset,
             RX_Data_In => RX_Data_In_s(0 to Lanes-1),
+            FlowControl => FlowControl,
             RX_Datavalid => RX_Datavalid_Out(Lanes-1 downto 0),
             --HealthLane => HealthLane(Lanes-1 downto 0),
             --HealthInterface => HealthInterface,

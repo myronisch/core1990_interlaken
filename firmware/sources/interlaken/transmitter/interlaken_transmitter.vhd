@@ -9,11 +9,9 @@ entity Interlaken_Transmitter is
         BurstMax      : positive;      -- Configurable value of BurstMax
         BurstShort    : positive;      -- Configurable value of BurstShort
         PacketLength  : positive;      -- Configurable value of PacketLength
-        LaneNumber    : integer      -- Current Lane TODO add bit 39 downto 32 of burstframe -- @suppress "Unused generic: LaneNumber is not used in work.Interlaken_Transmitter(Transmitter)"
-
+        LaneNumber    : integer   
     );
     port (
-        --write_clk : in std_logic;
         clk   : in std_logic;
         reset : in std_logic;
         TX_Lane_Data_Out : out std_logic_vector (66 downto 0);       -- Data ready to transmit
@@ -97,13 +95,6 @@ begin
             Gearboxready    => Gearbox_Pause
         );
 
-    Gearbox_Pause <= TX_Gearboxready ;--or GearboxSignal;
-    --   Gearbox : process(clk, reset)
-    --   begin
-    --       if reset = '1' then
-    --       elsif(rising_edge(clk)) then
-    --           GearboxSignal <= TX_Gearboxready;
-    --       end if;
-    --   end process Gearbox;
-
+    Gearbox_Pause <= TX_Gearboxready ;
+    
 end architecture Transmitter;

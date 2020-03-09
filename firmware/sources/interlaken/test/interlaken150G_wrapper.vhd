@@ -209,7 +209,6 @@ signal err3: std_logic;
 signal mty3: std_logic_vector(3 downto 0);
 
 begin
-    
     interlaken_instance : interlaken_0
       PORT MAP (
         gt_ref_clk0_p => GTREFCLK_IN_P,
@@ -218,114 +217,112 @@ begin
         init_clk => clk150,
         sys_reset => reset,
         gt_txusrclk2 => open,
+        gtpowergood_out => open,
         gt_rxusrclk2 => open,
-        gt_txresetdone_int => open,
-        gt_rxresetdone_int => open,
-        gt_tx_reset_done_inv => open,
         gt_rx_reset_done_inv => open,
-        gt_txp_out => TX_Out_P, 
-        gt_txn_out => TX_Out_N, 
-        gt_rxp_in => RX_In_P,   
-        gt_rxn_in => RX_In_N,   
-        s_axi_aclk => clk150, 
-        s_axi_sreset => reset,
-        s_axi_pm_tick => '0',
-        s_axi_awaddr => (others => '0'),            --axi write address          :in
-        s_axi_awvalid => '0',                       --axi write address valid    :in
-        s_axi_awready => open,                      --axi write address ready    :out
-        s_axi_wdata => (others => '0'),             --axi write data            :in
-        s_axi_wstrb => (others => '0'),             --axi write data strobe     :in
-        s_axi_wvalid => '0',                        --axi write data valid      :in
-        s_axi_wready => open,                       --axi write data ready      :out
-        s_axi_bresp => open,                        --axi write response        :out
-        s_axi_bvalid => open,                       --axi write response valid  :out
-        s_axi_bready => '1',                        --axi write response ready  :in
-        s_axi_araddr => (others => '0'),            --axi read address          :in
-        s_axi_arvalid => '0',                       --axi read address valid    :in
-        s_axi_arready => open,                      --axi read address ready    :out
-        s_axi_rdata => open,                        --axi read data             :out
-        s_axi_rresp => open,                        --axi read data response    :out
-        s_axi_rvalid => open,                       --axi read data valid       :out
-        s_axi_rready => '1',                        --axi read data ready       :in
+        usr_rx_reset => open,
+        gt_rxp_in => RX_In_P,
+        gt_rxn_in => RX_In_N,
+        gt_tx_reset_done_inv => open,
+        usr_tx_reset => open,
+        gt_txp_out => TX_Out_P,
+        gt_txn_out => TX_Out_N,
+        core_rx_reset => reset,
         rx_ovfout => open,
         rx_dataout0 => open, --data0,
         rx_chanout0 => open, --chan0,
-        rx_enaout0 =>  open, --ena0,
-        rx_sopout0 =>  open, --sop0,
-        rx_eopout0 =>  open, --eop0,
-        rx_errout0 =>  open, --err0,
-        rx_mtyout0 =>  open, --mty0,
+        rx_enaout0 => open, --ena0,
+        rx_sopout0 => open, --sop0,
+        rx_eopout0 => open, --eop0,
+        rx_errout0 => open, --err0,
+        rx_mtyout0 => open, --mty0,
         rx_dataout1 => open, --data1,
         rx_chanout1 => open, --chan1,
-        rx_enaout1 =>  open, --ena1,
-        rx_sopout1 =>  open, --sop1,
-        rx_eopout1 =>  open, --eop1,
-        rx_errout1 =>  open, --err1,
-        rx_mtyout1 =>  open, --mty1,
+        rx_enaout1 => open, --ena1,
+        rx_sopout1 => open, --sop1,
+        rx_eopout1 => open, --eop1,
+        rx_errout1 => open, --err1,
+        rx_mtyout1 => open, --mty1,
         rx_dataout2 => open, --data2,
         rx_chanout2 => open, --chan2,
-        rx_enaout2 =>  open, --ena2, 
-        rx_sopout2 =>  open, --sop2, 
-        rx_eopout2 =>  open, --eop2, 
-        rx_errout2 =>  open, --err2, 
-        rx_mtyout2 =>  open, --mty2, 
+        rx_enaout2 => open, --ena2, 
+        rx_sopout2 => open, --sop2, 
+        rx_eopout2 => open, --eop2, 
+        rx_errout2 => open, --err2, 
+        rx_mtyout2 => open, --mty2, 
         rx_dataout3 => open, -- data3,
         rx_chanout3 => open, -- chan3,
-        rx_enaout3 =>  open, --ena3, 
-        rx_sopout3 =>  open, --sop3, 
-        rx_eopout3 =>  open, --eop3, 
-        rx_errout3 =>  open, --err3, 
-        rx_mtyout3 =>  open, --mty3, 
+        rx_enaout3 => open, --ena3, 
+        rx_sopout3 => open, --sop3, 
+        rx_eopout3 => open, --eop3, 
+        rx_errout3 => open, --err3, 
+        rx_mtyout3 => open, --mty3, 
+        core_tx_reset => reset,
         tx_rdyout => tx_rdyout,
         tx_ovfout => open,
-        tx_datain0 =>  data0,
-        tx_chanin0 =>  chan0,
-        tx_enain0 =>  ena0,
-        tx_sopin0 =>  sop0,
-        tx_eopin0 =>  eop0,
-        tx_errin0 =>  err0,
-        tx_mtyin0 =>  mty0,
-        tx_bctlin0 =>  '0',
-        tx_datain1 =>  data1,
-        tx_chanin1 =>  chan1,
-        tx_enain1 =>  ena1,
-        tx_sopin1 =>  sop1,
-        tx_eopin1 =>  eop1,
-        tx_errin1 =>  err1,
-        tx_mtyin1 =>  mty1,
-        tx_bctlin1 =>  '0',
-        tx_datain2 =>  data2,
-        tx_chanin2 =>  chan2,
-        tx_enain2 =>  ena2,
-        tx_sopin2 =>  sop2,
-        tx_eopin2 =>  eop2,
-        tx_errin2 =>  err2,
-        tx_mtyin2 =>  mty2,
-        tx_bctlin2 =>  '0',
-        tx_datain3 =>  data3,
-        tx_chanin3 =>  chan3,
-        tx_enain3 =>  ena3,     
-        tx_sopin3 =>  sop3,     
-        tx_eopin3 =>  eop3,     
-        tx_errin3 =>  err3,
-        core_tx_reset => reset,
-        core_rx_reset => reset,
+        tx_datain0 => data0,
+        tx_chanin0 => chan0,
+        tx_enain0 => ena0,
+        tx_sopin0 => sop0,
+        tx_eopin0 => eop0,
+        tx_errin0 => err0,
+        tx_mtyin0 => mty0,
+        tx_bctlin0 => '0',
+        tx_datain1 => data1,
+        tx_chanin1 => chan1,
+        tx_enain1 => ena1,
+        tx_sopin1 => sop1,
+        tx_eopin1 => eop1,
+        tx_errin1 => err1,
+        tx_mtyin1 => mty1,
+        tx_bctlin1 => '0',
+        tx_datain2 => data2,
+        tx_chanin2 => chan2,
+        tx_enain2 => ena2,
+        tx_sopin2 => sop2,
+        tx_eopin2 => eop2,
+        tx_errin2 => err2,
+        tx_mtyin2 => mty2,
+        tx_bctlin2 => '0',
+        tx_datain3 => data3,
+        tx_chanin3 => chan3,
+        tx_enain3 => ena3,
+        tx_sopin3 => sop3,
+        tx_eopin3 => eop3,
+        tx_errin3 => err3,
         tx_mtyin3 => mty3,
         tx_bctlin3 => '0',
-        drp_clk => clk150,
-        core_drp_reset => reset,
         lockedn => reset,
+        core_drp_reset => reset,
+        drp_clk => clk150,
         drp_en => '0',
         drp_we => '0',
         drp_addr => (others => '0'),
         drp_di => (others => '0'),
         drp_do => open,
-        usr_tx_reset => open,
-        usr_rx_reset => open,
         drp_rdy => open,
         core_clk => clk300,
         lbus_clk => clk300,
-        gt_loopback_in => "000000000000",
+        s_axi_aclk => clk150,
+        s_axi_sreset => reset,
+        s_axi_pm_tick => '0',
+        s_axi_awaddr => (others => '0'), --axi write address          :in
+        s_axi_awvalid => '0', --axi write address valid    :in
+        s_axi_awready => open, --axi write address ready    :out
+        s_axi_wdata => (others => '0'), --axi write data            :in
+        s_axi_wstrb => (others => '0'), --axi write data strobe     :in
+        s_axi_wvalid => '0', --axi write data valid      :in
+        s_axi_wready => open, --axi write data ready      :out
+        s_axi_bresp => open, --axi write response        :out
+        s_axi_bvalid => open, --axi write response valid  :out
+        s_axi_bready => '1', --axi write response ready  :in
+        s_axi_araddr => (others => '0'), --axi read address          :in
+        s_axi_arvalid => '0', --axi read address valid    :in
+        s_axi_arready => open, --axi read address ready    :out
+        s_axi_rdata => open, --axi read data             :out
+        s_axi_rresp => open, --axi read data response    :out
+        s_axi_rvalid => open, --axi read data valid       :out
+        s_axi_rready => '1', --axi read data ready       :in
         gtwiz_reset_tx_datapath => reset,
         gtwiz_reset_rx_datapath => reset,
         stat_tx_underflow_err => open,
@@ -355,7 +352,9 @@ begin
         stat_rx_overflow_err => open,
         stat_rx_burstmax_err => open,
         stat_rx_burst_err => open,
-        gtpowergood_out => open
+        gt_txresetdone_int => open,
+        gt_rxresetdone_int => open,
+        gt_loopback_in => "000000000000"
       );
 
 --lbus_clk: process

@@ -56,27 +56,6 @@ begin
         
     );
 
-    --    RX_FIFO_Write <= Data_valid_Burst_Out;
-    --    RX_FIFO_Data <=  CRC32_Error_fifo & CRC24_Error_fifo & Data_Burst_Out;
-    --    
-    --    process(clk)
-    --    begin
-    --        if rising_edge(clk) then
-    --            if CRC24_Error_burst = '1' then
-    --                CRC24_Error_fifo <= '1';
-    --            elsif RX_FIFO_Write = '1' then
-    --                CRC24_Error_fifo <= '0';
-    --            end if;
-    --            
-    --            if CRC32_Error_meta = '1' then
-    --                CRC32_Error_fifo <= '1';
-    --            elsif RX_FIFO_Write = '1' then
-    --                CRC32_Error_fifo <= '0';
-    --            end if;
-    --            
-    --        end if;
-    --    end process;
-
     Deframing_Meta : entity work.Meta_Deframer
         port map (
             Clk => clk,
@@ -89,8 +68,6 @@ begin
             HealthLane => HealthLane,
             HealthInterface => HealthInterface
         );
-
-    --Data_Descrambler <= Data_Descrambler_Out;
 
     Descrambler : entity work.Descrambler
         generic map (

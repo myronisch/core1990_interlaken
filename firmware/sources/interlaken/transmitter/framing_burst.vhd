@@ -64,8 +64,8 @@ begin
                 CRC24_Out_v := CRC24_Out;
                 end if;
                 Data_out(66 downto 0)<= CRC24_TX(66 downto 0); --Pipe data 
-                if( (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "001")) --or  --EOP
-                  --  (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "100"))     --CONTROL BURSTMAX --TODO put CONTROL back on
+                if( (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "001")) or  --EOP
+                    (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "100"))     --CONTROL BURSTMAX 
                 ) then 
                     Data_out(23 downto 0) <= CRC24_Out_v; -- Include CRC in last packet of burst   
                 end if;
@@ -113,8 +113,8 @@ begin
                     CRC24_TX(61) <= '0'; --SOP
                     CRC24_TX(60 downto 57) <= x"0";--EOP_Format 
                     CRC24_TX(56) <= '0'; --Reset Calendar bit
-                    CRC24_TX(55 downto 40) <= FlowControl; --Per channel flow control, 1 means Xon, 0 means Xoff. (TODO invert these bits)
-                    CRC24_TX(39 downto 32) <= x"0" & LaneNumber; --Channel number, TODO: Insert insert i from for generate channels 
+                    CRC24_TX(55 downto 40) <= FlowControl; --Per channel flow control, 1 means Xon, 0 means Xoff. (Inverted at transmittermultichannel)
+                    CRC24_TX(39 downto 32) <= x"0" & LaneNumber;
                     CRC24_TX(31 downto 24) <= x"00"; --Multiple-Use field 
                     if(SendEOP = '1') then
                         CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;--EOP_Format, converted from tkeep.
