@@ -5,8 +5,9 @@ use work.axi_stream_package.all;
 
 entity Burst_Framer is
     generic (
-        BurstMax   : positive :=256;   -- Configurable value of BurstMax
-        BurstShort : positive :=8      -- Configurable value of BurstShort
+        BurstMax   : positive :=  256;   -- Configurable value of BurstMax
+        BurstShort : positive :=  8     -- Configurable value of BurstShort
+  
     );
     port (
         clk	             : in std_logic;			            -- System clock
@@ -17,7 +18,8 @@ entity Burst_Framer is
         meta_tready      : in std_logic;                        -- Request from the MetaFraming to read data from the FIFO
         Gearboxready     : in std_logic;
         s_axis           : in axis_64_type;
-        s_axis_tready    : out  std_logic
+        s_axis_tready    : out  std_logic;
+        LaneNumber       : in std_logic_vector (3 downto 0)
     );
 end Burst_Framer;
 
@@ -33,6 +35,7 @@ architecture framing of Burst_Framer is
     signal TX_ValidBytes_s      : std_logic_vector(2 downto 0);
     signal s_axis_tready_s      : std_logic;
     signal SendEOP              : std_logic; --Indication that the next burst word has to be an End of Packet
+    
   
 begin
     Channel_send_idle <= not s_axis.tvalid and s_axis.tlast;
@@ -56,10 +59,10 @@ begin
             Data_out <= (others => '0');
         elsif (rising_edge(clk)) then
             CRC24_TX(23 downto 0)  <= x"000000"; --CRC24 field
-            if(CRC24_TX(62 downto 60) = "100" or CRC24_TX(61 downto 60) = "01") then --Get CRC-24
-                CRC24_Out_v := CRC24_Out;
-            end if;
             if(Gearboxready = '1' and meta_tready = '1') then
+                 if(CRC24_TX(62 downto 60) = "100" or CRC24_TX(61 downto 60) = "01") then --Get CRC-24
+                CRC24_Out_v := CRC24_Out;
+                end if;
                 Data_out(66 downto 0)<= CRC24_TX(66 downto 0); --Pipe data 
                 if( (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "001")) --or  --EOP
                   --  (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "100"))     --CONTROL BURSTMAX --TODO put CONTROL back on
@@ -98,9 +101,8 @@ begin
     begin
         if rising_edge(clk) then
             CRC24_RST <= '0';
-            SendEOP <= '0';
-            
             if( meta_tready = '1' and Gearboxready = '1' ) then
+                SendEOP <= '0';
                 BURST_tready <= '1';
                 if BURST_tready = '0' then --This means that it was indicated in the data state to send a Burst control word.
                     Byte_Counter <= 8;
@@ -112,7 +114,7 @@ begin
                     CRC24_TX(60 downto 57) <= x"0";--EOP_Format 
                     CRC24_TX(56) <= '0'; --Reset Calendar bit
                     CRC24_TX(55 downto 40) <= FlowControl; --Per channel flow control, 1 means Xon, 0 means Xoff. (TODO invert these bits)
-                    CRC24_TX(39 downto 32) <= x"01"; --Channel number, TODO: Insert insert i from for generate channels 
+                    CRC24_TX(39 downto 32) <= x"0" & LaneNumber; --Channel number, TODO: Insert insert i from for generate channels 
                     CRC24_TX(31 downto 24) <= x"00"; --Multiple-Use field 
                     if(SendEOP = '1') then
                         CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;--EOP_Format, converted from tkeep.
@@ -144,7 +146,7 @@ begin
                 if(s_axis.tlast = '1' or Channel_send_idle = '1') then
                     BURST_tready <= '0'; --Indicate that we are going to send a Burst word in the next clock cycle
                 end if;    
-            end if; --s_axis_tready
+            end if; --meta_tready = '1' and Gearboxready = '1'
         end if; --clk
     end process output;
 

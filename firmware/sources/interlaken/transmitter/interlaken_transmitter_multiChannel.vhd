@@ -208,11 +208,11 @@ begin
 
         lane_tx : entity work.Interlaken_Transmitter
             generic map(
-                BurstMax     => BurstMax, -- Configurable value of BurstMax
-                BurstShort   => BurstShort, -- Configurable value of BurstShort
+                BurstMax => BurstMax, -- Configurable value of BurstMax
+                BurstShort => BurstShort, -- Configurable value of BurstShort
                 PacketLength => PacketLength, -- Configurable value of PacketLength
-                LaneNumber   => i       -- Current Lane (TX channel)
-            )
+                LaneNumber => i -- Current Lane (TX channel)
+           )
             port map(
                 --write_clk => write_clk,
                 clk => clk,

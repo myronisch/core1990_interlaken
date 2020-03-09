@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 use work.interlaken_package.all;
 use work.axi_stream_package.ALL;
 
@@ -8,7 +9,8 @@ entity Interlaken_Transmitter is
         BurstMax      : positive;      -- Configurable value of BurstMax
         BurstShort    : positive;      -- Configurable value of BurstShort
         PacketLength  : positive;      -- Configurable value of PacketLength
-        LaneNumber    : integer       -- Current Lane ToDo add bit 39 downto 32 of burstframe -- @suppress "Unused generic: LaneNumber is not used in work.Interlaken_Transmitter(Transmitter)"
+        LaneNumber    : integer      -- Current Lane TODO add bit 39 downto 32 of burstframe -- @suppress "Unused generic: LaneNumber is not used in work.Interlaken_Transmitter(Transmitter)"
+
     );
     port (
         --write_clk : in std_logic;
@@ -32,15 +34,17 @@ architecture Transmitter of Interlaken_Transmitter is
     signal Data_Scrambler_Out : std_logic_vector(66 downto 0);
     signal Gearbox_Pause : std_logic;
     signal TX_Enable : std_logic;
+    signal LaneNumber_s : std_logic_vector (3 downto 0);
 
 begin
 
     TX_Enable <= '1';
+    LaneNumber_s <= std_logic_vector(to_unsigned(LaneNumber, 4));
     
 	Framing_Burst : entity work.Burst_Framer  -- Define the connections of the Burst component
         generic map (
-            BurstMax      => BurstMax,
-            BurstShort    => BurstShort
+            BurstMax => BurstMax,
+            BurstShort => BurstShort
         )
         port map (
             clk => clk,
@@ -51,7 +55,8 @@ begin
             meta_tready => meta_tready,
             Gearboxready => Gearbox_Pause,
             s_axis => s_axis,
-            s_axis_tready => s_axis_tready
+            s_axis_tready => s_axis_tready,
+            LaneNumber => LaneNumber_s
         );
 
     Framing_Meta : entity work.Meta_Framer -- Define the connections of the Metaframing component
@@ -77,7 +82,7 @@ begin
             Scram_Rst => reset,
             Data_In => Data_Meta_Out,
             Data_Out => Data_Scrambler_Out,
-            Lane_Number => "0001",
+            LaneNumber => LaneNumber_s,
             Scrambler_En => '1',
             Gearboxready => Gearbox_Pause
         );

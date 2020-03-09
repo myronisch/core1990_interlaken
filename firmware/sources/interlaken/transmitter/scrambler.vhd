@@ -10,7 +10,7 @@ entity Scrambler is
         Data_In 		: in std_logic_vector (66 downto 0);  -- Data input
         Data_Out 		: out std_logic_vector (66 downto 0); -- Data output
 
-        Lane_Number		: in std_logic_vector (3 downto 0);   -- Each lane number starts with different scrambler word  
+        LaneNumber		: in std_logic_vector (3 downto 0);   -- Each lane number starts with different scrambler word  
         Scrambler_En	: in std_logic; 					  -- Input valid
         --Data_Control_In : in std_logic;                       -- Indicates a control word
         --Data_Control_Out: out std_logic;                      -- Output control word indication
@@ -90,11 +90,11 @@ begin
     Shiftreg(1) <= Poly(53) xor Poly(15);
     Shiftreg(0) <= Poly(52) xor Poly(14);
 
-    Scramble : process (Clk, Scram_Rst, Lane_Number)
+    Scramble : process (Clk, Scram_Rst, LaneNumber)
     begin
         if(Scram_Rst = '1') then
             Poly                <= (others => '1');
-            Poly(57 downto 54)  <= Lane_Number(3 downto 0);
+            Poly(57 downto 54)  <= LaneNumber(3 downto 0);
             Data_Out            <= (others => '0');
             --Data_Control_Out    <= '0';
         elsif (rising_edge(Clk)) then

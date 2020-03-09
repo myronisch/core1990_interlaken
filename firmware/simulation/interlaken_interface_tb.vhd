@@ -209,6 +209,7 @@ end generate;
         clk40  <=  '0';
         wait for SYSCLK_PERIOD/2;
     end process;
+
     
 Simulation_Framing_Burst : process
     begin
