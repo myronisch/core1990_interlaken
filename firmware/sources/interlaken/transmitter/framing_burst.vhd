@@ -10,16 +10,18 @@ entity Burst_Framer is
   
     );
     port (
-        clk	             : in std_logic;			            -- System clock
-        reset            : in std_logic;			            -- Reset, use for initialization
-        TX_Enable        : in std_logic;                        -- Enable the TX
-        Data_out         : out std_logic_vector(66 downto 0);   -- To scrambling/framing
-        FlowControl      : in std_logic_vector(15 downto 0);    -- Flow control data (yet unutilized)
-        meta_tready      : in std_logic;                        -- Request from the MetaFraming to read data from the FIFO
-        Gearboxready     : in std_logic;
-        s_axis           : in axis_64_type;
-        s_axis_tready    : out  std_logic;
-        LaneNumber       : in std_logic_vector (3 downto 0)
+        clk	              : in std_logic;			            -- System clock
+        reset             : in std_logic;			            -- Reset, use for initialization
+        TX_Enable         : in std_logic;                        -- Enable the TX
+        Data_out          : out std_logic_vector(66 downto 0);   -- To scrambling/framing
+        FlowControl       : in std_logic_vector(15 downto 0);    -- Flow control data (yet unutilized)
+        meta_tready       : in std_logic;                        -- Request from the MetaFraming to read data from the FIFO
+        Gearboxready      : in std_logic;
+        s_axis            : in axis_64_type;
+        s_axis_tready     : out  std_logic;
+        LaneNumber        : in std_logic_vector (3 downto 0);
+        insert_burst_idle : in std_logic;
+        insert_burst_sop  : in std_logic
     );
 end Burst_Framer;
 
@@ -35,8 +37,7 @@ architecture framing of Burst_Framer is
     signal TX_ValidBytes_s      : std_logic_vector(2 downto 0);
     signal s_axis_tready_s      : std_logic;
     signal SendEOP              : std_logic; --Indication that the next burst word has to be an End of Packet
-    
-  
+   
 begin
     Channel_send_idle <= not s_axis.tvalid and s_axis.tlast;
 
@@ -58,14 +59,14 @@ begin
         if (reset = '1') then
             Data_out <= (others => '0');
         elsif (rising_edge(clk)) then
-            CRC24_TX(23 downto 0)  <= x"000000"; --CRC24 field
+            --CRC24_TX(23 downto 0)  <= x"000000"; --CRC24 field
             if(Gearboxready = '1' and meta_tready = '1') then
                  if(CRC24_TX(62 downto 60) = "100" or CRC24_TX(61 downto 60) = "01") then --Get CRC-24
                 CRC24_Out_v := CRC24_Out;
                 end if;
                 Data_out(66 downto 0)<= CRC24_TX(66 downto 0); --Pipe data 
-                if( (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "001")) or  --EOP
-                    (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "100"))     --CONTROL BURSTMAX 
+                if( (CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "001"))  --EOP
+                    --(CRC24_TX(66 downto 64) = "010" and (CRC24_TX(62 downto 60) = "100"))     --CONTROL BURSTMAX 
                 ) then 
                     Data_out(23 downto 0) <= CRC24_Out_v; -- Include CRC in last packet of burst   
                 end if;
@@ -98,13 +99,17 @@ begin
     end process state_register;
 
     output : process (clk) is
+        variable insert_burst_sop_v: std_logic := '0';
     begin
         if rising_edge(clk) then
             CRC24_RST <= '0';
+            if insert_burst_sop = '1' then
+                insert_burst_sop_v := '1';
+            end if;
             if( meta_tready = '1' and Gearboxready = '1' ) then
                 SendEOP <= '0';
                 BURST_tready <= '1';
-                if BURST_tready = '0' then --This means that it was indicated in the data state to send a Burst control word.
+                if BURST_tready = '0' or insert_burst_idle = '1' then --This means that it was indicated in the data state to send a Burst control word.
                     Byte_Counter <= 8;
                     CRC24_RST <= '1';
                     CRC24_TX(66 downto 64) <= "010"; --inversion and framing
@@ -120,15 +125,12 @@ begin
                         CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;--EOP_Format, converted from tkeep.
                         BURST_tready <= '0';
                         SendEOP <= '0';
-                    elsif(TX_Enable = '1') then
+                    elsif(insert_burst_sop_v = '1') then
                         CRC24_TX(62) <= '1'; --Type
-                        CRC24_TX(61) <= '0'; --SOP
                         if (s_axis.tvalid = '1') then -- Indicates the start of data flow
                             CRC24_TX(61) <= '1'; --SOP
+                            insert_burst_sop_v := '0';
                         end if;
-                    else
-                        CRC24_TX(62) <= '0'; --Type
-                        CRC24_TX(61) <= '0'; --SOP
                     end if;
                 else
                     CRC24_TX(63 downto 0) <= s_axis.tdata;

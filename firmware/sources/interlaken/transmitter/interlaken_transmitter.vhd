@@ -20,7 +20,9 @@ entity Interlaken_Transmitter is
         HealthLane : in std_logic;
         HealthInterface : in std_logic;
 		s_axis      : in axis_64_type;
-        s_axis_tready : out std_logic
+        s_axis_tready : out std_logic;
+        insert_burst_idle : in std_logic;
+        insert_burst_sop  : in std_logic
     );
 end entity Interlaken_Transmitter;
 
@@ -54,7 +56,9 @@ begin
             Gearboxready => Gearbox_Pause,
             s_axis => s_axis,
             s_axis_tready => s_axis_tready,
-            LaneNumber => LaneNumber_s
+            LaneNumber => LaneNumber_s,
+            insert_burst_idle => insert_burst_idle,
+            insert_burst_sop => insert_burst_sop
         );
 
     Framing_Meta : entity work.Meta_Framer -- Define the connections of the Metaframing component

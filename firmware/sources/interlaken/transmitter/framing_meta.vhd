@@ -154,7 +154,7 @@ begin
                 when SKIP =>
                     next_state <= DATA;
                 when DATA =>
-                    if (Packet_Counter >= (PacketLength - 5)) then --(PacketLength-1 - metawords) --24-5
+                    if (Packet_Counter >= (PacketLength - 6)) then --(PacketLength-1 - metawords) --24-5
                         next_state <= P1;
                     else
                         next_state <= DATA;
@@ -191,7 +191,7 @@ begin
                             HDR_Meta <= "010";
                             CRC32_Rst <= '1';      --CRC-32
                         end if;
-                        Packet_Counter <= 1;
+                        Packet_Counter <= 0;
                         Data_P1 <= Data_In(63 downto 0);
                         CRC32_En <= '1';        --CRC-32
 
@@ -219,7 +219,7 @@ begin
                         Data_P1 <= Data_In(63 downto 0);
 
                         --changed size from -2 to -3!!
-                        if(Packet_Counter >= (PacketLength - 6) and Packet_Counter < (PacketLength - 3)) then -- Still 4 packets incoming after FIFO read disable
+                        if(Packet_Counter >= (PacketLength - 7) and Packet_Counter < (PacketLength - 4)) then -- Still 4 packets incoming after FIFO read disable
                             FIFO_read <= '0';                         -- PacketLength - 4 packets - 1 - 1 cycle delay fifo read - 4 cycle delay burst component
                         else
                             FIFO_read <= '1';
@@ -239,12 +239,10 @@ begin
                     when P3 =>
                         Packet_Counter <= Packet_Counter + 1;
                         Data_Framed <= Data_P3;
-                        FIFO_read <= '1';
 
                     when DIAG =>
                         Packet_Counter <= Packet_Counter + 1;
-                        --FIFO_Read <= '1';
-
+                        FIFO_read <= '1';
                         Data_Framed <= X"6400_0000_0000_0000"; -- Diagnostic word including CRC32
                         Data_Framed(33 downto 32) <= HealthLane & HealthInterface;
                         HDR_Meta <= "010";

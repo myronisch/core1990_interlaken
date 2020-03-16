@@ -170,6 +170,154 @@ component interlaken_0
     );
 end component interlaken_0;
 
+--COMPONENT interlaken_0
+--  PORT (
+--    gt_ref_clk0_p : IN STD_LOGIC;
+--    gt_ref_clk0_n : IN STD_LOGIC;
+--    gt_refclk_out : OUT STD_LOGIC;
+--    init_clk : IN STD_LOGIC;
+--    sys_reset : IN STD_LOGIC;
+--    gt_txusrclk2 : OUT STD_LOGIC;
+--    gt_rxusrclk2 : OUT STD_LOGIC;
+--    gt_txresetdone_int : OUT STD_LOGIC;
+--    gt_rxresetdone_int : OUT STD_LOGIC;
+--    gt_tx_reset_done_inv : OUT STD_LOGIC;
+--    gt_rx_reset_done_inv : OUT STD_LOGIC;
+--    gt_txp_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+--    gt_txn_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0);
+--    gt_rxp_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+--    gt_rxn_in : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+--    s_axi_aclk : IN STD_LOGIC;
+--    s_axi_sreset : IN STD_LOGIC;
+--    s_axi_pm_tick : IN STD_LOGIC;
+--    s_axi_awaddr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    s_axi_awvalid : IN STD_LOGIC;
+--    s_axi_awready : OUT STD_LOGIC;
+--    s_axi_wdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    s_axi_wstrb : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    s_axi_wvalid : IN STD_LOGIC;
+--    s_axi_wready : OUT STD_LOGIC;
+--    s_axi_bresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+--    s_axi_bvalid : OUT STD_LOGIC;
+--    s_axi_bready : IN STD_LOGIC;
+--    s_axi_araddr : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    s_axi_arvalid : IN STD_LOGIC;
+--    s_axi_arready : OUT STD_LOGIC;
+--    s_axi_rdata : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+--    s_axi_rresp : OUT STD_LOGIC_VECTOR(1 DOWNTO 0);
+--    s_axi_rvalid : OUT STD_LOGIC;
+--    s_axi_rready : IN STD_LOGIC;
+--    rx_ovfout : OUT STD_LOGIC;
+--    rx_dataout0 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    rx_chanout0 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    rx_enaout0 : OUT STD_LOGIC;
+--    rx_sopout0 : OUT STD_LOGIC;
+--    rx_eopout0 : OUT STD_LOGIC;
+--    rx_errout0 : OUT STD_LOGIC;
+--    rx_mtyout0 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    rx_dataout1 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    rx_chanout1 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    rx_enaout1 : OUT STD_LOGIC;
+--    rx_sopout1 : OUT STD_LOGIC;
+--    rx_eopout1 : OUT STD_LOGIC;
+--    rx_errout1 : OUT STD_LOGIC;
+--    rx_mtyout1 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    rx_dataout2 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    rx_chanout2 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    rx_enaout2 : OUT STD_LOGIC;
+--    rx_sopout2 : OUT STD_LOGIC;
+--    rx_eopout2 : OUT STD_LOGIC;
+--    rx_errout2 : OUT STD_LOGIC;
+--    rx_mtyout2 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    rx_dataout3 : OUT STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    rx_chanout3 : OUT STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    rx_enaout3 : OUT STD_LOGIC;
+--    rx_sopout3 : OUT STD_LOGIC;
+--    rx_eopout3 : OUT STD_LOGIC;
+--    rx_errout3 : OUT STD_LOGIC;
+--    rx_mtyout3 : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    tx_rdyout : OUT STD_LOGIC;
+--    tx_ovfout : OUT STD_LOGIC;
+--    tx_datain0 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    tx_chanin0 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    tx_enain0 : IN STD_LOGIC;
+--    tx_sopin0 : IN STD_LOGIC;
+--    tx_eopin0 : IN STD_LOGIC;
+--    tx_errin0 : IN STD_LOGIC;
+--    tx_mtyin0 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    tx_bctlin0 : IN STD_LOGIC;
+--    tx_datain1 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    tx_chanin1 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    tx_enain1 : IN STD_LOGIC;
+--    tx_sopin1 : IN STD_LOGIC;
+--    tx_eopin1 : IN STD_LOGIC;
+--    tx_errin1 : IN STD_LOGIC;
+--    tx_mtyin1 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    tx_bctlin1 : IN STD_LOGIC;
+--    tx_datain2 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    tx_chanin2 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    tx_enain2 : IN STD_LOGIC;
+--    tx_sopin2 : IN STD_LOGIC;
+--    tx_eopin2 : IN STD_LOGIC;
+--    tx_errin2 : IN STD_LOGIC;
+--    tx_mtyin2 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    tx_bctlin2 : IN STD_LOGIC;
+--    tx_datain3 : IN STD_LOGIC_VECTOR(127 DOWNTO 0);
+--    tx_chanin3 : IN STD_LOGIC_VECTOR(10 DOWNTO 0);
+--    tx_enain3 : IN STD_LOGIC;
+--    tx_sopin3 : IN STD_LOGIC;
+--    tx_eopin3 : IN STD_LOGIC;
+--    tx_errin3 : IN STD_LOGIC;
+--    core_tx_reset : IN STD_LOGIC;
+--    core_rx_reset : IN STD_LOGIC;
+--    tx_mtyin3 : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+--    tx_bctlin3 : IN STD_LOGIC;
+--    drp_clk : IN STD_LOGIC;
+--    core_drp_reset : IN STD_LOGIC;
+--    lockedn : IN STD_LOGIC;
+--    drp_en : IN STD_LOGIC;
+--    drp_we : IN STD_LOGIC;
+--    drp_addr : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+--    drp_di : IN STD_LOGIC_VECTOR(15 DOWNTO 0);
+--    drp_do : OUT STD_LOGIC_VECTOR(15 DOWNTO 0);
+--    usr_tx_reset : OUT STD_LOGIC;
+--    usr_rx_reset : OUT STD_LOGIC;
+--    drp_rdy : OUT STD_LOGIC;
+--    core_clk : IN STD_LOGIC;
+--    lbus_clk : IN STD_LOGIC;
+--    gt_loopback_in : IN STD_LOGIC_VECTOR(2 DOWNTO 0);
+--    gtwiz_reset_tx_datapath : IN STD_LOGIC;
+--    gtwiz_reset_rx_datapath : IN STD_LOGIC;
+--    stat_tx_underflow_err : OUT STD_LOGIC;
+--    stat_tx_burst_err : OUT STD_LOGIC;
+--    stat_tx_overflow_err : OUT STD_LOGIC;
+--    stat_rx_diagword_lanestat : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_diagword_intfstat : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_crc32_valid : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_crc32_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_mubits : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+--    stat_rx_mubits_updated : OUT STD_LOGIC;
+--    stat_rx_word_sync : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_synced : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_synced_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_framing_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_bad_type_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_mf_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_descram_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_mf_len_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_mf_repeat_err : OUT STD_LOGIC_VECTOR(11 DOWNTO 0);
+--    stat_rx_aligned : OUT STD_LOGIC;
+--    stat_rx_misaligned : OUT STD_LOGIC;
+--    stat_rx_aligned_err : OUT STD_LOGIC;
+--    stat_rx_crc24_err : OUT STD_LOGIC;
+--    stat_rx_msop_err : OUT STD_LOGIC;
+--    stat_rx_meop_err : OUT STD_LOGIC;
+--    stat_rx_overflow_err : OUT STD_LOGIC;
+--    stat_rx_burstmax_err : OUT STD_LOGIC;
+--    stat_rx_burst_err : OUT STD_LOGIC;
+--    gtpowergood_out : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+--  );
+--END COMPONENT;
     -------------------------- Generate System Clock ---------------------------
     
 --signal clk300: std_logic;
@@ -223,10 +371,14 @@ begin
         usr_rx_reset => open,
         gt_rxp_in => RX_In_P,
         gt_rxn_in => RX_In_N,
+        --gt_rxp_in => RX_In_P,
+        --gt_rxn_in => RX_In_N,
         gt_tx_reset_done_inv => open,
         usr_tx_reset => open,
         gt_txp_out => TX_Out_P,
         gt_txn_out => TX_Out_N,
+        --gt_txp_out => TX_Out_P,
+        --gt_txn_out => TX_Out_N,
         core_rx_reset => reset,
         rx_ovfout => open,
         rx_dataout0 => open, --data0,

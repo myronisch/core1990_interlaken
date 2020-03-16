@@ -20,7 +20,7 @@ source ../filesets/interlaken_fileset.tcl
 source ./external_editor.tcl
 source ../helper/questa_import_generic.tcl
 
-vsim -voptargs="+acc" work.interlaken_interface_tb work.glbl -t ps
+vsim -voptargs="+acc" work.interlaken_interface_tb work.glbl -t 100fs
 project compileoutofdate
 
 #Top entity

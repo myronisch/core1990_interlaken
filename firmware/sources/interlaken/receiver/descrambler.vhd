@@ -205,7 +205,6 @@ begin
 
                 when SYNC =>
                     if (Data_Valid_In = '1') then
-
                         MetaCounter <= MetaCounter + 1;
                         if(MetaCounter = 0) then
                             --if Data_In(63 downto 0) = SYNCHRONIZATION then
@@ -219,21 +218,19 @@ begin
                                     Data_HDR_P1 <= Data_In(66)&"10";
                                     Poly <= Data_In(57 downto 0);  -- Scrambler state in poly
                                     pres_state <= LOCKED;
-                                end if;
+                                 end if;
                             else
                                 Error_NoSync <= '1';
                                 pres_state <= IDLE;
                             end if;
                         end if;
-
-                        if(MetaCounter = (PacketLength-1)) then
-                            MetaCounter <= 0;
-                        end if;
                     end if;
                     if Sync_Words = 0 then
                         pres_state <= IDLE;
                     end if;
-
+                    if(MetaCounter = PacketLength-1) then
+                            MetaCounter <= 0;
+                    end if;
                 when LOCKED =>
                     Lock <= '1';
                     Data_Valid <= '0';
@@ -292,9 +289,6 @@ begin
                             Poly <= Shiftreg(57 downto 0);
                             Data_Descrambled <= Data_In(63 downto 0) xor (Poly(57 downto 0) & Shiftreg(63 downto 58));
                         end if;
-                    
-
-
                 end if;
                 when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
                     pres_state <= IDLE;

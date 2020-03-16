@@ -21,38 +21,38 @@ architecture tb of interlaken_interface_tb is
     constant    FIFO_MEMORY_TYPE        : string               := "auto";
     constant    PACKET_FIFO             : string               := "false";
     constant    LOOPBACK                : boolean              := false;
-
+    constant    TEST_Sim_TXipcore_TO_RXcore1990 : boolean      := true;
     --signal System_Clock_In_P : std_logic;
     --signal System_Clock_In_N : std_logic;
-    signal GTREFCLK_IN_P : std_logic;
-    signal GTREFCLK_IN_N : std_logic;
-    signal Reset 		: std_logic;
-    signal TX_Out_P     : std_logic_vector(3 downto 0);
-    signal TX_Out_N     : std_logic_vector(3 downto 0);
-    signal RX_In_P      : std_logic_vector(3 downto 0);
-    signal RX_In_N      : std_logic_vector(3 downto 0);
-    signal clk150 : std_logic;
-    signal clk300 : std_logic;
-    signal m_axis_aclk : std_logic;
-    signal m_axis_tready : axis_tready_array_type(0 to Lanes-1);
-    signal s_axis : axis_64_array_type(0 to Lanes-1);
-    signal s_axis_aclk : std_logic;
-    signal s_axis_tready : axis_tready_array_type(0 to Lanes-1); -- @suppress "signal s_axis_tready is never read"
-    signal m_axis : axis_64_array_type(0 to Lanes-1); -- @suppress "signal m_axis is never read"
-    signal m_axis_prog_empty : axis_tready_array_type(0 to Lanes-1); -- @suppress "signal m_axis_prog_empty is never read"
-    signal clk40 : std_logic;
-    signal Decoder_lock : std_logic_vector(Lanes-1 downto 0); --TODO use as status bit-- @suppress "signal Decoder_lock is never read"
-    signal HealthLane : std_logic_vector(Lanes-1 downto 0); --TODO use as status bit -- @suppress "signal HealthLane is never read"
-    signal HealthInterface : std_logic;
-    signal Descrambler_lock : std_logic_vector(Lanes-1 downto 0); --TODO use as status bit -- @suppress "signal Descrambler_lock is never read"
-    signal Channel : std_logic_vector(7 downto 0); --TODO use as status bit -- @suppress "signal Channel is never read"
-    signal stat_rx_aligned : STD_LOGIC;
+    signal GTREFCLK_IN_P     : std_logic;
+    signal GTREFCLK_IN_N     : std_logic;
+    signal Reset 		     : std_logic;
+    signal TX_Out_P_s        : std_logic_vector(3 downto 0);
+    signal TX_Out_N_s        : std_logic_vector(3 downto 0);
+    signal RX_In_P_s         : std_logic_vector(3 downto 0);
+    signal RX_In_N_s         : std_logic_vector(3 downto 0);
+    signal clk150            : std_logic;
+    signal clk300            : std_logic;
+    signal m_axis_aclk       : std_logic;
+    signal m_axis_tready     : axis_tready_array_type(0 to Lanes-1);
+    signal s_axis            : axis_64_array_type(0 to Lanes-1);
+    signal s_axis_aclk       : std_logic;
+    signal s_axis_tready     : axis_tready_array_type(0 to Lanes-1);    -- @suppress "signal s_axis_tready is never read"
+    signal m_axis            : axis_64_array_type(0 to Lanes-1);        -- @suppress "signal m_axis is never read"
+    signal m_axis_prog_empty : axis_tready_array_type(0 to Lanes-1);    -- @suppress "signal m_axis_prog_empty is never read"
+    signal clk40             : std_logic;
+    signal Decoder_lock      : std_logic_vector(Lanes-1 downto 0);      --TODO use as status bit-- @suppress "signal Decoder_lock is never read"
+    signal HealthLane        : std_logic_vector(Lanes-1 downto 0);      --TODO use as status bit -- @suppress "signal HealthLane is never read"
+    signal HealthInterface   : std_logic;
+    signal Descrambler_lock  : std_logic_vector(Lanes-1 downto 0);      --TODO use as status bit -- @suppress "signal Descrambler_lock is never read"
+    signal Channel           : std_logic_vector(7 downto 0);            --TODO use as status bit -- @suppress "signal Channel is never read"
+    signal stat_rx_aligned   : STD_LOGIC;
     
 	
 begin
     g_loopback: if LOOPBACK generate
-    RX_In_N <=  TX_Out_N;
-    RX_In_P <=  TX_Out_P;
+    RX_In_N_s <=  TX_Out_N_s;
+    RX_In_P_s <=  TX_Out_P_s;
     end generate;
 
     uut : entity work.interlaken_interface
@@ -71,10 +71,10 @@ begin
             reset => Reset,
             GTREFCLK_IN_P => GTREFCLK_IN_P,
             GTREFCLK_IN_N => GTREFCLK_IN_N,
-            TX_Out_P => TX_Out_P,
-            TX_Out_N => TX_Out_N,
-            RX_In_P => RX_In_P,
-            RX_In_N => RX_In_N,
+            TX_Out_P => TX_Out_P_s,
+            TX_Out_N => TX_Out_N_s,
+            RX_In_P => RX_In_P_s,
+            RX_In_N => RX_In_N_s,
             TX_FlowControl => (others => (others => '0')),
             s_axis => s_axis,
             s_axis_aclk => s_axis_aclk,
@@ -94,18 +94,19 @@ begin
 g_noloopback: if LOOPBACK = false generate
     il0: entity work.interlaken150G_wrapper
     port map(
-        clk300 => clk150,
+        clk300 => clk300,
         clk150 => clk150,
         GTREFCLK_IN_P => GTREFCLK_IN_P,
         GTREFCLK_IN_N => GTREFCLK_IN_N,
-        TX_Out_P => RX_In_P,
-        TX_Out_N => RX_In_N,
-        RX_In_P => TX_Out_P,
-        RX_In_N => TX_Out_N,
+        TX_Out_P => RX_In_P_s,
+        TX_Out_N => RX_In_N_s,
+        RX_In_P => TX_Out_P_s,
+        RX_In_N => TX_Out_N_s,
         stat_rx_aligned => stat_rx_aligned,
         reset => Reset
     );
 end generate;
+
 
     process
     begin
@@ -163,6 +164,13 @@ end generate;
         wait for SYSCLK_PERIOD/2;
     end process;
 
+Sim_TXipcore_TO_RXcore1990 : process
+begin
+    if TEST_Sim_TXipcore_TO_RXcore1990 then
+    
+    wait;
+    end if;
+end process;
     
 Simulation_Framing_Burst : process
     begin
@@ -195,7 +203,7 @@ Simulation_Framing_Burst : process
                 s_axis(i).tdata <= x"0000000000000000";         -- start data
             end loop;
             wait for DCLK_PERIOD;
-            for j in 1 to 256 loop --256 bursts
+            for j in 1 to 5 loop --256 bursts
                 
                 for i in 0 to Lanes-1 loop                      -- For all lanes
                     s_axis(i).tlast <= '0';                     -- Set tlast '0'
@@ -204,9 +212,9 @@ Simulation_Framing_Burst : process
                 wait for DCLK_PERIOD;                           -- Wait for data clk
                 
             end loop;
-            for i in 0 to Lanes-1 loop                          -- For all lanes
-              s_axis(i).tlast <= '1';                           -- Set tlast '1'
-            end loop;
+            --for i in 0 to Lanes-1 loop                          -- For all lanes
+              s_axis(Lanes-1).tlast <= '1';                           -- Set tlast '1'
+            --end loop;
 
         end loop;
         wait for DCLK_PERIOD;

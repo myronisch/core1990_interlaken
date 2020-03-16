@@ -36,8 +36,10 @@ end entity Interlaken_Transmitter_multiChannel;
 
 architecture Transmitter of Interlaken_Transmitter_multiChannel is
     signal HealthInterface_s : std_logic;
-
-
+    signal axis_tready_transmitter, axis_tready_process    : std_logic_vector(Lanes-1 downto 0);
+    signal axis           : axis_64_array_type(0 to Lanes-1);
+    signal insert_burst_idle: std_logic_vector(Lanes-1 downto 0);
+    signal insert_burst_sop: std_logic_vector(Lanes-1 downto 0);
 begin
 
     HealthInterface_procc : process(HealthLane)
@@ -56,9 +58,9 @@ begin
     --        signal Gearbox_Count : integer range 0 to 67;
     --        signal Gearbox_Pause : std_logic;
     --        signal GearboxSignal : std_logic;
-        signal axis           : axis_64_type;
+        
         signal m_axis_aresetn : std_logic;
-        signal axis_tready    : std_logic;
+        
         signal FlowControl_s     : slv_16_array(0 to Lanes-1);
 
     begin
@@ -78,8 +80,10 @@ begin
                 FlowControl => FlowControl_s(i), -- Per channel flow control, 1 means Xon, 0 means Xoff.
                 HealthLane => HealthLane(i),
                 HealthInterface => HealthInterface_s,
-                s_axis => axis, --: out axis_64_type;
-                s_axis_tready => axis_tready --: in std_logic;
+                s_axis => axis(i), --: out axis_64_type;
+                s_axis_tready => axis_tready_transmitter(i), --: in std_logic;
+                insert_burst_idle => insert_burst_idle(i),
+                insert_burst_sop => insert_burst_sop(i)
             );
         FlowControl_s(i) <= not FlowControl(i);
         m_axis_aresetn <= not reset;
@@ -99,10 +103,39 @@ begin
                 s_axis            => s_axis(i),
                 s_axis_tready     => s_axis_tready(i),
                 m_axis_aclk       => clk,
-                m_axis            => axis,
-                m_axis_tready     => axis_tready,
+                m_axis            => axis(i),
+                m_axis_tready     => axis_tready_process(i),
                 m_axis_prog_empty => open
             );
     end generate;
-
+    
+    process(axis, axis_tready_transmitter)
+        variable tlast_found : boolean;
+    begin
+        axis_tready_process <= axis_tready_transmitter;
+        tlast_found := false;
+        insert_burst_idle <= (others => '0');
+        for i in 0 to Lanes-2 loop
+            if axis(i).tlast = '1' and axis(i).tvalid = '1' then
+                tlast_found := true;
+            end if;
+            if tlast_found then
+                axis_tready_process(i+1) <= '0';
+                insert_burst_idle(i+1) <= '1';
+            end if;
+        end loop;
+    end process;
+    
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            insert_burst_sop <= (others => '0');
+            for i in 0 to Lanes-1 loop
+                if axis(i).tlast = '1' and axis(i).tvalid = '1' then
+                    insert_burst_sop(0) <= '1';
+                    exit;
+                end if;
+            end loop;
+        end if;
+    end process;
 end architecture Transmitter;
