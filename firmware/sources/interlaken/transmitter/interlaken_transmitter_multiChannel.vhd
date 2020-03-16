@@ -109,7 +109,7 @@ begin
             );
     end generate;
     
-    process(axis, axis_tready_transmitter)
+   EOP_&_IDLE_Handling: process(axis, axis_tready_transmitter)
         variable tlast_found : boolean;
     begin
         axis_tready_process <= axis_tready_transmitter;
@@ -124,9 +124,9 @@ begin
                 insert_burst_idle(i+1) <= '1';
             end if;
         end loop;
-    end process;
+   end process EOP_&_IDLE_Handling;
     
-    process(clk)
+   SOP_Handling: process(clk)
     begin
         if rising_edge(clk) then
             insert_burst_sop <= (others => '0');
@@ -137,5 +137,5 @@ begin
                 end if;
             end loop;
         end if;
-    end process;
+   end process SOP_Handling;
 end architecture Transmitter;

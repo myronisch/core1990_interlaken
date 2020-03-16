@@ -20,7 +20,7 @@ entity Interlaken_Receiver_multiChannel is
         clk   		     : in std_logic;
         reset 		     : in std_logic;
 		
-		RX_Data_In 	     : in slv_67_array(0 to Lanes-1);
+        RX_Data_In 	     : in slv_67_array(0 to Lanes-1);
         FlowControl	    : out slv_16_array(0 to Lanes-1);   -- Flow control data (yet unutilized)
         RX_Datavalid     : in std_logic_vector(Lanes-1 downto 0); -- From GTH Transceiver
         Bitslip         : out std_logic_vector(Lanes-1 downto 0);
@@ -37,8 +37,11 @@ entity Interlaken_Receiver_multiChannel is
 end entity Interlaken_Receiver_multiChannel;
 
 architecture Receiver of Interlaken_Receiver_multiChannel is
-    signal HealthInterface_s : std_logic_vector(Lanes-1 downto 0);
-   
+    signal HealthInterface_s : std_logic_vector(Lanes-1 downto 0);  
+    signal insert_t_valid : std_logic_vector(Lanes-1 downto 0);
+    signal all_lanes_aligned: std_logic;
+    variable wait_for_lane_n :  integer; 
+
 begin
 
     HealthInterface_procc : process(HealthInterface_s)
@@ -54,7 +57,7 @@ begin
 
 ----- Instantiation of different Receiver Lanes. -----   
     g_lanes: for i in 0 to Lanes-1 generate      -- Generate RX Lanes (Channels)
-        signal axis : axis_64_type;
+        --signal axis : axis_64_type;
         signal s_axis_aresetn : std_logic;
         signal axis_tready  : std_logic;
     begin
@@ -106,5 +109,33 @@ begin
                 m_axis_prog_empty => m_axis_prog_empty(i)       --: out std_logic
             );
     end generate;
+
+    --TODO test code down this line and implement burst_frame_ready and insert_t_valid
+--  skewHandling : process (clk)
+--  begin
+--    insert_t_valid(i) <=( others => '0');      --no valid data   
+--    if rising_edge_(clk) then                  --clk
+--      for i in 0 to Lanes-1 loop               --for each lane
+--        if (i >= wait_for_lane_n) then         --skip already processed lanes
+--          if (burst_frame_ready(i) = '0') then --if burst frame not ready
+--             all_lanes_aligned = '0';          --lanes are not longer aligned
+--          else                                      --if burst frame ready
+--             wait_for_lane_n = wait_for_lane_n + 1; --wait for next lane
+--             insert_t_valid(i) <= '1';              --insert t valid and process this lane
+--          end if;
+--        end if;
+--      end loop;
+--    end if;
+--  end process skewHandling;
+
+--  skewReset: process
+--  begin
+--     if (wait_for_lane_n = Lanes)then          --if all lanes are done
+--        all_lanes_aligned = '1';               --Lanes are aligned
+--     end if;
+--     if (all_lanes_aligned = '1') then         --if lanes were aligned
+--        wait_for_lane_n ='0';                  --revaluate all lanes from top
+--     end if;  
+--  end process skewReset;
 
 end architecture Receiver;
