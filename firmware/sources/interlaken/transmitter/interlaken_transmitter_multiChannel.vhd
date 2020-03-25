@@ -40,6 +40,9 @@ architecture Transmitter of Interlaken_Transmitter_multiChannel is
     signal axis           : axis_64_array_type(0 to Lanes-1);
     signal insert_burst_idle: std_logic_vector(Lanes-1 downto 0);
     signal insert_burst_sop: std_logic_vector(Lanes-1 downto 0);
+    signal insert_burst_eop: std_logic_vector(Lanes-1 downto 0);
+    signal LaneByteMax :std_logic_vector (Lanes-1 downto 0);
+    
 begin
 
     HealthInterface_procc : process(HealthLane)
@@ -59,10 +62,8 @@ begin
     --        signal Gearbox_Pause : std_logic;
     --        signal GearboxSignal : std_logic;
         
-        signal m_axis_aresetn : std_logic;
-        
+        signal m_axis_aresetn : std_logic;     
         signal FlowControl_s     : slv_16_array(0 to Lanes-1);
-
     begin
 
         lane_tx : entity work.Interlaken_Transmitter
@@ -70,12 +71,12 @@ begin
                 BurstMax => BurstMax, -- Configurable value of BurstMax
                 BurstShort => BurstShort, -- Configurable value of BurstShort
                 PacketLength => PacketLength, -- Configurable value of PacketLength
-                LaneNumber => i -- Current Lane (TX channel)
-           )
+                LaneNumber => i, -- Current Lane (TX channel)
+                Lanes => Lanes           )
             port map(
                 clk => clk,
                 reset => reset,
-                TX_Lane_Data_Out => TX_Data_Out(i)(66 downto 0),       
+                TX_Lane_Data_Out => TX_Data_Out(i)(66 downto 0),
                 TX_Gearboxready => TX_Gearboxready(i),
                 FlowControl => FlowControl_s(i), -- Per channel flow control, 1 means Xon, 0 means Xoff.
                 HealthLane => HealthLane(i),
@@ -83,7 +84,9 @@ begin
                 s_axis => axis(i), --: out axis_64_type;
                 s_axis_tready => axis_tready_transmitter(i), --: in std_logic;
                 insert_burst_idle => insert_burst_idle(i),
-                insert_burst_sop => insert_burst_sop(i)
+                insert_burst_sop => insert_burst_sop(i),
+                insert_burst_eop => insert_burst_eop(i),
+                LaneByteMax => LaneByteMax(i)
             );
         FlowControl_s(i) <= not FlowControl(i);
         m_axis_aresetn <= not reset;
@@ -109,7 +112,10 @@ begin
             );
     end generate;
     
-   EOP_&_IDLE_Handling: process(axis, axis_tready_transmitter)
+   --TODO EOP and SOP need to be on the right channels 
+   --TODO Burst-Counters Need to be used correct
+    
+   EOP_and_IDLE_Handling: process(axis, axis_tready_transmitter)
         variable tlast_found : boolean;
     begin
         axis_tready_process <= axis_tready_transmitter;
@@ -124,18 +130,32 @@ begin
                 insert_burst_idle(i+1) <= '1';
             end if;
         end loop;
-   end process EOP_&_IDLE_Handling;
+   end process EOP_and_IDLE_Handling;
     
    SOP_Handling: process(clk)
     begin
         if rising_edge(clk) then
             insert_burst_sop <= (others => '0');
             for i in 0 to Lanes-1 loop
-                if axis(i).tlast = '1' and axis(i).tvalid = '1' then
+                if (insert_burst_eop(Lanes-1) = '1') then
                     insert_burst_sop(0) <= '1';
                     exit;
                 end if;
             end loop;
         end if;
    end process SOP_Handling;
+   
+   ByteMax_Handling: process (clk) 
+   begin
+       if rising_edge(clk) then
+          insert_burst_eop <=(others => '0');
+          for i in 0 to Lanes-1 loop
+            if (LaneByteMax(0) = '1') then --or (axis(i).tlast = '1' and axis(i).tvalid = '1') then
+                insert_burst_eop(Lanes-1)<='1';      
+                exit;
+            end if;
+         end loop;
+       end if;    
+   end process ByteMax_Handling;
+       
 end architecture Transmitter;

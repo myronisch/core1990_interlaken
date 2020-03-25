@@ -40,7 +40,7 @@ architecture Receiver of Interlaken_Receiver_multiChannel is
     signal HealthInterface_s : std_logic_vector(Lanes-1 downto 0);  
     signal insert_t_valid : std_logic_vector(Lanes-1 downto 0);
     signal all_lanes_aligned: std_logic;
-    variable wait_for_lane_n :  integer; 
+    --variable wait_for_lane_n :  integer; 
 
 begin
 
@@ -57,7 +57,7 @@ begin
 
 ----- Instantiation of different Receiver Lanes. -----   
     g_lanes: for i in 0 to Lanes-1 generate      -- Generate RX Lanes (Channels)
-        --signal axis : axis_64_type;
+        signal axis : axis_64_type;
         signal s_axis_aresetn : std_logic;
         signal axis_tready  : std_logic;
     begin

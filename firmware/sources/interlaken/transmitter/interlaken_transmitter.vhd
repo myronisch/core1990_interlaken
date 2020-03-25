@@ -9,7 +9,8 @@ entity Interlaken_Transmitter is
         BurstMax      : positive;      -- Configurable value of BurstMax
         BurstShort    : positive;      -- Configurable value of BurstShort
         PacketLength  : positive;      -- Configurable value of PacketLength
-        LaneNumber    : integer   
+        LaneNumber    : integer ;
+        Lanes : positive  
     );
     port (
         clk   : in std_logic;
@@ -22,8 +23,11 @@ entity Interlaken_Transmitter is
 		s_axis      : in axis_64_type;
         s_axis_tready : out std_logic;
         insert_burst_idle : in std_logic;
-        insert_burst_sop  : in std_logic
-    );
+        insert_burst_sop  : in std_logic;
+        insert_burst_eop  : in std_logic;
+        LaneByteMax       : out std_logic    
+        );
+        
 end entity Interlaken_Transmitter;
 
 architecture Transmitter of Interlaken_Transmitter is
@@ -35,6 +39,7 @@ architecture Transmitter of Interlaken_Transmitter is
     signal Gearbox_Pause : std_logic;
     signal TX_Enable : std_logic;
     signal LaneNumber_s : std_logic_vector (3 downto 0);
+    
 
 begin
 
@@ -44,7 +49,8 @@ begin
 	Framing_Burst : entity work.Burst_Framer  -- Define the connections of the Burst component
         generic map (
             BurstMax => BurstMax,
-            BurstShort => BurstShort
+            BurstShort => BurstShort,
+            Lanes => Lanes
         )
         port map (
             clk => clk,
@@ -58,7 +64,10 @@ begin
             s_axis_tready => s_axis_tready,
             LaneNumber => LaneNumber_s,
             insert_burst_idle => insert_burst_idle,
-            insert_burst_sop => insert_burst_sop
+            insert_burst_sop => insert_burst_sop,
+            insert_burst_eop => insert_burst_eop,
+            LaneByteMax => LaneByteMax
+            
         );
 
     Framing_Meta : entity work.Meta_Framer -- Define the connections of the Metaframing component
