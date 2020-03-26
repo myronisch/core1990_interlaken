@@ -173,6 +173,7 @@ begin
 end process;
     
 Simulation_Framing_Burst : process
+    variable n: integer := 0;
     begin
         m_axis_tready <= (others => '1');
         
@@ -189,7 +190,7 @@ Simulation_Framing_Burst : process
         else
             wait until (stat_rx_aligned = '1'); -- @suppress "Dead code"
         end if;
-        
+        wait for DCLK_PERIOD;
     
         for i in 0 to Lanes-1 loop
             s_axis(i).tvalid <= '1';
@@ -198,23 +199,31 @@ Simulation_Framing_Burst : process
         end loop;
         
         for packet in 0 to 256 loop -- Send 256 packets of 1 to 256
-            
-            for i in 0 to Lanes-1 loop                          -- For all lanes
-                s_axis(i).tdata <= x"0000000000000000";         -- start data
-            end loop;
-            wait for DCLK_PERIOD;
-            for j in 1 to 5 loop --256 bursts
-                
-                for i in 0 to Lanes-1 loop                      -- For all lanes
-                    s_axis(i).tlast <= '0';                     -- Set tlast '0'
-                    s_axis(i).tdata <= x"0000000000000000"+j;   -- Set data pattern
+            for count in 1 to 10 loop
+                for i in 0 to Lanes-1 loop
+                   s_axis(i).tlast <='0';
                 end loop;
-                wait for DCLK_PERIOD;                           -- Wait for data clk
-                
-            end loop;
-            --for i in 0 to Lanes-1 loop                          -- For all lanes
-              s_axis(Lanes-1).tlast <= '1';                           -- Set tlast '1'
+                s_axis(n).tdata <= x"0000000000000000" + count;
+                n := n+1;
+                if (n=4) then
+                    n :=0 ;
+                    wait for DCLK_PERIOD;
+                end if;                
+            end loop; 
+            s_axis(3).tlast <='1';
+            
+            --for j in 1 to 5 loop --256 bursts
+            --    
+            --    for i in 0 to Lanes-1 loop                      -- For all lanes
+            --        s_axis(i).tlast <= '0';                     -- Set tlast '0'
+            --        s_axis(i).tdata <= x"0000000000000000"+j;   -- Set data pattern
+            --    end loop;
+            --    wait for DCLK_PERIOD;                           -- Wait for data clk
+            --    
             --end loop;
+            ----for i in 0 to Lanes-1 loop                          -- For all lanes
+            --  s_axis(Lanes-1).tlast <= '1';                           -- Set tlast '1'
+            ----end loop;
 
         end loop;
         wait for DCLK_PERIOD;

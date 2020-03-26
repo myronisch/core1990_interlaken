@@ -25,7 +25,8 @@ entity Interlaken_Transmitter is
         insert_burst_idle : in std_logic;
         insert_burst_sop  : in std_logic;
         insert_burst_eop  : in std_logic;
-        LaneByteMax       : out std_logic    
+        LaneByteMax       : out std_logic;
+        LaneByteShort : out std_logic
         );
         
 end entity Interlaken_Transmitter;
@@ -39,6 +40,7 @@ architecture Transmitter of Interlaken_Transmitter is
     signal Gearbox_Pause : std_logic;
     signal TX_Enable : std_logic;
     signal LaneNumber_s : std_logic_vector (3 downto 0);
+    
     
 
 begin
@@ -66,7 +68,8 @@ begin
             insert_burst_idle => insert_burst_idle,
             insert_burst_sop => insert_burst_sop,
             insert_burst_eop => insert_burst_eop,
-            LaneByteMax => LaneByteMax
+            LaneByteMax => LaneByteMax,
+            LaneByteShort => LaneByteShort
             
         );
 

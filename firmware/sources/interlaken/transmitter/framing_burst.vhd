@@ -24,8 +24,8 @@ entity Burst_Framer is
         insert_burst_idle : in std_logic;
         insert_burst_sop  : in std_logic;
         insert_burst_eop  : in std_logic;
-        LaneByteMax       : out std_logic
-        
+        LaneByteMax       : out std_logic;
+        LaneByteShort     : out std_logic
     );
 end Burst_Framer;
 
@@ -43,11 +43,12 @@ architecture framing of Burst_Framer is
     signal SendEOP              : std_logic; --Indication that the next burst word has to be an End of Packet
     signal delay_SOP            : std_logic;
     signal delay_EOP            : std_logic;
-    signal LaneByteMax_S : std_logic;
+    signal LaneByteMax_s : std_logic;
     signal SOP_is_delayed : std_logic;
+    signal LaneByteShort_s : std_logic;
 
 begin
-    Channel_send_idle <= not s_axis.tvalid and s_axis.tlast;
+    --Channel_send_idle <= not s_axis.tvalid and s_axis.tlast;
 
     CRC_24_Encoding : entity work.CRC_24 -- Define the connections of the CRC-24 component to the Burst component and generics
         port map(
@@ -107,32 +108,24 @@ begin
         end if;
     end process state_register;
 
-    --TODO Determine if byte counter needs to go out and be used in TXmultichannel, (bytecounter can commune how much bytes are processed)
-    --Because of 1 SOP and 1 EOP per packet (NOW-> multiple EOP's and 1 SOP at channel 1)
-    --1 SOP means burst divided per lane so every full packet 1 EOP and SOP on the next channel
-
-    LaneByteMax <= LaneByteMax_S;
-
-    output : process (clk) is
+    LaneByteMax <= LaneByteMax_s;       --Burstmax flag
+    LaneByteShort <=LaneByteShort_s;    --Burstshort flag
+    
+    output : process (clk, reset) is
         variable insert_burst_sop_v: std_logic := '0';
         variable insert_burst_eop_v: std_logic := '0';
     begin
-        if rising_edge(clk) then
+        if reset = '1' then
+            delay_SOP <= '0';
+            delay_EOP <= '0';
+            SOP_is_delayed <= '0';
+        elsif rising_edge(clk) then
             CRC24_RST <= '0';
             if( meta_tready = '1' and Gearboxready = '1' ) then
                 SendEOP <= '0';
                 BURST_tready <= '1';
-                --if insert_burst_sop = '1' or delay_SOP = '1' then
-                --    insert_burst_sop_v := '1';
-                --    BURST_tready <= '0';
-                --    delay_SOP <= '0';
-                --end if;
-                --if insert_burst_eop = '1' then
-                --    insert_burst_eop_v := '1';
-                --    BURST_tready <= '0';
-                --end if;
                  
-                if (BURST_tready = '0' and insert_burst_sop = '0' and insert_burst_sop = '0') or (insert_burst_idle = '1') then --This means that it was indicated in the data state to send a Burst control word.
+                if (BURST_tready = '0' and insert_burst_sop = '0' and insert_burst_eop = '0') or (insert_burst_idle = '1') then --or (Channel_send_idle = '1') then --This means that it was indicated in the data state to send a Burst control word.
                     Byte_Counter <= Byte_Counter + 8;
                     CRC24_RST <= '1';
                     CRC24_TX(66 downto 64) <= "010"; --inversion and framing
@@ -147,6 +140,7 @@ begin
                     if(insert_burst_eop_v = '1') then
                         CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;--EOP_Format, converted from tkeep.
                         insert_burst_eop_v := '0';
+                        Byte_Counter <= 0;
                     elsif(insert_burst_sop_v = '1') then
                         CRC24_TX(62) <= '1'; --Type
                         insert_burst_sop_v := '0'; 
@@ -158,18 +152,19 @@ begin
                     CRC24_TX(63 downto 0) <= s_axis.tdata;
                     CRC24_TX(66 downto 64)<= "001"; --Data word
                     Byte_Counter <= Byte_Counter + 8;
-                    if Channel_send_idle='1' then--TODO Channel-send-idle
-                        BURST_tready <= '0';
-                    end if;
                 end if;
-                --if(Channel_send_idle = '1') then --TODO saxis.tlast was removed 
-                --    BURST_tready <= '0'; --Indicate that we are going to send a Burst word in the next clock cycle
-                --end if;
+                --Burstshort flag process
+                if(Byte_Counter <= (BurstShort/Lanes)) then
+                    LaneByteShort_s <= '0';
+                else 
+                    LaneByteShort_s <= '1';
+                end if;
+                --burstmax flag process
                 if(Byte_Counter = ByteMax) then
-                    LaneByteMax_S <= '1';
+                    LaneByteMax_s <= '1';
                     Byte_Counter <= 8; 
                 else 
-                    LaneByteMax_S <= '0';
+                    LaneByteMax_s <= '0';
                 end if;        
             end if; --meta_tready = '1' and Gearboxready = '1'
             
@@ -177,7 +172,7 @@ begin
                BURST_tready  <= '0';
             end if;
             
-            if (insert_burst_sop = '1' and BURST_tready= '1' and LaneByteMax_S ='0') or (SOP_is_delayed = '1'and BURST_tready= '1' and LaneByteMax_S ='0' ) then
+            if (insert_burst_sop = '1' and BURST_tready= '1' and LaneByteMax_s ='0') or (SOP_is_delayed = '1'and BURST_tready= '1' and LaneByteMax_s ='0' ) then
                 if  (meta_tready='1' and Gearboxready= '1' and SOP_is_delayed = '0') or (delay_SOP = '0' and meta_tready='1' and Gearboxready= '1') then
                     insert_burst_sop_v := '1';
                     BURST_tready <= '0';
@@ -203,14 +198,9 @@ begin
                 end if;
             end if;
             
-            if (insert_burst_eop = '1' and LaneByteMax_S ='0') or delay_EOP = '1'then
-                --if Gearboxready = '1' then
-                insert_burst_eop_v := '1';
-                BURST_tready <= '0';
-                --delay_EOP <= '0';
-                --else
-                --delay_EOP <= '1';
-                --end if;
+            if (insert_burst_eop = '1') then
+                    insert_burst_eop_v := '1';
+                    BURST_tready <= '0';
             end if;
 
             --if Gearboxready = '1' and  insert_burst_eop_v = '1' then
