@@ -42,6 +42,10 @@ architecture framing of Burst_Framer is
     signal s_axis_tready_s      : std_logic;
     signal SendEOP              : std_logic; --Indication that the next burst word has to be an End of Packet
     signal delay_SOP            : std_logic;
+    signal delay_EOP            : std_logic;
+    signal LaneByteMax_S : std_logic;
+    signal SOP_is_delayed : std_logic;
+
 begin
     Channel_send_idle <= not s_axis.tvalid and s_axis.tlast;
 
@@ -80,7 +84,8 @@ begin
 
     s_axis_tready_s <= BURST_tready and meta_tready and Gearboxready;
     s_axis_tready <= s_axis_tready_s;
-
+   
+    
     state_register : process (clk, reset) is -- Determines the next state of the FSM
     begin
         if (reset='1') then
@@ -106,6 +111,8 @@ begin
     --Because of 1 SOP and 1 EOP per packet (NOW-> multiple EOP's and 1 SOP at channel 1)
     --1 SOP means burst divided per lane so every full packet 1 EOP and SOP on the next channel
 
+    LaneByteMax <= LaneByteMax_S;
+
     output : process (clk) is
         variable insert_burst_sop_v: std_logic := '0';
         variable insert_burst_eop_v: std_logic := '0';
@@ -115,17 +122,17 @@ begin
             if( meta_tready = '1' and Gearboxready = '1' ) then
                 SendEOP <= '0';
                 BURST_tready <= '1';
-                if insert_burst_sop = '1' or delay_SOP = '1' then
-                    insert_burst_sop_v := '1';
-                    BURST_tready <= '0';
-                    delay_SOP <= '0';
-                end if;
-                if insert_burst_eop = '1' then
-                    insert_burst_eop_v := '1';
-                    BURST_tready <= '0';
-                end if;
+                --if insert_burst_sop = '1' or delay_SOP = '1' then
+                --    insert_burst_sop_v := '1';
+                --    BURST_tready <= '0';
+                --    delay_SOP <= '0';
+                --end if;
+                --if insert_burst_eop = '1' then
+                --    insert_burst_eop_v := '1';
+                --    BURST_tready <= '0';
+                --end if;
                  
-                if BURST_tready = '0' or insert_burst_idle = '1' then --This means that it was indicated in the data state to send a Burst control word.
+                if (BURST_tready = '0' and insert_burst_sop = '0' and insert_burst_sop = '0') or (insert_burst_idle = '1') then --This means that it was indicated in the data state to send a Burst control word.
                     Byte_Counter <= Byte_Counter + 8;
                     CRC24_RST <= '1';
                     CRC24_TX(66 downto 64) <= "010"; --inversion and framing
@@ -146,7 +153,7 @@ begin
                         if (s_axis.tvalid = '1') then -- Indicates the start of data flow
                             CRC24_TX(61) <= '1'; --SOP      
                         end if;
-                    end if;
+                     end if;
                 else
                     CRC24_TX(63 downto 0) <= s_axis.tdata;
                     CRC24_TX(66 downto 64)<= "001"; --Data word
@@ -158,31 +165,54 @@ begin
                 --if(Channel_send_idle = '1') then --TODO saxis.tlast was removed 
                 --    BURST_tready <= '0'; --Indicate that we are going to send a Burst word in the next clock cycle
                 --end if;
-            if(Byte_Counter = ByteMax) then
-                LaneByteMax <= '1';
-                Byte_Counter <= 8; 
-            else 
-                LaneByteMax <= '0';
-            end if;        
-                
+                if(Byte_Counter = ByteMax) then
+                    LaneByteMax_S <= '1';
+                    Byte_Counter <= 8; 
+                else 
+                    LaneByteMax_S <= '0';
+                end if;        
             end if; --meta_tready = '1' and Gearboxready = '1'
-            if insert_burst_sop = '1' or delay_SOP = '1' then
-                if Gearboxready = '1' then
+            
+            if ((BURST_tready = '0' and insert_burst_sop = '1') or (BURST_tready = '0' and insert_burst_sop = '1')) then
+               BURST_tready  <= '0';
+            end if;
+            
+            if (insert_burst_sop = '1' and BURST_tready= '1' and LaneByteMax_S ='0') or (SOP_is_delayed = '1'and BURST_tready= '1' and LaneByteMax_S ='0' ) then
+                if  (meta_tready='1' and Gearboxready= '1' and SOP_is_delayed = '0') or (delay_SOP = '0' and meta_tready='1' and Gearboxready= '1') then
                     insert_burst_sop_v := '1';
-                    delay_SOP <= '0';
                     BURST_tready <= '0';
+                    SOP_is_delayed <= '0';
+                elsif delay_SOP = '1' and insert_burst_sop = '0' then
+                    delay_SOP <= '0';
                 else
                     delay_SOP <=  '1';
+                    SOP_is_delayed <= '1';
+                end if;
+                
+                if(insert_burst_sop = '1' and SOP_is_delayed = '1') then
+                    delay_SOP <=  '1';
+                    SOP_is_delayed <= '1';
+                end if;
+                
+                if (Gearboxready = '0' and insert_burst_sop = '1') then
+                    SOP_is_delayed <= '1';
+                    delay_SOP <=  '0';
+                elsif (meta_tready = '0' and insert_burst_sop = '0') then
+                    SOP_is_delayed <= '1';
+                    delay_SOP <=  '0';
                 end if;
             end if;
             
-                if insert_burst_eop = '1' then
-                    insert_burst_eop_v := '1';
-                    BURST_tready <= '0';
-                end if;
-                 
-            
-            
+            if (insert_burst_eop = '1' and LaneByteMax_S ='0') or delay_EOP = '1'then
+                --if Gearboxready = '1' then
+                insert_burst_eop_v := '1';
+                BURST_tready <= '0';
+                --delay_EOP <= '0';
+                --else
+                --delay_EOP <= '1';
+                --end if;
+            end if;
+
             --if Gearboxready = '1' and  insert_burst_eop_v = '1' then
             --    BURST_tready <= '0';
             --end if;    
