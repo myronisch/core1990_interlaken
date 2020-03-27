@@ -125,7 +125,7 @@ begin
                 SendEOP <= '0';
                 BURST_tready <= '1';
                  
-                if (BURST_tready = '0' and insert_burst_sop = '0' and insert_burst_eop = '0') or (insert_burst_idle = '1') then --or (Channel_send_idle = '1') then --This means that it was indicated in the data state to send a Burst control word.
+                if (BURST_tready = '0' and insert_burst_sop = '0' and insert_burst_eop = '0') or (insert_burst_idle = '1') or (s_axis.tvalid ='0') then --or (Channel_send_idle = '1') then --This means that it was indicated in the data state to send a Burst control word.
                     Byte_Counter <= Byte_Counter + 8;
                     CRC24_RST <= '1';
                     CRC24_TX(66 downto 64) <= "010"; --inversion and framing
@@ -137,11 +137,11 @@ begin
                     CRC24_TX(55 downto 40) <= FlowControl; --Per channel flow control, 1 means Xon, 0 means Xoff. (Inverted at transmittermultichannel)
                     CRC24_TX(39 downto 32) <= x"0" & LaneNumber;
                     CRC24_TX(31 downto 24) <= x"00"; --Multiple-Use field 
-                    if(insert_burst_eop_v = '1') then
+                    if(insert_burst_eop_v = '1' and s_axis.tvalid ='1') then
                         CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;--EOP_Format, converted from tkeep.
                         insert_burst_eop_v := '0';
                         Byte_Counter <= 0;
-                    elsif(insert_burst_sop_v = '1') then
+                    elsif(insert_burst_sop_v = '1' and s_axis.tvalid ='1') then
                         CRC24_TX(62) <= '1'; --Type
                         insert_burst_sop_v := '0'; 
                         if (s_axis.tvalid = '1') then -- Indicates the start of data flow
