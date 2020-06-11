@@ -25,6 +25,7 @@ entity Interlaken_Transmitter is
         insert_burst_idle : in std_logic;
         insert_burst_sop  : in std_logic;
         insert_burst_eop  : in std_logic;
+        insert_burst_data  : in std_logic;
         LaneByteMax       : out std_logic;
         LaneByteShort : out std_logic
         );
@@ -68,6 +69,7 @@ begin
             insert_burst_idle => insert_burst_idle,
             insert_burst_sop => insert_burst_sop,
             insert_burst_eop => insert_burst_eop,
+            insert_burst_data => insert_burst_data,
             LaneByteMax => LaneByteMax,
             LaneByteShort => LaneByteShort
             

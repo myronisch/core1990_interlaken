@@ -73,7 +73,8 @@ entity interlaken_interface is
 
         loopback_in       : in std_logic_vector(2 downto 0);
         HealthLane : out std_logic_vector(Lanes-1 downto 0);
-        HealthInterface : out std_logic
+        HealthInterface : out std_logic;
+        axis_tready_transmitter : out std_logic_vector(Lanes-1 downto 0)
 		
 	);
 end entity interlaken_interface;
@@ -716,6 +717,7 @@ begin
         port map (
         
         --write_clk => clk150,
+            axis_tready_transmitter => axis_tready_transmitter,
             clk => TX_User_Clock,
             reset => reset,
             --TX_Data_In => TX_Data,

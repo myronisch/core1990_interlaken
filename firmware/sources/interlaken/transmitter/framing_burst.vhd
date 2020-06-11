@@ -24,6 +24,7 @@ entity Burst_Framer is
         insert_burst_idle : in std_logic;
         insert_burst_sop  : in std_logic;
         insert_burst_eop  : in std_logic;
+        insert_burst_data : in std_logic;
         LaneByteMax       : out std_logic;
         LaneByteShort     : out std_logic
     );
@@ -39,7 +40,7 @@ architecture framing of Burst_Framer is
     signal CRC24_RST            : std_logic;                                        -- CRC24 reset 
     signal CalcCrc              : std_logic;                                        -- CRC24_EN and Gearboxready
     signal TX_ValidBytes_s      : std_logic_vector(2 downto 0);
-    signal s_axis_tready_s      : std_logic;
+    signal s_axis_tready_s      : std_logic := '0';
     signal SendEOP              : std_logic; --Indication that the next burst word has to be an End of Packet
     signal delay_SOP            : std_logic;
     signal delay_EOP            : std_logic;
@@ -83,7 +84,7 @@ begin
         end if;
     end process pipeline;
 
-    s_axis_tready_s <= BURST_tready and meta_tready and Gearboxready;
+    s_axis_tready_s <= BURST_tready and meta_tready and Gearboxready; --and not idle
     s_axis_tready <= s_axis_tready_s;
    
     
@@ -109,11 +110,12 @@ begin
     end process state_register;
 
     LaneByteMax <= LaneByteMax_s;       --Burstmax flag
-    LaneByteShort <=LaneByteShort_s;    --Burstshort flag
+    LaneByteShort <= LaneByteShort_s;    --Burstshort flag
+    
     
     output : process (clk, reset) is
-        variable insert_burst_sop_v: std_logic := '0';
-        variable insert_burst_eop_v: std_logic := '0';
+        --variable insert_burst_sop_v: std_logic := '0';
+        --variable insert_burst_eop_v: std_logic := '0';
     begin
         if reset = '1' then
             delay_SOP <= '0';
@@ -121,11 +123,13 @@ begin
             SOP_is_delayed <= '0';
         elsif rising_edge(clk) then
             CRC24_RST <= '0';
+
             if( meta_tready = '1' and Gearboxready = '1' ) then
                 SendEOP <= '0';
                 BURST_tready <= '1';
                  
-                if (BURST_tready = '0' and insert_burst_sop = '0' and insert_burst_eop = '0') or (insert_burst_idle = '1') or (s_axis.tvalid ='0') then --or (Channel_send_idle = '1') then --This means that it was indicated in the data state to send a Burst control word.
+                if (insert_burst_sop = '1') or (insert_burst_eop = '1') or (insert_burst_idle = '1') or (s_axis.tvalid ='0') then --or (Channel_send_idle = '1') then --This means that it was indicated in the data state to send a Burst control word.
+                    BURST_tready <= '0';
                     Byte_Counter <= Byte_Counter + 8;
                     CRC24_RST <= '1';
                     CRC24_TX(66 downto 64) <= "010"; --inversion and framing
@@ -137,18 +141,19 @@ begin
                     CRC24_TX(55 downto 40) <= FlowControl; --Per channel flow control, 1 means Xon, 0 means Xoff. (Inverted at transmittermultichannel)
                     CRC24_TX(39 downto 32) <= x"0" & LaneNumber;
                     CRC24_TX(31 downto 24) <= x"00"; --Multiple-Use field 
-                    if(insert_burst_eop_v = '1' and s_axis.tvalid ='1') then
+                    if(insert_burst_eop = '1' and s_axis.tvalid ='1') then
                         CRC24_TX(60 downto 57) <= '1' & TX_ValidBytes_s;--EOP_Format, converted from tkeep.
-                        insert_burst_eop_v := '0';
+                        --insert_burst_eop_v := '0';
                         Byte_Counter <= 0;
-                    elsif(insert_burst_sop_v = '1' and s_axis.tvalid ='1') then
+                    elsif(insert_burst_sop = '1' and s_axis.tvalid ='1') then
                         CRC24_TX(62) <= '1'; --Type
-                        insert_burst_sop_v := '0'; 
+                        --insert_burst_sop_v := '0'; 
                         if (s_axis.tvalid = '1') then -- Indicates the start of data flow
                             CRC24_TX(61) <= '1'; --SOP      
                         end if;
                      end if;
                 else
+                	
                     CRC24_TX(63 downto 0) <= s_axis.tdata;
                     CRC24_TX(66 downto 64)<= "001"; --Data word
                     Byte_Counter <= Byte_Counter + 8;
@@ -168,40 +173,43 @@ begin
                 end if;        
             end if; --meta_tready = '1' and Gearboxready = '1'
             
-            if ((BURST_tready = '0' and insert_burst_sop = '1') or (BURST_tready = '0' and insert_burst_sop = '1')) then
-               BURST_tready  <= '0';
-            end if;
-            
-            if (insert_burst_sop = '1' and BURST_tready= '1' and LaneByteMax_s ='0') or (SOP_is_delayed = '1'and BURST_tready= '1' and LaneByteMax_s ='0' ) then
-                if  (meta_tready='1' and Gearboxready= '1' and SOP_is_delayed = '0') or (delay_SOP = '0' and meta_tready='1' and Gearboxready= '1') then
-                    insert_burst_sop_v := '1';
-                    BURST_tready <= '0';
-                    SOP_is_delayed <= '0';
-                elsif delay_SOP = '1' and insert_burst_sop = '0' then
-                    delay_SOP <= '0';
-                else
-                    delay_SOP <=  '1';
-                    SOP_is_delayed <= '1';
-                end if;
-                
-                if(insert_burst_sop = '1' and SOP_is_delayed = '1') then
-                    delay_SOP <=  '1';
-                    SOP_is_delayed <= '1';
-                end if;
-                
-                if (Gearboxready = '0' and insert_burst_sop = '1') then
-                    SOP_is_delayed <= '1';
-                    delay_SOP <=  '0';
-                elsif (meta_tready = '0' and insert_burst_sop = '0') then
-                    SOP_is_delayed <= '1';
-                    delay_SOP <=  '0';
-                end if;
-            end if;
-            
-            if (insert_burst_eop = '1') then
-                    insert_burst_eop_v := '1';
-                    BURST_tready <= '0';
-            end if;
+           -- if ((BURST_tready = '0' and insert_burst_sop = '1') or (BURST_tready = '0' and insert_burst_sop = '1')) then
+           --    BURST_tready  <= '0';
+           -- end if;
+           -- 
+           -- if (insert_burst_sop = '1' and BURST_tready= '1' and LaneByteMax_s ='0') or (SOP_is_delayed = '1'and BURST_tready= '1' and LaneByteMax_s ='0' ) then
+           --     if  (meta_tready='1' and Gearboxready= '1' and SOP_is_delayed = '0') or (delay_SOP = '0' and meta_tready='1' and Gearboxready= '1') then
+           --         insert_burst_sop_v := '1';
+           --         BURST_tready <= '0';
+           --         SOP_is_delayed <= '0';
+           --     elsif delay_SOP = '1' and insert_burst_sop = '0' then
+           --         delay_SOP <= '0';
+           --     else
+           --         delay_SOP <=  '1';
+           --         SOP_is_delayed <= '1';
+           --     end if;
+           --     
+           --     if(insert_burst_sop = '1' and SOP_is_delayed = '1') then
+           --         delay_SOP <=  '1';
+           --         SOP_is_delayed <= '1';
+           --     end if;
+           --     
+           --     if (Gearboxready = '0' and insert_burst_sop = '1') then
+           --         SOP_is_delayed <= '1';
+           --         delay_SOP <=  '0';
+           --     elsif (meta_tready = '0' and insert_burst_sop = '0') then
+           --         SOP_is_delayed <= '1';
+           --         delay_SOP <=  '0';
+           --     end if;
+           -- end if;
+           --if (insert_burst_sop = '1') then     
+           --        insert_burst_sop_v := '1';   
+           --        BURST_tready <= '0';         
+           --end if;                              
+            --if (insert_burst_eop = '1') then
+            --        insert_burst_eop_v := '1';
+            --        BURST_tready <= '0';
+            --end if;
 
             --if Gearboxready = '1' and  insert_burst_eop_v = '1' then
             --    BURST_tready <= '0';

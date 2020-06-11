@@ -47,6 +47,7 @@ architecture tb of interlaken_interface_tb is
     signal Descrambler_lock  : std_logic_vector(Lanes-1 downto 0);      --TODO use as status bit -- @suppress "signal Descrambler_lock is never read"
     signal Channel           : std_logic_vector(7 downto 0);            --TODO use as status bit -- @suppress "signal Channel is never read"
     signal stat_rx_aligned   : STD_LOGIC;
+    signal axis_tready_transmitter : std_logic_vector(Lanes-1 downto 0);
     
 	
 begin
@@ -67,6 +68,7 @@ begin
             PACKET_FIFO => PACKET_FIFO
         )
         port map(
+            axis_tready_transmitter => axis_tready_transmitter,
             clk40 => clk40,
             reset => Reset,
             GTREFCLK_IN_P => GTREFCLK_IN_P,
@@ -174,6 +176,7 @@ end process;
     
 Simulation_Framing_Burst : process
     variable n: integer := 0;
+    variable count: integer := 0;
     begin
         m_axis_tready <= (others => '1');
         
@@ -190,7 +193,7 @@ Simulation_Framing_Burst : process
         else
             wait until (stat_rx_aligned = '1'); -- @suppress "Dead code"
         end if;
-        wait for DCLK_PERIOD;
+        wait for 1*DCLK_PERIOD;
     
         for i in 0 to Lanes-1 loop
             s_axis(i).tvalid <= '1';
@@ -198,19 +201,38 @@ Simulation_Framing_Burst : process
             s_axis(i).tuser <= (others => '0');
         end loop;
         
-        for packet in 0 to 256 loop -- Send 256 packets of 1 to 256
-            for count in 1 to 10 loop
+        
+        
+        for packet in 0 to 100 loop -- Send 256 packets of 1 to 256
+            count := 0;
+            while (count<16) loop
                 for i in 0 to Lanes-1 loop
                    s_axis(i).tlast <='0';
-                end loop;
-                s_axis(n).tdata <= x"0000000000000000" + count;
-                n := n+1;
-                if (n=4) then
-                    n :=0 ;
-                    wait for DCLK_PERIOD;
+               end loop;
+               
+               if (s_axis_tready(n) = '1') then
+                   count := count + 1;
+                   s_axis(n).tdata <= x"0000000000000000" + count;
+                   n := n+1;
+                   if (n=4) then
+                   	n :=0 ;
+                	wait for DCLK_PERIOD;
+                   end if;
+                   if count = 16 then
+                       if n = 0 then
+                         s_axis(3).tlast <='1';
+                       else
+                         s_axis(n-1).tlast <='1';  
+                       end if;
+                   end if;
+                else 
+                	n := n+1;
+                	if ( n = 4 ) then
+                		n := 0;
+                		wait for DCLK_PERIOD;
+                	end if;
                 end if;                
             end loop; 
-            s_axis(3).tlast <='1';
             
             --for j in 1 to 5 loop --256 bursts
             --    

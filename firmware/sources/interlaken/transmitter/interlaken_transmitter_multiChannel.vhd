@@ -30,23 +30,27 @@ entity Interlaken_Transmitter_multiChannel is
         HealthLane      : in  std_logic_vector(Lanes - 1 downto 0);
         s_axis_aclk     : in  std_logic;
         s_axis          : in  axis_64_array_type(0 to Lanes - 1);
-        s_axis_tready   : out axis_tready_array_type(0 to Lanes - 1)
+        s_axis_tready   : out axis_tready_array_type(0 to Lanes - 1);
+        axis_tready_transmitter : out std_logic_vector(Lanes-1 downto 0)
     );
 end entity Interlaken_Transmitter_multiChannel;
 
 architecture Transmitter of Interlaken_Transmitter_multiChannel is
     signal HealthInterface_s : std_logic;
-    signal axis_tready_transmitter, axis_tready_process    : std_logic_vector(Lanes-1 downto 0);
+    signal axis_tready_transmitter_s, axis_tready_process    : std_logic_vector(Lanes-1 downto 0);
     signal axis           : axis_64_array_type(0 to Lanes-1);
     signal insert_burst_idle: std_logic_vector(Lanes-1 downto 0);
     signal insert_burst_sop: std_logic_vector(Lanes-1 downto 0);
     signal insert_burst_eop: std_logic_vector(Lanes-1 downto 0);
+    signal insert_burst_data: std_logic_vector(Lanes-1 downto 0);
     signal LaneByteMax :std_logic_vector (Lanes-1 downto 0);
     signal LaneByteShort :std_logic_vector (Lanes-1 downto 0);
     signal insert_byteMax_eop : std_logic;
     signal insert_tlast_eop : std_logic;
     
 begin
+	
+	axis_tready_transmitter <= axis_tready_transmitter_s;
 
     HealthInterface_procc : process(HealthLane)
     begin
@@ -85,10 +89,11 @@ begin
                 HealthLane => HealthLane(i),
                 HealthInterface => HealthInterface_s,
                 s_axis => axis(i), --: out axis_64_type;
-                s_axis_tready => axis_tready_transmitter(i), --: in std_logic;
+                s_axis_tready => axis_tready_transmitter_s(i), --: in std_logic;
                 insert_burst_idle => insert_burst_idle(i),
                 insert_burst_sop => insert_burst_sop(i),
                 insert_burst_eop => insert_burst_eop(i),
+                insert_burst_data => insert_burst_data(i),
                 LaneByteMax => LaneByteMax(i),
                 LaneByteShort => LaneByteShort(i)
             );
@@ -119,58 +124,124 @@ begin
    --TODO EOP and SOP need to be on the right channels 
    --TODO Burst-Counters Need to be used correct
     
-   EOP_and_IDLE_Handling: process(axis, axis_tready_transmitter, LaneByteShort)
-        variable tlast_found : boolean;
-    begin
-        axis_tready_process <= axis_tready_transmitter;
-        tlast_found := false;
-        insert_burst_idle <= (others => '0');
-        insert_tlast_eop <='0';
-        for i in 0 to Lanes-2 loop
-            if axis(i).tlast = '1' and axis(i).tvalid = '1' then
-                tlast_found := true;
-            end if;
-            if tlast_found then
-                axis_tready_process(i+1) <= '0';
-                insert_burst_idle(i+1) <= '1';
-                if (LaneByteShort ="1111") then
-                    insert_tlast_eop <= '1';
-                end if;    
-            end if;    
-        end loop;
-        if (axis(Lanes-1).tlast = '1' and axis(Lanes-1).tvalid = '1') then
-           if (LaneByteShort ="1111") then
-               insert_tlast_eop <= '1';
-           end if;
-        end if;
-   end process EOP_and_IDLE_Handling;
-    
-   insert_burst_eop<= (insert_tlast_eop  or insert_byteMax_eop) & "000" ; 
-    
-   SOP_Handling: process(clk)
-    begin
-        if rising_edge(clk) then
-            insert_burst_sop <= (others => '0');
-            for i in 0 to Lanes-1 loop
-                if (insert_burst_eop(Lanes-1) = '1') then
-                    insert_burst_sop(0) <= '1';
-                    exit;
-                end if;
-            end loop;
-        end if;
-   end process SOP_Handling;
-   
-   ByteMax_Handling: process (clk) 
+ --  EOP_and_IDLE_Handling: process(axis, axis_tready_transmitter, LaneByteShort)
+ --       variable tlast_found : boolean;
+ --   begin
+ --       axis_tready_process <= axis_tready_transmitter;
+ --       tlast_found := false;
+ --       insert_burst_idle <= (others => '0');
+ --       insert_tlast_eop <='0';
+ --       for i in 0 to Lanes-2 loop
+ --           if axis(i).tlast = '1' and axis(i).tvalid = '1' then
+ --           	tlast_found := true;
+ --           	insert_tlast_eop <= '1';
+ --           end if;
+ --           if tlast_found then
+ --               axis_tready_process(i+1) <= '0';
+ --               insert_burst_idle(i+1) <= '1';
+ --               --if (LaneByteShort ="1111") then
+ --               --    insert_tlast_eop <= '1';
+ --               --end if;    
+ --           end if;    
+ --       end loop;
+ --       if (axis(Lanes-1).tlast = '1' and axis(Lanes-1).tvalid = '1') then
+ --       	insert_tlast_eop <= '1';
+ --       end if;
+ --       --if (axis(Lanes-1).tlast = '1' and axis(Lanes-1).tvalid = '1') then
+ --       --   if (LaneByteShort ="1111") then
+ --       --       insert_tlast_eop <= '1';
+ --       --   end if;
+ --       --end if;
+ --  end process EOP_and_IDLE_Handling;
+ --   
+ --  insert_burst_eop <= (insert_tlast_eop or insert_byteMax_eop) & "000" ; 
+ --   
+ --  SOP_Handling: process(clk)
+ --   begin
+ --       if rising_edge(clk) then
+ --           insert_burst_sop <= (others => '0');
+ --           for i in 0 to Lanes-1 loop
+ --               if (insert_burst_eop(Lanes-1) = '1') and axis(i).tvalid = '1' then
+ --                   insert_burst_sop(0) <= '1';
+ --                   exit;
+ --               end if;
+ --           end loop;
+ --       end if;
+ --  end process SOP_Handling;
+ --  
+ --  ByteMax_Handling: process (clk) 
+ --  begin
+ --      if rising_edge(clk) then
+ --         insert_byteMax_eop <= '0';
+ --         for i in 0 to Lanes-1 loop
+ --           if (LaneByteMax(0) = '1') then --or (axis(i).tlast = '1' and axis(i).tvalid = '1') then
+ --               insert_byteMax_eop <= '1';      
+ --               exit;
+ --           end if;
+ --        end loop;
+ --      end if;    
+ --  end process ByteMax_Handling;
+ --  
+   LaneFormatHandling: process(clk)
+   	   variable SOP : boolean := true;
+   	   variable Idle : boolean;
+   	   variable EOP : boolean;
    begin
-       if rising_edge(clk) then
-          insert_byteMax_eop <= '0';
-          for i in 0 to Lanes-1 loop
-            if (LaneByteMax(0) = '1') then --or (axis(i).tlast = '1' and axis(i).tvalid = '1') then
-                insert_byteMax_eop <= '1';      
-                exit;
-            end if;
-         end loop;
-       end if;    
-   end process ByteMax_Handling;
+   	   if rising_edge(clk) then
+   	   Idle := false;
+   	   EOP 	:= false;
+   	   axis_tready_process  <= axis_tready_transmitter_s;
+   	   insert_burst_sop 	<= (others => '0');
+   	   insert_burst_idle 	<= (others => '0');
+       insert_burst_eop 	<= (others => '0');
+   	   insert_burst_data 	<= (others => '0');
+   		    --lane 0-1-2
+   		    for i in 0 to Lanes-2 loop
+   		    	--search for tlast (EOP)
+   		    	if axis(i).tlast = '1' and axis(i).tvalid = '1' then
+   		    		EOP := true;
+   		    		insert_burst_eop(i) <= '1';
+   		    		Idle:= true;
+   		    	end if;
+   		    	
+   		    	--remember package had EOP
+   		    	if EOP then
+   		    		SOP := true;
+   		    	end if;
+   		    	
+   		    	--Signal the SOP after an EOP
+   		    	if SOP and not EOP and axis(i).tvalid ='1' then
+   		    		insert_burst_sop(i) <='1';
+   		    		SOP := false;
+   		    		Idle:= true;
+   		    	end if;
+   		    	
+   		    	--Insert burst idles after SOP or EOP
+   		    	if Idle then
+   		    		axis_tready_process(i+1) <= '0';
+                    insert_burst_idle(i+1) <= '1';
+   		    	end if;	
+   		    end loop;
+   		    
+   		    --if the last lane has EOP
+   		    if(axis(Lanes-1).tlast ='1' and axis(Lanes-1).tvalid = '1') then
+   		    	insert_burst_eop(Lanes-1) <= '1';
+   		    	EOP := true; SOP := true;
+   		    end if;
+   		    
+   		    for i in 0 to Lanes-1 loop
+   		    	--Insert burst idles when not valid
+   		    	if(axis(i).tvalid ='0') then
+   		    		axis_tready_process(i) <= '0';
+                    insert_burst_idle(i) <= '1';
+   		    	end if;
+   		    	
+   		    	--If nothing was true then insert data
+   		    	if (Idle or EOP or SOP) = false then
+   		    		insert_burst_data(i) <= '1'; 
+   		    	end if;
+   		    end loop;
+   	end if;
+   end process LaneFormatHandling;
        
 end architecture Transmitter;
