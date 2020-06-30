@@ -23,11 +23,9 @@ entity Interlaken_Transmitter is
 		s_axis      : in axis_64_type;
         s_axis_tready : out std_logic;
         insert_burst_idle : in std_logic;
+        insert_burst_idle_df : in std_logic;
         insert_burst_sop  : in std_logic;
-        insert_burst_eop  : in std_logic;
-        insert_burst_data  : in std_logic;
-        LaneByteMax       : out std_logic;
-        LaneByteShort : out std_logic
+        insert_burst_eop  : in std_logic
         );
         
 end entity Interlaken_Transmitter;
@@ -67,12 +65,9 @@ begin
             s_axis_tready => s_axis_tready,
             LaneNumber => LaneNumber_s,
             insert_burst_idle => insert_burst_idle,
+            insert_burst_idle_df => insert_burst_idle_df,
             insert_burst_sop => insert_burst_sop,
-            insert_burst_eop => insert_burst_eop,
-            insert_burst_data => insert_burst_data,
-            LaneByteMax => LaneByteMax,
-            LaneByteShort => LaneByteShort
-            
+            insert_burst_eop => insert_burst_eop
         );
 
     Framing_Meta : entity work.Meta_Framer -- Define the connections of the Metaframing component
