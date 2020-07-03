@@ -77,6 +77,8 @@ begin
             Data_Framed_P1       <= (others => '0');
             Data_Framed_P2       <= (others => '0');
             Data_Out             <= (others => '0');
+            HDR_P1               <= (others => '0');
+            HDR_P2               <= (others => '0');
             -- Data_Control_Out     <= '0';
         elsif (rising_edge(clk)) then
             Gearboxready_P1 <= Gearboxready;

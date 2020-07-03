@@ -23,8 +23,25 @@ source ../helper/questa_import_generic.tcl
 vsim -voptargs="+acc" work.interlaken_interface_tb work.glbl -t 100fs
 project compileoutofdate
 
+
 #Top entity
 add wave -group Top -position insertpoint sim:/interlaken_interface_tb/*
+
+#group certain framing burst signals
+add wave -group Top -position insertpoint  \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(0)/lane_tx/Framing_Burst/s_axis \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(0)/lane_tx/Framing_Burst/s_axis_tready \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(1)/lane_tx/Framing_Burst/s_axis \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(1)/lane_tx/Framing_Burst/s_axis_tready \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(2)/lane_tx/Framing_Burst/s_axis \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(2)/lane_tx/Framing_Burst/s_axis_tready \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(3)/lane_tx/Framing_Burst/s_axis \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(3)/lane_tx/Framing_Burst/s_axis_tready \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(0)/lane_tx/Framing_Burst/CRC24_TX \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(1)/lane_tx/Framing_Burst/CRC24_TX \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(2)/lane_tx/Framing_Burst/CRC24_TX \
+sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(3)/lane_tx/Framing_Burst/CRC24_TX 
+
 
 #Lane 0
 add wave -group Framing_Burst_0 -position insertpoint sim:/interlaken_interface_tb/uut/Interlaken_TX/g_lanes(0)/lane_tx/Framing_Burst/*

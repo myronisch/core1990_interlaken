@@ -37,21 +37,14 @@ end entity Interlaken_Transmitter_multiChannel;
 
 architecture Transmitter of Interlaken_Transmitter_multiChannel is
 	signal HealthInterface_s : std_logic;
-	signal axis_tready_transmitter_s, axis_tready_process    : std_logic_vector(Lanes-1 downto 0);
+	signal axis_tready_transmitter_s    : std_logic_vector(Lanes-1 downto 0);
 	signal axis           : axis_64_array_type(0 to Lanes-1);
 	signal insert_burst_idle: std_logic_vector(Lanes-1 downto 0);
-	signal insert_burst_idle_df: std_logic_vector(Lanes-1 downto 0); --idle, data follows
-    signal insert_burst_sop: std_logic_vector(Lanes-1 downto 0);
+	signal insert_burst_sop: std_logic_vector(Lanes-1 downto 0);
 	signal insert_burst_eop: std_logic_vector(Lanes-1 downto 0);
-	signal LaneByteMax :std_logic_vector (Lanes-1 downto 0);
-	signal LaneByteShort :std_logic_vector (Lanes-1 downto 0);
-	signal insert_byteMax_eop : std_logic;
-	signal insert_tlast_eop : std_logic;
-	signal EOP_FLAG : std_logic;
+	signal insert_burst_eop_now: std_logic_vector(Lanes-1 downto 0);
+	signal insert_burst_eop_next: std_logic_vector(Lanes-1 downto 0);
 	signal SOP_FLAG : std_logic;
-	signal reset_sop_flag : std_logic;
-	
-	
 begin
 
 	axis_tready_transmitter <= axis_tready_transmitter_s;
@@ -75,15 +68,28 @@ begin
 
 		signal m_axis_aresetn : std_logic;
 		signal FlowControl_s     : slv_16_array(0 to Lanes-1);
+		signal axis_mapped : axis_64_type;
+		signal axis_tready_transmitter_mapped : std_logic;
 	begin
+		-- The start of packet always transmits on lane 0, therefore the first word from the FIFO0 goes to lane 1.
+		g_axismap_1: if i > 0 generate
+			axis_mapped <= axis(i-1);
+			axis_tready_transmitter_s(i-1) <= axis_tready_transmitter_mapped;
+		end generate;
+		--! For Lanes = 0 this is the only valid generate statement, 0 maps correctly to 0.
+		g_axismap_0: if i = 0 generate
+			axis_mapped <= axis(Lanes-1);
+			axis_tready_transmitter_s(Lanes-1) <= axis_tready_transmitter_mapped;
+		end generate;
+		
 
 		lane_tx : entity work.Interlaken_Transmitter
 			generic map(
 				BurstMax => BurstMax, -- Configurable value of BurstMax
 				BurstShort => BurstShort, -- Configurable value of BurstShort
 				PacketLength => PacketLength, -- Configurable value of PacketLength
-				LaneNumber => i, -- Current Lane (TX channel)
-				Lanes => Lanes           )
+				Lanes => Lanes,
+				LaneNumber => i)
 			port map(
 				clk => clk,
 				reset => reset,
@@ -92,14 +98,13 @@ begin
 				FlowControl => FlowControl_s(i), -- Per channel flow control, 1 means Xon, 0 means Xoff.
 				HealthLane => HealthLane(i),
 				HealthInterface => HealthInterface_s,
-				s_axis => axis(i), --: out axis_64_type;
-				s_axis_tready => axis_tready_transmitter_s(i), --: in std_logic;
+				s_axis => axis_mapped, --: out axis_64_type;
+				s_axis_tready => axis_tready_transmitter_mapped, --: in std_logic;
 				insert_burst_idle => insert_burst_idle(i),
-				insert_burst_idle_df => insert_burst_idle_df(i),
-                insert_burst_sop => insert_burst_sop(i),
+				insert_burst_sop => insert_burst_sop(i),
 				insert_burst_eop => insert_burst_eop(i)
 			);
-		FlowControl_s(i) <= not FlowControl(i);
+		FlowControl_s(i) <= FlowControl(i);
 		m_axis_aresetn <= not reset;
 
 		fifo0 : entity work.Axis64Fifo
@@ -118,32 +123,40 @@ begin
 				s_axis_tready     => s_axis_tready(i),
 				m_axis_aclk       => clk,
 				m_axis            => axis(i),
-				m_axis_tready     => axis_tready_process(i),
+				m_axis_tready     => axis_tready_transmitter_s(i),
 				m_axis_prog_empty => open
 			);
 	end generate;
 --
-LaneFormatHandling: process (SOP_FLAG, axis, axis_tready_transmitter_s,insert_burst_idle)
-	
+LaneFormatHandling: process (SOP_FLAG, axis, insert_burst_eop_now, insert_burst_eop_next, insert_burst_eop)
+	variable addIdle : std_logic;
 begin
-	axis_tready_process  <= axis_tready_transmitter_s and (not insert_burst_idle);
 	-- For all lanes 
 	for i in 0 to Lanes - 1 loop
 		insert_burst_idle(i)<= '0';
-		insert_burst_idle_df(i)<= '0';
-        insert_burst_sop(i) <= '0';
-		-- SOP when new valid data after an EOP
-		if(axis(0).tvalid ='1' and SOP_FLAG = '1' ) then
-			insert_burst_sop(0) <= '1';
+		insert_burst_sop(i) <= '0';
+		insert_burst_eop_now(i) <= '0';
+		if(axis(i).tvalid ='1' and axis(i).tlast = '1' and i < Lanes-2) then
+			insert_burst_eop_now(i+2) <= '1';
 		end if;
-
+		insert_burst_eop(i) <= insert_burst_eop_now(i) or insert_burst_eop_next(i);
+	
 	end loop;
+	-- SOP when new valid data after an EOP
+	if(axis(0).tvalid ='1' and SOP_FLAG = '1' ) then
+		insert_burst_sop(0) <= '1';
+	end if;
 	if insert_burst_eop /= (insert_burst_eop'range => '0') then
 	   insert_burst_idle <= not insert_burst_eop; 
-    end if;
-    if insert_burst_sop /= (insert_burst_sop'range => '0') then
-       insert_burst_idle_df <= not insert_burst_sop; 
-    end if;
+	end if;
+	addIdle := '0';
+	for i in 0 to Lanes - 1 loop
+		insert_burst_idle(i) <= addIdle; --Add an idle in the remaining lanes to keep the channels aligned
+		if insert_burst_eop(i) = '1' then
+			addIdle := '1';
+		end if;
+	end loop;
+
 end process LaneFormatHandling;
 
 LaneFormatHandling_SOP_decoder: process (clk, reset)
@@ -156,7 +169,6 @@ begin
 				SOP_FLAG <= '1';
 			elsif (insert_burst_sop(0)='1' ) then
 				SOP_FLAG <= '0'; --when done reset flag
-				reset_sop_flag <= '0';
 			end if;
 		end loop;
 	end if;
@@ -165,12 +177,12 @@ end process LaneFormatHandling_SOP_decoder;
 process (clk, reset)
 begin
     if (reset = '1') then
-        insert_burst_eop <= (others=>'0');
+        insert_burst_eop_next <= (others=>'0');
     elsif rising_edge(clk) then
         for i in 0 to Lanes - 1 loop
-            insert_burst_eop(i) <= '0';
-            if (axis(i).tlast = '1' and axis(i).tvalid = '1') then
-                insert_burst_eop(i) <= '1';
+            insert_burst_eop_next(i) <= '0';
+            if (axis(i).tlast = '1' and axis(i).tvalid = '1' and i>=Lanes-2) then
+                insert_burst_eop_next(i-2) <= '1';
             end if;
         end loop;
     end if;

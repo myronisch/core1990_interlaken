@@ -220,6 +220,7 @@ begin
                                     pres_state <= LOCKED;
                                  end if;
                             else
+                                Sync_Words <= 0;
                                 Error_NoSync <= '1';
                                 pres_state <= IDLE;
                             end if;

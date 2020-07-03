@@ -6,12 +6,14 @@ use ieee.std_logic_unsigned.all; -- @suppress "Deprecated package" (used for sig
 entity interlaken_interface_tb is
 end entity interlaken_interface_tb;
 
+library ieee;
+use ieee.numeric_std.all;
 architecture tb of interlaken_interface_tb is
 	constant    clk300_period           : time                 :=  3.333 ns;
 	constant    clk150_period           : time                 :=  6.666 ns;
-	constant    REFCLK_PERIOD           : time                 :=  8.0 ns;
+	constant    REFCLK_PERIOD           : time                 :=  6.4 ns;
 	constant    SYSCLK_PERIOD           : time                 :=  25.0 ns;
-	constant    DCLK_PERIOD             : time                 :=  5.0 ns;
+	constant    DCLK_PERIOD             : time                 :=  3.333 ns;
 	constant    Lanes                   : integer              :=  4;
 	constant    BurstMax                : positive             := 256;                -- Configurable value of BurstMax
 	constant    BurstShort              : positive             := 64;                 -- Configurable value of BurstShort
@@ -68,7 +70,6 @@ begin
 			PACKET_FIFO => PACKET_FIFO
 		)
 		port map(
-			axis_tready_transmitter => axis_tready_transmitter,
 			clk40 => clk40,
 			reset => Reset,
 			GTREFCLK_IN_P => GTREFCLK_IN_P,
@@ -91,7 +92,8 @@ begin
 			Channel => Channel,
 			loopback_in => "000",
 			HealthLane => HealthLane,
-			HealthInterface => HealthInterface
+			HealthInterface => HealthInterface,
+			axis_tready_transmitter => axis_tready_transmitter
 		);
 	g_noloopback: if LOOPBACK = false generate
 		il0: entity work.interlaken150G_wrapper
@@ -193,12 +195,13 @@ begin
 		else
 			wait until (stat_rx_aligned = '1'); -- @suppress "Dead code"
 		end if;
-		wait for 1*DCLK_PERIOD;
+		wait for 20*DCLK_PERIOD;
 
 		for i in 0 to Lanes-1 loop
 			s_axis(i).tvalid <= '1';
 			s_axis(i).tkeep <= (others => '0');
 			s_axis(i).tuser <= (others => '0');
+			s_axis(i).tid <= (others => '0');
 		end loop;
         
         
@@ -212,6 +215,7 @@ begin
 
 				if (s_axis_tready(n) = '1') then
 					s_axis(n).tdata <= x"0000000000000000" + count;
+					s_axis(n).tid <= std_logic_vector(to_unsigned(packet, 8));
 					
 					if count = 11 then
 						s_axis(n).tlast <='1';
