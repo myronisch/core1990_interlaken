@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 use work.interlaken_package.all;
 
 entity Scrambler is
@@ -111,5 +112,14 @@ begin
             end if;
         end if;
     end process;
+    
+--    report_proc: process(clk)
+--    begin
+--        if rising_edge(clk) then
+--            if Scrambler_En = '1' and Gearboxready = '1' then
+--                report integer'image(to_integer(unsigned(LaneNumber))) & " TX: " & to_hstring(Data_In(65 downto 0));
+--            end if;
+--        end if;
+--    end process;
 
 end architecture Scrambling;

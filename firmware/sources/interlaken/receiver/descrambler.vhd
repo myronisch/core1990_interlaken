@@ -137,6 +137,15 @@ begin
             Data_Valid_P1<= Data_Valid;
         end if;
     end process data;
+    
+  --  report_proc: process(clk)
+  --  begin
+  --      if rising_edge(clk) then
+  --          if Data_Valid_P1 = '1' then
+  --              report integer'image(to_integer(unsigned(Lane_Number))) & " RX: " & to_hstring(Data_HDR_P1(1 downto 0)&Data_P1);
+  --          end if;
+  --      end if;
+  --  end process;
 
     --	state_register : process (clk) is
     --    begin

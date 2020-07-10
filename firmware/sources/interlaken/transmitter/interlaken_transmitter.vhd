@@ -21,8 +21,10 @@ entity Interlaken_Transmitter is
         HealthLane : in std_logic;
         HealthInterface : in std_logic;
 		s_axis      : in axis_64_type;
+        Channel : in std_logic_vector(7 downto 0);
         s_axis_tready : out std_logic;
         insert_burst_idle : in std_logic;
+        insert_burst_idle_df : in std_logic;
         insert_burst_sop  : in std_logic;
         insert_burst_eop  : in std_logic
         );
@@ -48,9 +50,8 @@ begin
     
 	Framing_Burst : entity work.Burst_Framer  -- Define the connections of the Burst component
         generic map (
-            BurstMax => BurstMax,
-            BurstShort => BurstShort,
-            Lanes => Lanes
+            Lanes => Lanes,
+            Lane => LaneNumber
         )
         port map (
             clk => clk,
@@ -59,9 +60,11 @@ begin
             FlowControl => FlowControl,
             meta_tready => meta_tready,
             Gearboxready => Gearbox_Pause,
+            Channel => Channel,
             s_axis => s_axis,
             s_axis_tready => s_axis_tready,
             insert_burst_idle => insert_burst_idle,
+            insert_burst_idle_df => insert_burst_idle_df,
             insert_burst_sop => insert_burst_sop,
             insert_burst_eop => insert_burst_eop
         );

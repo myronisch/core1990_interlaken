@@ -3,7 +3,7 @@
 # 
 #
 quit -sim
-project close
+#project close
 source ../helper/clear_filesets.tcl
 
 set PROJECT_NAME WUPPER_INTERLAKEN_QUESTA
@@ -20,7 +20,7 @@ source ../filesets/interlaken_fileset.tcl
 source ./external_editor.tcl
 source ../helper/questa_import_generic.tcl
 
-vsim -voptargs="+acc" work.interlaken_interface_tb work.glbl -t 100fs
+vsim -voptargs="+acc" work.interlaken_interface_tb work.glbl -t 10fs -L unisim
 project compileoutofdate
 
 

@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use work.interlaken_package.all;
 use work.axi_stream_package.ALL;
+use ieee.numeric_std.all;
 
 entity Interlaken_Receiver is
     generic (
@@ -18,7 +19,6 @@ entity Interlaken_Receiver is
 		Flowcontrol     : out std_logic_vector(15 downto 0);
         Descrambler_lock : out std_logic;
         Decoder_Lock : out std_logic;
-        Channel : out  std_logic_vector(7 downto 0);
         Bitslip         : out std_logic;
         HealthLane : out std_logic;
         HealthInterface: out std_logic
@@ -47,7 +47,6 @@ begin
             Reset => reset,
             Data_In => Data_Meta_Out,
             Data_Valid_In => Data_valid_Meta_out,
-            Channel => Channel,
             CRC32_Error_meta => CRC32_Error_meta,
             CRC24_Error => open,
             Flowcontrol => Flowcontrol,
@@ -78,7 +77,7 @@ begin
             Reset => reset,
             Data_In => Data_Decoder_Out,
             Data_Out => Data_Descrambler_Out,
-            Lane_Number => "0001",
+            Lane_Number => std_logic_vector(to_unsigned(LaneNumber,4)),
             Data_Valid_In => Data_valid_decoder_out,
             Data_Valid_Out => Data_valid_Descrambler_out,
             Lock => Descrambler_lock,

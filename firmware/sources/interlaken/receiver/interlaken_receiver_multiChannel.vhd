@@ -31,8 +31,7 @@ entity Interlaken_Receiver_multiChannel is
         Descrambler_lock : out std_logic_vector(Lanes-1 downto 0);
         Decoder_Lock : out std_logic_vector(Lanes-1 downto 0);
         HealthLane : out std_logic_vector(Lanes-1 downto 0);
-        HealthInterface: out std_logic;
-        Channel : out std_logic_vector(7 downto 0)
+        HealthInterface: out std_logic
     );
 end entity Interlaken_Receiver_multiChannel;
 
@@ -76,7 +75,6 @@ begin
                 Flowcontrol => FlowControl(i),
                 Descrambler_lock => Descrambler_lock(i),
                 Decoder_Lock => Decoder_Lock(i),
-                Channel => Channel,
                 Bitslip => Bitslip(i),
                 HealthLane => HealthLane(i),
                 HealthInterface => HealthInterface_s(i)

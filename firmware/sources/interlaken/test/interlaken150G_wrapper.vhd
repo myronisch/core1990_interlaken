@@ -378,6 +378,7 @@ signal ctl_tx_diagword_intfstat : STD_LOGIC;
 signal ctl_tx_mubits : STD_LOGIC_VECTOR(7 DOWNTO 0);
 signal ctl_rx_force_resync : STD_LOGIC;
 signal rx_reset : std_logic;
+signal stat_rx_aligned_s : std_logic;
 begin
 	
 	rx_reset_proc: process(clk150)
@@ -552,7 +553,7 @@ begin
         stat_rx_descram_err => open,
         stat_rx_mf_len_err => open,
         stat_rx_mf_repeat_err => open,
-        stat_rx_aligned => stat_rx_aligned,
+        stat_rx_aligned => stat_rx_aligned_s,
         stat_rx_misaligned => open,
         stat_rx_aligned_err => open,
         stat_rx_crc24_err => open,
@@ -563,6 +564,8 @@ begin
         stat_rx_burst_err => open,
         gtpowergood_out => open
       );
+      
+      stat_rx_aligned <= stat_rx_aligned_s;
 
 --lbus_clk: process
 --begin
@@ -613,7 +616,7 @@ begin
     err3 <= '0';
     mty3 <= (others => '0');
     bctlin3 <= '0';
-    wait for 50 us;
+    wait until stat_rx_aligned_s = '1';
     wait until rising_edge(clk300);
     --wait until tx_rdyout = '1';
     loop
