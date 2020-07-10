@@ -44,26 +44,6 @@ architecture Deframing of Meta_Deframer is
     signal CRC32_Check1, CRC32_Check2, CRC32_Check3 : std_logic := '0'; -- Pipeline for CRC check 
     --signal CRC32_Good : std_logic;                      -- CRC value is checked and valid-- Constants
 
-
-
-    
---    component CRC_32 -- Add the CRC-32 component
-    --        generic
-    --        (
-    --            Nbits     : positive := 64;
-    --            CRC_Width : positive := 24; 
-    --            G_Poly    : Std_Logic_Vector := X"1EDC_6F41"; 
-    --            G_InitVal : std_logic_vector :=X"FFFF_FFFF"
-    --        );
-    --        port
-    --        (
-    --            CRC   : out std_logic_vector(CRC_Width-1 downto 0);
-    --            Calc  : in  std_logic;
-    --            Clk   : in  std_logic;
-    --            DIn   : in  std_logic_vector(Nbits-1 downto 0);
-    --            Reset : in  std_logic
-    --        );
-    --    end component CRC_32;
 begin
 
     CRC_32_Encoding : entity work.CRC_32 -- Define the connections of the CRC-24 component to the Burst component and generics
@@ -103,30 +83,6 @@ begin
             end if;
         end if;
     end process Meta_Deframing;
-
-    --    Burst_Deframing : process (clk, reset) is
-    --    begin
-    --        if reset = '1' then
-    --            Data_Test <= (others => '0');
-    --            Data_Control_Out <= '0';
-    --            Data_Valid_Out <= '0';
-    --        elsif rising_edge(clk) then
-    --            Data_Valid_Out <= '1';
-    --            if (Data_Control_In = '1' and Data_In(63) = '0')then
-    --                Data_Out <= (others => '0');
-    --                Data_Control_Out <= '1';
-    --                Data_Valid_Out <= '0';
-    --            elsif (Data_Control_In = '1' and Data_In(63) = '1') then
-    --                Data_Out <= Data_In;
-    --                Data_Control_Out <= '1';
-    --            else
-    --                Data_Out <= Data_In;
-    --                Data_Control_Out <= '0';
-    --            end if;
-    --        end if;
-    --    end process Burst_Deframing;
-    
-
 
     crc_check : process (Clk, Reset)
     begin
@@ -176,7 +132,7 @@ begin
                     CRC32_In(57 downto 0)  <= (others => '0'); -- CRC was generated with field padded with zeros   
 
                 --if(Packet_Counter = 23) then
-                elsif(Data_In(65 downto 58) = "10"&"0"&META_TYPE_DIAGNOSTIC ) then
+                elsif(Data_In(65 downto 58) = "10"&"0"&META_TYPE_DIAGNOSTIC or Data_In(65 downto 58) = "10"&"0"&"00110") then
                     -- if(Data_In(65 downto 34) = "10"&DIAGNOSTIC ) then
                     CRC32_Value <= Data_In(31 downto 0);
                     CRC32_In(63 downto 58) <= Data_In(63 downto 58);

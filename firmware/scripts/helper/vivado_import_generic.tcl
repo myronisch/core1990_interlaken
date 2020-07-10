@@ -17,7 +17,7 @@ if {$BOARD_TYPE == 711 || $BOARD_TYPE == 712} {
 	set VHDL_FILES [concat $VHDL_FILES $VHDL_FILES_V7]
 	set SIM_FILES [concat $SIM_FILES $SIM_FILES_V7]
 } elseif {$BOARD_TYPE == 128} {
-	set PART xcvu37p-fsvh2892-2-e-es1
+	set PART xcvu37p-fsvh2892-2-e
 	set core_dir $firmware_dir/sources/ip_cores/VU37P/
 	set XCI_FILES [concat $XCI_FILES $XCI_FILES_VU37P]
 	set VHDL_FILES [concat $VHDL_FILES $VHDL_FILES_VU37P]
