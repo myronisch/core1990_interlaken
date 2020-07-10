@@ -13,12 +13,12 @@ set TOPLEVEL wupper_interlaken_top
 #source ../filesets/crToHost_fileset.tcl
 #source ../filesets/decoding_fileset.tcl
 #source ../filesets/wupper_oc_fileset.tcl
-source ../filesets/wupper_fileset.tcl
-source ../filesets/housekeeping_fileset.tcl
+#source ../filesets/wupper_fileset.tcl
+#source ../filesets/housekeeping_fileset.tcl
 source ../filesets/interlaken_fileset.tcl
-source ../filesets/interlaken_oc_fileset.tcl
-source ../filesets/application_fileset.tcl
-source ../filesets/wb_fileset.tcl
+#source ../filesets/interlaken_oc_fileset.tcl
+#source ../filesets/application_fileset.tcl
+#source ../filesets/wb_fileset.tcl
 #Actually execute all the filesets
 source ../helper/vivado_import_generic.tcl
 

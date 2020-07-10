@@ -134,8 +134,8 @@ begin
                 else
                     next_state <= LOCKED;
                 end if;
-                --    when others =>
-                --        next_state <= IDLE;
+                    when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+                        next_state <= IDLE;
         end case;
     end process state_decoder;
 
@@ -185,6 +185,9 @@ begin
                             end if;
                         else
                             Bitslip <= '0';
+                        end if;
+                        if (Sync_Counter = 64) then
+                            Sync_Counter <= 0;
                         end if;
                     end if;
                 when LOCKED =>

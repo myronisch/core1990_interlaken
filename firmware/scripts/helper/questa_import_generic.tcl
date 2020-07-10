@@ -41,6 +41,11 @@ foreach VHDL_FILE $VHDL_FILES {
     project addfile ${firmware_dir}/sources/${VHDL_FILE} vhdl
 }
 
+foreach VERILOG_FILE $VERILOG_FILES {
+    project addfile ${firmware_dir}/sources/${VERILOG_FILE} verilog
+}
+
+
 foreach EXCLUDE_SIM_FILE $EXCLUDE_SIM_FILES {
 	project removefile ${firmware_dir}/sources/${EXCLUDE_SIM_FILE}
 }

@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use work.interlaken_package.all;
 use work.axi_stream_package.ALL;
+use ieee.numeric_std.all;
 
 entity Interlaken_Receiver is
     generic (
@@ -18,7 +19,6 @@ entity Interlaken_Receiver is
 		Flowcontrol     : out std_logic_vector(15 downto 0);
         Descrambler_lock : out std_logic;
         Decoder_Lock : out std_logic;
-        Channel : out  std_logic_vector(7 downto 0);
         Bitslip         : out std_logic;
         HealthLane : out std_logic;
         HealthInterface: out std_logic
@@ -47,7 +47,6 @@ begin
             Reset => reset,
             Data_In => Data_Meta_Out,
             Data_Valid_In => Data_valid_Meta_out,
-            Channel => Channel,
             CRC32_Error_meta => CRC32_Error_meta,
             CRC24_Error => open,
             Flowcontrol => Flowcontrol,
@@ -55,27 +54,6 @@ begin
             m_axis_tready => m_axis_tready
         
     );
-
-    --    RX_FIFO_Write <= Data_valid_Burst_Out;
-    --    RX_FIFO_Data <=  CRC32_Error_fifo & CRC24_Error_fifo & Data_Burst_Out;
-    --    
-    --    process(clk)
-    --    begin
-    --        if rising_edge(clk) then
-    --            if CRC24_Error_burst = '1' then
-    --                CRC24_Error_fifo <= '1';
-    --            elsif RX_FIFO_Write = '1' then
-    --                CRC24_Error_fifo <= '0';
-    --            end if;
-    --            
-    --            if CRC32_Error_meta = '1' then
-    --                CRC32_Error_fifo <= '1';
-    --            elsif RX_FIFO_Write = '1' then
-    --                CRC32_Error_fifo <= '0';
-    --            end if;
-    --            
-    --        end if;
-    --    end process;
 
     Deframing_Meta : entity work.Meta_Deframer
         port map (
@@ -90,8 +68,6 @@ begin
             HealthInterface => HealthInterface
         );
 
-    --Data_Descrambler <= Data_Descrambler_Out;
-
     Descrambler : entity work.Descrambler
         generic map (
             PacketLength => PacketLength
@@ -101,7 +77,7 @@ begin
             Reset => reset,
             Data_In => Data_Decoder_Out,
             Data_Out => Data_Descrambler_Out,
-            Lane_Number => "0001",
+            Lane_Number => std_logic_vector(to_unsigned(LaneNumber,4)),
             Data_Valid_In => Data_valid_decoder_out,
             Data_Valid_Out => Data_valid_Descrambler_out,
             Lock => Descrambler_lock,
@@ -109,9 +85,6 @@ begin
             Error_StateMismatch => Error_StateMismatch,
             Error_NoSync => Error_NoSync
         );
-
-    
-    
         
     Decoder : entity work.Decoder
         port map (
@@ -126,7 +99,5 @@ begin
             Sync_Error => Error_Decoder_Sync,
             Bitslip => Bitslip
         );
-
-    
 
 end architecture Receiver;

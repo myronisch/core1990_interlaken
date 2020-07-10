@@ -2,7 +2,7 @@
 set scriptdir [pwd]
 #Download SigasiProjectCreator from https://github.com/sigasi/SigasiProjectCreator 
 #Extract it in the directory below (/opt by default).
-set SigasiProjectCreator /opt/SigasiProjectCreator
+set SigasiProjectCreator /eda/fpga/SigasiProjectCreator/
 set firmware_dir $scriptdir/../../
 # Vivado project directory:
 set project_dir $firmware_dir/Projects/$PROJECT_NAME

@@ -10,8 +10,6 @@ entity Encoder is
         Data_Out     : out std_logic_vector(66 downto 0);-- Encoded 67-bit output
 
         --Data_Control : in std_logic;                     -- Determines whether the word is data or control
-        Data_valid_in: in std_logic;
-        Data_valid_out: out std_logic;
 
         Encoder_En   : in std_logic;                     -- Enables the encoder
         Encoder_Rst  : in std_logic;                     -- Resets the encoder
@@ -78,8 +76,7 @@ begin
                     end if;
                 end loop;
 
-                Data_Out <= Data_Temp;
-                Data_valid_out <= Data_valid_in;	 
+                Data_Out <= Data_Temp; 
             end if;
         end if;
     end process output;

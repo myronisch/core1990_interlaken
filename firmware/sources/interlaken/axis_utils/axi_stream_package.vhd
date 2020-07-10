@@ -77,7 +77,8 @@ package axi_stream_package is
         tvalid       : std_logic;                      --! Indicates valid data when tready is '1', when tready is '0' tvalid has to stay high in order to not break the packet.
         tlast        : std_logic;                      --! Indicates the last cycle of a chunk / packet.
         tkeep        : std_logic_vector(7 downto 0);   --! Serves as byte enable
-        tuser        : std_logic_vector(3 downto 0);   --! Meaning of tuser bits: 
+        tuser        : std_logic_vector(3 downto 0);   --! Meaning of tuser bits:
+        tid          : std_logic_vector(7 downto 0);   --! Converts to channel 
         --!   3: link truncation or FIFO full 
         --!   2: link BUSY 
         --!   1: Chunk error 
