@@ -137,6 +137,15 @@ begin
             Data_Valid_P1<= Data_Valid;
         end if;
     end process data;
+    
+  --  report_proc: process(clk)
+  --  begin
+  --      if rising_edge(clk) then
+  --          if Data_Valid_P1 = '1' then
+  --              report integer'image(to_integer(unsigned(Lane_Number))) & " RX: " & to_hstring(Data_HDR_P1(1 downto 0)&Data_P1);
+  --          end if;
+  --      end if;
+  --  end process;
 
     --	state_register : process (clk) is
     --    begin
@@ -205,7 +214,6 @@ begin
 
                 when SYNC =>
                     if (Data_Valid_In = '1') then
-
                         MetaCounter <= MetaCounter + 1;
                         if(MetaCounter = 0) then
                             --if Data_In(63 downto 0) = SYNCHRONIZATION then
@@ -219,21 +227,20 @@ begin
                                     Data_HDR_P1 <= Data_In(66)&"10";
                                     Poly <= Data_In(57 downto 0);  -- Scrambler state in poly
                                     pres_state <= LOCKED;
-                                end if;
+                                 end if;
                             else
+                                Sync_Words <= 0;
                                 Error_NoSync <= '1';
                                 pres_state <= IDLE;
                             end if;
-                        end if;
-
-                        if(MetaCounter = (PacketLength-1)) then
-                            MetaCounter <= 0;
                         end if;
                     end if;
                     if Sync_Words = 0 then
                         pres_state <= IDLE;
                     end if;
-
+                    if(MetaCounter = PacketLength-1) then
+                            MetaCounter <= 0;
+                    end if;
                 when LOCKED =>
                     Lock <= '1';
                     Data_Valid <= '0';
@@ -244,14 +251,19 @@ begin
 
                     if (Data_Valid_In = '1') then
                         Data_Valid <= '1';
-                        MetaCounter <= MetaCounter + 1;
+                        if MetaCounter /= PacketLength then
+                            MetaCounter <= MetaCounter + 1;
+                        else
+                            MetaCounter <= 0;
+                            pres_state <= IDLE; --Error occurred
+                        end if;
                         Data_HDR <= Data_In(66 downto 64);
                         --Data_In_P1 <= Data_In; ---
-                        if (Data_In(65 downto 64) = "10" and Data_In(63) = '0' and 
-                        MetaCounter = 0 and
-                        ((Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_P ) or 
-                        (Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_N ))
-                        ) then
+                        if (    Data_In(65 downto 64) = "10" and Data_In(63) = '0' and 
+                                MetaCounter = 0 and
+                                ((Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_P ) or 
+                                (Data_In(62 downto 58) = META_TYPE_SCRAM_STATE_N ))
+                            ) then
                             scram_state_word_detected <= '1';
                             Poly <= Data_In(57 downto 0);
                             Data_Descrambled <= Data_In(63 downto 0);
@@ -287,9 +299,6 @@ begin
                             Poly <= Shiftreg(57 downto 0);
                             Data_Descrambled <= Data_In(63 downto 0) xor (Poly(57 downto 0) & Shiftreg(63 downto 58));
                         end if;
-                    
-
-
                 end if;
                 when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
                     pres_state <= IDLE;
